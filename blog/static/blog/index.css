@@ -80,9 +80,14 @@
 }
 
 #about p {
-  font-size: clamp(1.05rem, 2.5vw, 1.5rem);
+  /* Slightly smaller than the old 1.5rem cap so more words fit per line, and
+     a wider column so the text fills the panel instead of sitting in a narrow
+     ribbon. Together these land around 70 characters a line on a desktop —
+     comfortable to read, and no longer dwarfed by the empty space either side. */
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+  line-height: 1.6;
   color: #353535;
-  max-width: 44rem;
+  max-width: 58rem;
   margin-inline: auto;
 }
 

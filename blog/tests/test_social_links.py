@@ -97,11 +97,13 @@ class SocialLinkRenderingTests(TestCase):
         self.assertContains(response, 'target="_blank"')
 
     @override_settings(SOCIAL_LINKS=LINKS)
-    def test_homepage_bio_also_lists_them(self):
-        response = self.client.get(reverse("starting-page"))
-        # Footer plus the bio panel.
-        self.assertEqual(response.content.decode().count("social-links"), 3)
-        self.assertContains(response, "social-links--on-colour")
+    def test_they_appear_once_per_page_in_the_footer_only(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+
+        self.assertEqual(body.count('class="social-links'), 1)
+        # Not repeated inside the homepage bio panel.
+        bio = body[body.index('id="about"') : body.index("site-footer")]
+        self.assertNotIn("social-link", bio)
 
     @override_settings(SOCIAL_LINKS=[])
     def test_nothing_renders_when_none_are_configured(self):

@@ -850,24 +850,6 @@ body.lightbox-open {
   outline: none;
 }
 
-/* On the orange bio panel, where white pills would glare. */
-.social-links--on-colour {
-  margin: 2rem 0 0 0;
-}
-
-.social-links--on-colour .social-link {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 0, 0, 0.15);
-  color: #2e2e2e;
-}
-
-.social-links--on-colour .social-link:hover,
-.social-links--on-colour .social-link:focus-visible {
-  background-color: #2e2e2e;
-  border-color: #2e2e2e;
-  color: white;
-}
-
 @media (max-width: 48rem) {
   .social-link {
     /* Comfortable tap target alongside the other mobile controls. */
