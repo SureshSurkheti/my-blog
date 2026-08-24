@@ -1,0 +1,8 @@
+{% if tags %}
+<div class="tags">
+  {% for item in tags %}
+  <a class="tag {% if tag and tag.pk == item.pk %}tag--active{% endif %}"
+     href="{{ item.get_absolute_url }}">{{ item.caption }}</a>
+  {% endfor %}
+</div>
+{% endif %}

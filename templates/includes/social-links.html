@@ -1,0 +1,15 @@
+{% comment %}
+Social profile links. Renders nothing until at least one SOCIAL_* handle is set
+in .env. `rel="me"` lets those profiles verify this site as yours.
+{% endcomment %}
+{% if social_links %}
+<ul class="social-links {{ social_variant|default:'' }}">
+  {% for link in social_links %}
+  <li>
+    <a class="social-link" href="{{ link.url }}" target="_blank" rel="me noopener">
+      {{ link.label }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

@@ -1,23 +1,74 @@
-{% load static %}
-
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static "app.css" %}"/>
-    {% block css_files%}{% endblock %}
+    <title>{% block title %}{{ blog.title }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ blog.description }}{% endblock %}" />
+    <link rel="alternate" type="application/rss+xml" title="{{ blog.title }} RSS" href="{% url 'post-feed-rss' %}" />
+    <link rel="alternate" type="application/atom+xml" title="{{ blog.title }} Atom" href="{% url 'post-feed-atom' %}" />
+    <link rel="stylesheet" href="{% static 'app.css' %}" />
+    {% block css_files %}{% endblock %}
   </head>
   <body>
-    {% block content %}
+    {% with route=request.resolver_match.url_name %}
     <header id="main-navigation">
-<h1><a href="{% url 'starting-page' %}">Suresh' Blog</a><h1>
-    <nav>
-        <a href="{% url 'read-later' %}">Stored Posts</a>
-        <a href="{% url 'posts-page' %}">All Posts</a>
-    </nav>
-</header>
-    {% endblock %}
+      <a class="site-title" href="{% url 'starting-page' %}">{{ blog.title }}</a>
+
+      <nav aria-label="Main">
+        <a href="{% url 'posts-page' %}"
+           {% if route == 'posts-page' or route == 'post-detail-page' or route == 'tag-posts-page' or route == 'author-posts-page' or route == 'search-page' %}class="is-active" aria-current="page"{% endif %}>
+          <span class="nav-label--full">All Posts</span>
+          <span class="nav-label--short">Posts</span>
+        </a>
+        <a href="{% url 'read-later' %}"
+           {% if route == 'read-later' %}class="is-active" aria-current="page"{% endif %}>
+          Saved
+        </a>
+
+        <button class="nav-search__toggle" type="button" hidden
+                data-nav-search-toggle aria-expanded="false"
+                aria-controls="nav-search-form" aria-label="Search posts">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor"
+                    stroke-width="2" />
+            <line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <form class="nav-search" id="nav-search-form" data-nav-search
+              action="{% url 'search-page' %}" method="GET" role="search">
+          <label class="visually-hidden" for="nav-search-input">Search posts</label>
+          <input id="nav-search-input" type="search" name="q" placeholder="Search…"
+                 value="{{ query|default:'' }}" />
+          <button type="submit">Go</button>
+        </form>
+      </nav>
+    </header>
+    {% endwith %}
+
+    {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}
+      <li class="message message--{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+      {% include "includes/social-links.html" %}
+      <p>&copy; {% now "Y" %} {{ blog.title }}</p>
+      <p>
+        <a href="{% url 'post-feed-rss' %}">RSS</a>
+        ·
+        <a href="{% url 'post-feed-atom' %}">Atom</a>
+      </p>
+    </footer>
+
+    <script src="{% static 'nav.js' %}" defer></script>
+    {% block scripts %}{% endblock %}
   </body>
 </html>

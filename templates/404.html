@@ -1,10 +1,11 @@
-{{ extends "base.html" }}
+{% extends "base.html" %}
 
-{% block title %}
-We didn't find that page!
-{% endblock %}
+{% block title %}Page not found · {{ blog.title }}{% endblock %}
 
 {% block content %}
-<h2>We're sorry!</h2>
-<p>But we couldn't find that page!</p>
+<main class="simple-page">
+  <h2>We're sorry!</h2>
+  <p>We couldn't find that page. It may have moved, or never existed.</p>
+  <p><a href="{% url 'posts-page' %}">Browse all posts</a></p>
+</main>
 {% endblock %}

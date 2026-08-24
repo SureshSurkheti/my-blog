@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Posts by {{ author.full_name }} · {{ blog.title }}{% endblock %}
+{% block description %}All posts written by {{ author.full_name }}.{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'blog/post.css' %}" />
+<link rel="stylesheet" href="{% static 'blog/all-posts.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section id="all-posts">
+  <h2>Posts by {{ author.full_name }}</h2>
+  {% if author.bio %}<p class="author-bio">{{ author.bio }}</p>{% endif %}
+
+  {% if posts %}
+  <ul>
+    {% for post in posts %}
+    {% include "blog/includes/post.html" %}
+    {% endfor %}
+  </ul>
+  {% include "blog/includes/pagination.html" %}
+  {% else %}
+  <p class="empty-state">This author hasn't published anything yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search{% endif %} · {{ blog.title }}{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'blog/post.css' %}" />
+<link rel="stylesheet" href="{% static 'blog/all-posts.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section id="all-posts">
+  <h2>Search</h2>
+
+  <form class="search-form" action="{% url 'search-page' %}" method="GET" role="search">
+    <label class="visually-hidden" for="search-input">Search posts</label>
+    <input id="search-input" type="search" name="q" value="{{ query }}" placeholder="Search posts…" autofocus />
+    <button type="submit">Search</button>
+  </form>
+
+  {% if query %}
+  <p class="search-summary">
+    {{ paginator.count }} result{{ paginator.count|pluralize }} for “{{ query }}”
+  </p>
+    {% if posts %}
+    <ul>
+      {% for post in posts %}
+      {% include "blog/includes/post.html" %}
+      {% endfor %}
+    </ul>
+    {% include "blog/includes/pagination.html" %}
+    {% else %}
+    <p class="empty-state">Nothing matched “{{ query }}”. Try another word.</p>
+    {% endif %}
+  {% else %}
+  <p class="empty-state">Type something above to search the archive.</p>
+  {% endif %}
+</section>
+{% endblock %}

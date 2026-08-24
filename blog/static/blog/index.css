@@ -1,7 +1,8 @@
 
 #welcome {
   background: linear-gradient(to right top, #6305dd, #390281);
-  padding: 6rem 12%;
+  /* The header sits above this now rather than floating over it. */
+  padding: 3rem 12% 6rem 12%;
 }
 
 #welcome header {
@@ -23,7 +24,7 @@
 }
 
 #welcome h2 {
-  font-size: 3.5rem;
+  font-size: clamp(2rem, 7vw, 3.5rem);
   margin: 0 0 0 2rem;
   color: #e4e4e4;
   width: 10rem;
@@ -31,14 +32,15 @@
 
 #welcome p {
   color: white;
-  font-size: 1.5rem;
+  font-size: clamp(1.05rem, 2.5vw, 1.5rem);
 }
 
 #latest-posts {
   background-color: white;
   padding: 2rem;
   border-radius: 12px;
-  width: 60rem;
+  width: 90%;
+  max-width: 60rem;
   margin: -6rem auto 2rem auto;
   box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.4);
 }
@@ -51,12 +53,19 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
 }
 
 #latest-posts li {
-  flex: 1;
+  display: flex;
+}
+
+#latest-posts .post a {
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  background-color: white;
 }
 
 #about {
@@ -67,10 +76,58 @@
 }
 
 #about h2 {
-  font-size: 3rem;
+  font-size: clamp(1.85rem, 6vw, 3rem);
 }
 
 #about p {
-  font-size: 1.5rem;
+  font-size: clamp(1.05rem, 2.5vw, 1.5rem);
   color: #353535;
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 48rem) {
+  #welcome {
+    padding: 2.5rem 1.25rem 3.5rem 1.25rem;
+  }
+
+  /* Portrait and title stack and centre instead of sitting side by side in a
+     10rem-wide column. */
+  #welcome header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto 1.5rem auto;
+  }
+
+  #welcome img {
+    width: 8rem;
+    height: 8rem;
+    transform: none;
+  }
+
+  #welcome h2 {
+    width: auto;
+    margin: 1rem 0 0 0;
+  }
+
+  #welcome p {
+    text-align: center;
+  }
+
+  #latest-posts {
+    width: calc(100% - 2.5rem);
+    padding: 1.25rem;
+    margin: -2.5rem auto 0 auto;
+  }
+
+  #latest-posts h2 {
+    font-size: 1.4rem;
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  #about {
+    padding: 2.25rem 1.25rem;
+    margin-top: 2.5rem;
+  }
 }
