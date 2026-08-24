@@ -2,27 +2,31 @@ body {
   background-color: #e7e7e7;
 }
 
-#main-navigation {
-  background-color: #390281;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-
 #summary {
-  margin: 8rem auto 3rem auto;
+  /* No top margin: the .back-link above already clears the header. */
+  margin: 0 auto 3rem auto;
   padding: 2rem;
+  /* Room for the absolutely positioned author card on the right. */
+  padding-right: 20rem;
   width: 90%;
   max-width: 90rem;
   border-radius: 16px;
   background-color: #5706c0;
   position: relative;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  height: 22rem;
+  /* Grows with the title and excerpt instead of clipping them; the button is
+     pinned to the bottom so it sits in the same place on every post. */
+  min-height: 22rem;
+  display: flex;
+  flex-direction: column;
 }
 
 #summary h2 {
   color: white;
-  font-size: 4.5rem;
-  margin-bottom: 0.25rem;
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  line-height: 1.05;
+  margin: 0 0 0.5rem 0;
+  overflow-wrap: break-word;
 }
 
 #summary article {
@@ -38,6 +42,8 @@ body {
 #summary article img {
   width: 12rem;
   height: 12rem;
+  object-fit: cover;
+  background-color: #ede1fb;
   border-radius: 12px;
   transform: rotateZ(5deg);
   border: 5px solid white;
@@ -169,7 +175,9 @@ main {
 
 
 #read_later {
-  margin: 2rem 0;
+  /* Pushes the button to the bottom of the hero on every post. */
+  margin-top: auto;
+  padding-top: 1.5rem;
 }
 
 #read_later button {
@@ -184,4 +192,79 @@ main {
 #read_later button:active {
   background-color: white;
   color: #390281;
+}
+@media (max-width: 60rem) {
+  #summary {
+    padding-right: 2rem;
+    min-height: 0;
+  }
+
+  #summary article {
+    position: static;
+    text-align: left;
+    padding: 1rem 0 0 0;
+  }
+
+  #summary article img {
+    transform: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  #summary {
+    /* No absolutely positioned header above it any more. */
+    margin: 0 auto 2rem auto;
+    padding: 1.5rem 1.25rem;
+    width: calc(100% - 2.5rem);
+    border-radius: 12px;
+  }
+
+  #summary article {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #summary article img {
+    width: 100%;
+    height: 12rem;
+    border-width: 3px;
+  }
+
+  #read_later {
+    padding-top: 1rem;
+  }
+
+  #read_later button {
+    /* Full-width, thumb-sized primary action. */
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+  }
+
+  main,
+  #comments,
+  #comment-form {
+    width: calc(100% - 2.5rem);
+    margin: 1.5rem auto;
+    padding: 1.25rem;
+  }
+
+  #comments h2,
+  #comment-form h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-control input,
+  .form-control textarea {
+    /* 16px stops iOS Safari zooming in when a field is focused. */
+    font-size: 1rem;
+    padding: 0.6rem;
+    min-height: 2.75rem;
+  }
+
+  #comment-form button {
+    width: 100%;
+    min-height: 2.75rem;
+  }
 }

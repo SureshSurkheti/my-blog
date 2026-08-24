@@ -19,45 +19,1009 @@ h3 {
   font-weight: bold;
 }
 
+/* --------------------------------------------------------------------------
+   Header. In the flow and sticky, not absolutely positioned: pages no longer
+   need hand-tuned top margins to clear it (that was the cause of a 104px gap
+   above the post hero), and it stays reachable while scrolling a long post.
+   One background here rather than one per page, so it looks the same
+   everywhere.
+   -------------------------------------------------------------------------- */
 #main-navigation {
-  width: 100%;
-  height: 5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10%;
-  position: absolute;
+  position: sticky;
   top: 0;
-  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 4rem;
+  padding: 0 clamp(1rem, 6vw, 10%);
+  background-color: #390281;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-#main-navigation a {
-  text-decoration: none;
-  color: white;
+/* Where supported, let the page tint through — it keeps the homepage gradient
+   readable behind the bar instead of cutting it off with a hard edge. */
+@supports (backdrop-filter: blur(8px)) {
+  #main-navigation {
+    background-color: rgba(41, 1, 92, 0.82);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.site-title {
+  font-family: "Lato", sans-serif;
+  /* Scales with the viewport so it stays the biggest thing in the bar without
+     crowding the links on a phone. */
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
   font-weight: bold;
-  margin-left: 1rem;
-}
-
-
-#main-navigation a:hover,
-#main-navigation a:active {
-  color: #cf79f1;
-}
-
-#main-navigation h1 a:hover,
-#main-navigation h1 a:active {
+  letter-spacing: -0.01em;
   color: white;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+/* A colour shift rather than an underline — an underline under a large title
+   looked heavy, and the title is obviously a link from its position. */
+.site-title:hover {
+  color: #e9c9fb;
+}
+
+/* Keyboard users still need a visible focus indicator. */
+.site-title:focus-visible {
+  outline: 3px solid #cf79f1;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+#main-navigation nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 #main-navigation nav a {
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-decoration: none;
-    text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 4rem;
+  padding: 0 0.65rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 #main-navigation nav a:hover,
-#main-navigation nav a:active {
-    color: #cf54a6;
+#main-navigation nav a:focus-visible {
+  color: #e9c9fb;
+  outline: none;
+}
+
+/* Underline marks the section you are in. */
+#main-navigation nav a.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: 0.85rem;
+  height: 3px;
+  border-radius: 2px;
+  background-color: #cf54a6;
+}
+
+.nav-label--short {
+  display: none;
+}
+
+/* Search: an icon that expands, once JavaScript has collapsed the form. */
+.nav-search__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: white;
+  cursor: pointer;
+}
+
+.nav-search__toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.nav-search__toggle:hover,
+.nav-search__toggle:focus-visible {
+  background-color: rgba(255, 255, 255, 0.32);
+  outline: none;
+}
+
+.nav-search {
+  display: flex;
+  gap: 0.35rem;
+}
+
+/* Only hidden once the script has run, so a scriptless visitor keeps a plain
+   working search box. */
+.js-nav .nav-search {
+  display: none;
+}
+
+.js-nav .nav-search--open {
+  display: flex;
+}
+
+.nav-search input {
+  font: inherit;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.94);
+  width: 10rem;
+}
+
+.nav-search input:focus-visible,
+.search-form input:focus-visible {
+  outline: 3px solid #cf79f1;
+  outline-offset: 1px;
+}
+
+.nav-search button {
+  font: inherit;
+  font-weight: bold;
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #cf54a6;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-search button:hover,
+.nav-search button:focus-visible {
+  background-color: #a83b83;
+  outline: none;
+}
+
+/* Flash messages */
+.messages {
+  list-style: none;
+  margin: 1.5rem auto 0 auto;
+  padding: 0;
+  width: 90%;
+  max-width: 60rem;
+  display: block;
+}
+
+.message {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  background-color: #ede1fb;
+  color: #390281;
+  border-left: 5px solid #5706c0;
+}
+
+.message--error {
+  background-color: #fbe1e1;
+  color: #7a0b0b;
+  border-left-color: #b81b1b;
+}
+
+/* Tag pills that link through to the tag archive */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1rem 0 2rem 0;
+}
+
+a.tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  background-color: #5706c0;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+a.tag:hover,
+a.tag:active {
+  background-color: #390281;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 3rem 0;
+  font-weight: bold;
+}
+
+.pagination a {
+  color: #5706c0;
+  text-decoration: none;
+}
+
+.pagination a:hover,
+.pagination a:active {
+  color: #cf54a6;
+}
+
+.pagination__disabled {
+  color: #9d9d9d;
+}
+
+.pagination__status {
+  color: #2e2e2e;
+  font-weight: normal;
+}
+
+/* Search page */
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-form input {
+  font: inherit;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #c3c3c3;
+  border-radius: 8px;
+  width: min(24rem, 70vw);
+}
+
+.search-form button {
+  font: inherit;
+  font-weight: bold;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #5706c0;
+  color: white;
+  cursor: pointer;
+}
+
+.search-form button:hover,
+.search-form button:active {
+  background-color: #390281;
+}
+
+.search-summary {
+  text-align: center;
+  color: #4a4a4a;
+}
+
+/* Rendered markdown body */
+.post-body {
+  line-height: 1.7;
+}
+
+.post-body h1,
+.post-body h2,
+.post-body h3 {
+  margin-top: 2rem;
+  color: #2e2e2e;
+}
+
+.post-body a {
+  color: #5706c0;
+}
+
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.post-body pre {
+  background-color: #2e2e2e;
+  color: #f4f4f4;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.post-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+}
+
+.post-body :not(pre) > code {
+  background-color: #ede1fb;
+  color: #390281;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.post-body blockquote {
+  margin: 1.5rem 0;
+  padding: 0.5rem 1.25rem;
+  border-left: 4px solid #5706c0;
+  color: #4a4a4a;
+  font-style: italic;
+}
+
+.post-body table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.post-body th,
+.post-body td {
+  border: 1px solid #d5d5d5;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+/* Small shared bits */
+.post__meta {
+  color: #6b6b6b;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.empty-state {
+  text-align: center;
+  color: #6b6b6b;
+  font-style: italic;
+  padding: 1.5rem 0;
+}
+
+.section-link {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.section-link a {
+  color: #5706c0;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.author-bio {
+  max-width: 40rem;
+  margin: 0 auto 2rem auto;
+  text-align: center;
+  color: #4a4a4a;
+}
+
+.comment-meta {
+  color: #6b6b6b;
+  font-size: 0.85rem;
+}
+
+.field-error {
+  color: #b81b1b;
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+}
+
+.form-errors {
+  color: #b81b1b;
+  font-weight: bold;
+}
+
+.draft-banner {
+  margin: 1.5rem auto 0 auto;
+  width: 90%;
+  max-width: 60rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #fff4d6;
+  color: #7a5600;
+  border-left: 5px solid #d1a000;
+  font-weight: bold;
+}
+
+.inline-form {
+  display: inline;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 0.75rem;
+  color: #b81b1b;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.simple-page {
+  margin: 4rem auto;
+  width: 90%;
+  max-width: 40rem;
+  text-align: center;
+}
+
+.simple-page a {
+  color: #5706c0;
+  font-weight: bold;
+}
+
+.site-footer {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  text-align: center;
+  color: #6b6b6b;
+  font-size: 0.9rem;
+  border-top: 1px solid #d5d5d5;
+}
+
+.site-footer a {
+  color: #5706c0;
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   Phones and small tablets. The desktop header is absolutely positioned over
+   each page's coloured hero; here it sits in the flow instead, which means it
+   needs a background of its own — without one the white text landed on the
+   white homepage and vanished.
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   Phones. The header stays a single row — three stacked rows took 161px, a
+   fifth of the screen, before any content.
+   -------------------------------------------------------------------------- */
+@media (max-width: 48rem) {
+  #main-navigation {
+    height: 3.5rem;
+    padding: 0 0.9rem;
+    gap: 0.5rem;
+  }
+
+  #main-navigation nav {
+    gap: 0.15rem;
+  }
+
+  #main-navigation nav a {
+    height: 3.5rem;
+    padding: 0 0.45rem;
+    font-size: 0.95rem;
+  }
+
+  #main-navigation nav a.is-active::after {
+    left: 0.45rem;
+    right: 0.45rem;
+    bottom: 0.6rem;
+  }
+
+  /* "All Posts" / "Stored Posts" are too wide for one row at 320px. */
+  .nav-label--full {
+    display: none;
+  }
+
+  .nav-label--short {
+    display: inline;
+  }
+
+  .nav-search__toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* Expanded, the field takes the width it needs on its own line below. */
+  .js-nav .nav-search--open {
+    position: absolute;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    padding: 0.6rem 0.9rem;
+    background-color: #390281;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .nav-search input {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    min-height: 2.75rem;
+  }
+
+  .nav-search button {
+    min-height: 2.75rem;
+  }
+
+  .messages,
+  .draft-banner {
+    margin-top: 1rem;
+    width: calc(100% - 2.5rem);
+  }
+
+  #gallery {
+    padding: 1rem;
+    margin: 1.5rem auto;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .gallery-item img {
+    height: 13rem;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin: 2rem 0;
+  }
+
+  .pagination a,
+  .pagination__disabled {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .search-form {
+    flex-wrap: wrap;
+  }
+
+  .search-form input,
+  .search-form button {
+    width: 100%;
+    min-height: 2.75rem;
+  }
+
+  .site-footer {
+    margin-top: 2.5rem;
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* Wide content inside a post body must scroll in its own box rather than
+   pushing the page sideways. */
+.post-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.post-body pre,
+.codehilite {
+  max-width: 100%;
+}
+
+/* Long URLs in body copy shouldn't widen the page either. */
+.post-body a {
+  overflow-wrap: break-word;
+}
+
+/* The post-detail hero shares the tag pill's purple, so give the pills and the
+   excerpt enough contrast to read against it. */
+#summary > p {
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 44rem;
+}
+
+#summary a.tag {
+  background-color: rgba(255, 255, 255, 0.22);
+  color: white;
+}
+
+#summary a.tag:hover,
+#summary a.tag:active {
+  background-color: rgba(255, 255, 255, 0.38);
+}
+
+#summary .tags {
+  justify-content: flex-start;
+}
+
+/* Current tag on a tag archive page */
+a.tag--active {
+  background-color: #cf54a6;
+}
+
+a.tag--active:hover,
+a.tag--active:active {
+  background-color: #a83b83;
+}
+
+/* Gallery on a post page */
+#gallery {
+  width: 90%;
+  max-width: 90rem;
+  margin: 3rem auto;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#gallery h2 {
+  margin-top: 0;
+  color: #2e2e2e;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.gallery-item {
+  margin: 0;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 11rem;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  background-color: #ede1fb;
+  transition: transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+.gallery-item img:hover {
+  transform: scale(1.02);
+}
+
+.gallery-item figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #5a5a5a;
+  line-height: 1.4;
+}
+
+/* Spam honeypot: off-screen rather than display:none, which some bots skip. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.field-help {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+
+/* Lightbox: full-screen photo viewer with previous/next on either side. */
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: rgba(20, 4, 40, 0.92);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(90rem, 100%);
+  max-height: 100%;
+}
+
+.lightbox__image {
+  max-width: 100%;
+  /* Leaves room for the caption under the photo. */
+  max-height: calc(100vh - 8rem);
+  object-fit: contain;
+  border-radius: 8px;
+  background-color: #1b0730;
+}
+
+.lightbox__caption {
+  color: #e9e2f5;
+  text-align: center;
+  font-size: 0.95rem;
+  max-width: 44rem;
+  line-height: 1.4;
+}
+
+.lightbox__nav,
+.lightbox__close {
+  flex: none;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+}
+
+.lightbox__nav {
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 2.25rem;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1.75rem;
+}
+
+.lightbox__nav:hover,
+.lightbox__close:hover,
+.lightbox__nav:focus-visible,
+.lightbox__close:focus-visible {
+  background-color: rgba(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.lightbox__nav[hidden] {
+  display: none;
+}
+
+@media (max-width: 48rem) {
+  .lightbox {
+    gap: 0.35rem;
+    padding: 0.75rem;
+  }
+
+  .lightbox__nav,
+  .lightbox__close {
+    /* Keep the controls thumb-sized even on the narrowest screens. */
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.75rem;
+  }
+
+  .lightbox__close {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .lightbox__image {
+    max-height: calc(100vh - 10rem);
+  }
+}
+
+.gallery-hint {
+  margin: 1rem 0 0 0;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+
+/* Social profile links (footer, and the homepage bio) */
+.social-links {
+  list-style: none;
+  margin: 0 0 1.25rem 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #c9b8e8;
+  background-color: white;
+  color: #5706c0;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.social-link:hover,
+.social-link:focus-visible {
+  background-color: #5706c0;
+  border-color: #5706c0;
+  color: white;
+  outline: none;
+}
+
+/* On the orange bio panel, where white pills would glare. */
+.social-links--on-colour {
+  margin: 2rem 0 0 0;
+}
+
+.social-links--on-colour .social-link {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #2e2e2e;
+}
+
+.social-links--on-colour .social-link:hover,
+.social-links--on-colour .social-link:focus-visible {
+  background-color: #2e2e2e;
+  border-color: #2e2e2e;
+  color: white;
+}
+
+@media (max-width: 48rem) {
+  .social-link {
+    /* Comfortable tap target alongside the other mobile controls. */
+    min-height: 2.75rem;
+    padding: 0.5rem 1.1rem;
+  }
+}
+
+/* Back to the list, above the post hero */
+/* The header is in the flow now, so this is plain spacing rather than
+   clearance for something floating above it. */
+.back-link {
+  width: 90%;
+  max-width: 90rem;
+  margin: 1.5rem auto 0.75rem auto;
+}
+
+.back-link a {
+  color: #5706c0;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+}
+
+.back-link a:hover,
+.back-link a:focus-visible {
+  color: #cf54a6;
+}
+
+/* "Keep reading" — the neighbouring posts at the end of an article. Styled as
+   a panel like #gallery and #comments so it belongs to the page rather than
+   floating between sections. A missing neighbour is omitted entirely; an empty
+   placeholder just looked broken. */
+#post-nav {
+  width: 90%;
+  max-width: 90rem;
+  margin: 3rem auto;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+#post-nav h2 {
+  margin: 0 0 1.25rem 0;
+  color: #2e2e2e;
+  font-size: 1.5rem;
+}
+
+.post-nav__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.post-nav__card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-width: 0;
+  border: 1px solid #e2dced;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #2e2e2e;
+  background-color: white;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.post-nav__card:hover,
+.post-nav__card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #c9b8e8;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.post-nav__card img {
+  flex: none;
+  width: 6.5rem;
+  height: 100%;
+  min-height: 6rem;
+  object-fit: cover;
+  background-color: #ede1fb;
+}
+
+/* Mirror the older card so the artwork sits on the side the arrow points to. */
+.post-nav__card--older {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.post-nav__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 0.9rem 1.1rem;
+}
+
+.post-nav__dir {
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #5706c0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.post-nav__title {
+  font-weight: bold;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+}
+
+.post-nav__date {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  font-style: italic;
+}
+
+#post-nav .section-link {
+  margin: 1.25rem 0 0 0;
+}
+
+@media (max-width: 48rem) {
+  .back-link {
+    width: calc(100% - 2.5rem);
+    margin: 1rem auto 0.5rem auto;
+  }
+
+  #post-nav {
+    width: calc(100% - 2.5rem);
+    margin: 2rem auto;
+    padding: 1.25rem;
+  }
+
+  .post-nav__grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* Both cards read left-to-right on a narrow screen; mirroring them there
+     just makes the titles harder to scan. */
+  .post-nav__card--older {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .post-nav__card img {
+    width: 5.5rem;
+    min-height: 5.5rem;
+  }
 }

@@ -1,0 +1,133 @@
+"""The site header: active-section marking and the collapsible search."""
+
+from django.test import TestCase
+from django.urls import reverse
+
+from .factories import make_author, make_post, make_tag
+
+
+class ActiveSectionTests(TestCase):
+    def setUp(self):
+        self.tag = make_tag("Japan")
+        self.author = make_author("Ada", "Lovelace")
+        self.post = make_post("A post", author=self.author, tags=[self.tag])
+
+    def test_all_posts_is_marked_across_the_archive(self):
+        for url in (
+            reverse("posts-page"),
+            self.post.get_absolute_url(),
+            self.tag.get_absolute_url(),
+            self.author.get_absolute_url(),
+            reverse("search-page"),
+        ):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, 'aria-current="page"')
+                self.assertContains(response, 'class="is-active"')
+
+    def test_read_later_marks_its_own_link(self):
+        response = self.client.get(reverse("read-later"))
+        body = response.content.decode()
+        # The marker sits on the Saved link, not the archive one.
+        stored_index = body.index(reverse("read-later"))
+        self.assertIn('aria-current="page"', body[stored_index : stored_index + 200])
+
+    def test_homepage_marks_nothing(self):
+        response = self.client.get(reverse("starting-page"))
+        self.assertNotContains(response, 'aria-current="page"')
+
+    def test_only_one_link_is_ever_marked(self):
+        response = self.client.get(reverse("posts-page"))
+        self.assertEqual(response.content.decode().count('aria-current="page"'), 1)
+
+
+class HeaderSearchTests(TestCase):
+    def test_search_form_is_present_and_usable_without_javascript(self):
+        response = self.client.get(reverse("starting-page"))
+
+        # The form ships visible; only the script collapses it.
+        self.assertContains(response, 'id="nav-search-form"')
+        self.assertContains(response, 'action="/search"')
+        self.assertContains(response, 'name="q"')
+
+    def test_toggle_button_starts_hidden_for_scriptless_visitors(self):
+        response = self.client.get(reverse("starting-page"))
+        self.assertContains(response, "data-nav-search-toggle")
+        self.assertContains(response, 'aria-expanded="false"')
+        self.assertContains(response, "hidden")
+
+    def test_toggle_is_labelled_and_wired_to_the_form(self):
+        response = self.client.get(reverse("starting-page"))
+        self.assertContains(response, 'aria-controls="nav-search-form"')
+        self.assertContains(response, 'aria-label="Search posts"')
+
+    def test_script_is_loaded_on_every_page(self):
+        post = make_post("Anywhere")
+        for url in (
+            reverse("starting-page"),
+            reverse("posts-page"),
+            post.get_absolute_url(),
+        ):
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), "nav.js")
+
+    def test_the_search_term_is_kept_in_the_field(self):
+        response = self.client.get(reverse("search-page"), {"q": "beppu"})
+        self.assertContains(response, 'value="beppu"')
+
+
+class HeaderMarkupTests(TestCase):
+    def test_title_links_home_and_both_label_lengths_are_present(self):
+        response = self.client.get(reverse("posts-page"))
+
+        self.assertContains(response, 'class="site-title"')
+        # Full labels for wide screens, short ones for phones.
+        self.assertContains(response, "All Posts")
+        self.assertContains(response, "Posts</span>")
+        self.assertContains(response, "Saved")
+
+    def test_nav_is_labelled_for_assistive_tech(self):
+        response = self.client.get(reverse("posts-page"))
+        self.assertContains(response, '<nav aria-label="Main">')
+
+
+class ConsistentNamingTests(TestCase):
+    """One name for the reading list, everywhere it is mentioned."""
+
+    def test_nav_calls_it_saved(self):
+        response = self.client.get(reverse("starting-page"))
+        self.assertContains(response, "Saved")
+        self.assertNotContains(response, "Stored Posts")
+
+    def test_the_list_page_calls_it_saved(self):
+        response = self.client.get(reverse("read-later"))
+        self.assertContains(response, "<h2>Saved</h2>", html=True)
+        self.assertNotContains(response, "Read Later")
+        # One label, not a longer variant on the page it belongs to.
+        self.assertNotContains(response, "Saved posts")
+
+    def test_the_post_button_uses_the_same_word(self):
+        post = make_post("Saveable")
+
+        unsaved = self.client.get(post.get_absolute_url())
+        self.assertContains(unsaved, "Save for later")
+        self.assertNotContains(unsaved, "Read Later")
+
+        self.client.post(reverse("read-later"), {"post_id": post.id})
+
+        saved = self.client.get(post.get_absolute_url())
+        self.assertContains(saved, "Remove from saved")
+
+    def test_the_confirmation_message_uses_the_same_word(self):
+        post = make_post("Saveable")
+        response = self.client.post(
+            reverse("read-later"), {"post_id": post.id}, follow=True
+        )
+        self.assertContains(response, "Saved for later")
+
+    def test_the_title_is_not_underlined_on_hover(self):
+        # The rule lives in the stylesheet, so assert on what ships.
+        with open("static/app.css") as handle:
+            css = handle.read()
+        title_block = css[css.index(".site-title {") : css.index(".site-title:focus")]
+        self.assertNotIn("text-decoration: underline", title_block)

@@ -1,177 +1,175 @@
-# from datetime import date
-
-from django.shortcuts import render, get_object_or_404
+from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.views.generic import ListView
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
+from django.views.generic import ListView
 
 from .forms import CommentForm
+from .models import Author, Post, Tag
 
-from .models import Post
-
-# all_posts = [
-#     # {
-#     #     "slug": "swimming-in-the-river",
-#     #     "image": "river.jpg",
-#     #     "author": "Suresh",
-#     #     "date": date(2023, 6, 3),
-#     #     "title": "Nature At Its Best",
-#     #     "excerpt": " There's prepared for what happened whilst I was enjoying view!",
-#     #     "content": """
-#     #     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-#     #     ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-#     # },
-#     # {
-#     #     "slug": "hike-in-the-mountains",
-#     #     "image": "mountains.jpeg",
-#     #     "author": "Suresh",
-#     #     "date": date(2023, 6, 3),
-#     #     "title": "Mountain Hiking",
-#     #     "excerpt": " There's nothing prepared for what happened whilst I was enjoying view!",
-#     #     "content": """
-#     #     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-#     #     ut labore et dolore magna aliqua. Ut enim ad minim veniam"""
-#     # },
-#     # {
-#     #     "slug": "coding-is-the-growing",
-#     #     "image": "code.png",
-#     #     "author": "Suresh",
-#     #     "date": date(2023, 6, 3),
-#     #     "title": "Programming Is Great!",
-#     #     "excerpt": " There's nothing lik the  for what happened whilst I was enjoying view!",
-#     #     "content": """
-#     #     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-#     #     ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-#     #     laboris nisi ut aliquip ex ea commodo consequat.
-#     #     """,
-#     # },
-# ]
+SESSION_KEY = "stored_posts"
 
 
-# def get_date(post):
-#     return post["date"]
+def _stored_post_ids(request):
+    """Read-later ids held in the session, always as a list of ints."""
+    stored = request.session.get(SESSION_KEY) or []
+    return [int(pk) for pk in stored]
 
 
-class StartingPageView(ListView):
-    template_name = "blog/index.html"
+class PublishedPostListView(ListView):
+    """Base list view: published posts only, paginated, related data prefetched."""
+
     model = Post
-    ordering = ["-date"]
     context_object_name = "posts"
 
+    def get_paginate_by(self, queryset):
+        return settings.BLOG_SETTINGS["posts_per_page"]
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        data = queryset[:3]
-        return data
+        return Post.objects.published().with_related()
 
 
-# def starting_page(request):
-#     latest_posts = Post.objects.all().order_by("-date")[:3]
-#     # sorted_posts = sorted(all_posts, key=get_date)
-#     # latest_posts = sorted_posts[-3:]
-#     return render(request, "blog/index.html", {"posts": latest_posts})
+class StartingPageView(PublishedPostListView):
+    template_name = "blog/index.html"
+    paginate_by = None
+
+    def get_paginate_by(self, queryset):
+        return None
+
+    def get_queryset(self):
+        limit = settings.BLOG_SETTINGS["latest_posts_count"]
+        return super().get_queryset()[:limit]
 
 
-class AllPostsView(ListView):
+class AllPostsView(PublishedPostListView):
     template_name = "blog/all-posts.html"
-    model = Post
-    ordering = ["-date"]
-    context_object_name = "all_posts"
 
 
-# def posts(request):
-#     all_posts = Post.objects.all().order_by("-date")
-#     return render(request, "blog/all-posts.html", {"all_posts": all_posts})
+class TagPostsView(PublishedPostListView):
+    template_name = "blog/tag-posts.html"
+
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs["slug"])
+        return super().get_queryset().filter(tags=self.tag)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(tag=self.tag, **kwargs)
+
+
+class AuthorPostsView(PublishedPostListView):
+    template_name = "blog/author-posts.html"
+
+    def get_queryset(self):
+        self.author = get_object_or_404(Author, slug=self.kwargs["slug"])
+        return super().get_queryset().filter(author=self.author)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(author=self.author, **kwargs)
+
+
+class SearchView(PublishedPostListView):
+    template_name = "blog/search.html"
+
+    def get_queryset(self):
+        self.query = self.request.GET.get("q", "").strip()
+        if not self.query:
+            return Post.objects.none()
+        return super().get_queryset().search(self.query)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(query=self.query, **kwargs)
 
 
 class SinglePostView(View):
-    # template_name = "blog/post-detail.html"
-    # model = Post
+    template_name = "blog/post-detail.html"
 
-    def is_stored_post(self, request, post_id):
-        stored_post = request.session.get("stored_posts")
-        if stored_post is not None:
-            is_saved_for_later = post_id in stored_post
+    def get_post(self, slug):
+        # Staff may preview drafts; everybody else only sees published posts.
+        queryset = Post.objects.with_related().prefetch_related("gallery")
+        if not (self.request.user.is_authenticated and self.request.user.is_staff):
+            queryset = queryset.published()
+        return get_object_or_404(queryset, slug=slug)
 
-        else:
-            is_saved_for_later = False
-
-            return is_saved_for_later
-
-    def get(self, request, slug):
-        post = Post.objects.get(slug=slug)
-        context = {
+    def build_context(self, request, post, comment_form=None):
+        return {
             "post": post,
             "post_tags": post.tags.all(),
-            "comment_form": CommentForm(),
-            "comments": post.comments.all().order_by("-id"),
-            "saved_for_later": self.is_stored_post(request, post.id),
+            "gallery": post.gallery.all(),
+            "comment_form": comment_form or CommentForm(),
+            "comments": post.comments.approved(),
+            "saved_for_later": post.id in _stored_post_ids(request),
+            "newer_post": post.get_newer_post(),
+            "older_post": post.get_older_post(),
         }
-        return render(request, "blog/post-detail.html", context)
+
+    def get(self, request, slug):
+        post = self.get_post(slug)
+        return render(request, self.template_name, self.build_context(request, post))
 
     def post(self, request, slug):
+        post = self.get_post(slug)
         comment_form = CommentForm(request.POST)
-        post = Post.objects.get(slug=slug)
+
+        if comment_form.is_spam:
+            # Silently accept and drop it: telling a bot it failed just invites
+            # a retry, and a human can never trip this.
+            return HttpResponseRedirect(post.get_absolute_url())
 
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.post = post
             comment.save()
-            return HttpResponseRedirect(reverse("post-detail-page", args=[slug]))
+            messages.success(
+                request,
+                "Thanks! Your comment has been sent and will appear once approved.",
+            )
+            return HttpResponseRedirect(post.get_absolute_url())
 
-        context = {
-            "post": post,
-            "post_tags": post.tags.all(),
-            "comment_form": CommentForm(),
-            "comments": post.comments.all().order_by("-id"),
-            "saved_for_later": self.is_stored_post(request, post.id),
-        }
-
-        return render(request, "blog/post-detail.html", context)
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context["post_tags"] = self.object.tags.all()
-    #     context["comment_form"] = CommentForm()
-    #     return context
-
-
-# def post_detail(request, slug=None):
-#     identified_post = get_object_or_404(Post, slug=slug)
-#     # identified_post = next(post for post in all_posts if post["slug"] == slug)
-#     return render(
-#         request,
-#         "blog/post-detail.html",
-#         {"post": identified_post, "post_tags": identified_post.tags.all()},
-#     )
+        context = self.build_context(request, post, comment_form=comment_form)
+        return render(request, self.template_name, context, status=400)
 
 
 class ReadLaterView(View):
+    """Session-backed reading list. POST toggles a post in or out of the list."""
+
+    template_name = "blog/stored-posts.html"
+
     def get(self, request):
-        stored_posts = request.session.get("stored_posts")
-
-        context = {}
-
-        if stored_posts is None or len(stored_posts) == 0:
-            context["posts"] = []
-            context["has_posts"] = False
-        else:
-            posts = Post.objects.filter(id__in=stored_posts)
-            context["posts"] = posts
-            context["has_posts"] = True
-
-        return render(request, "blog/stored-posts.html", context)
+        stored = _stored_post_ids(request)
+        posts = (
+            Post.objects.published().with_related().filter(id__in=stored)
+            if stored
+            else Post.objects.none()
+        )
+        context = {"posts": posts, "has_posts": bool(posts)}
+        return render(request, self.template_name, context)
 
     def post(self, request):
-        stored_posts = request.session.get("stored_posts")
+        try:
+            post_id = int(request.POST["post_id"])
+        except (KeyError, ValueError):
+            return HttpResponseRedirect(reverse("read-later"))
 
-        if stored_posts is None:
-            stored_posts = []
+        stored = _stored_post_ids(request)
+        if post_id in stored:
+            stored.remove(post_id)
+            messages.info(request, "Removed from your saved posts.")
+        else:
+            stored.append(post_id)
+            messages.success(request, "Saved for later.")
 
-        post_id = int(request.POST["post_id"])
+        request.session[SESSION_KEY] = stored
+        return HttpResponseRedirect(self.redirect_target(request))
 
-        if post_id not in stored_posts:
-            stored_posts.append(post_id)
-            request.session["stored_posts"] = stored_posts
-
-        return HttpResponseRedirect("/")
+    def redirect_target(self, request):
+        target = request.POST.get("next") or ""
+        if target and url_has_allowed_host_and_scheme(
+            target,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            return target
+        return reverse("read-later")

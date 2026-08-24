@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Posts tagged “{{ tag.caption }}” · {{ blog.title }}{% endblock %}
+{% block description %}All posts tagged {{ tag.caption }} on {{ blog.title }}.{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static 'blog/post.css' %}" />
+<link rel="stylesheet" href="{% static 'blog/all-posts.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section id="all-posts">
+  <h2>Tagged “{{ tag.caption }}”</h2>
+
+  {% with tags=all_tags %}{% include "blog/includes/tag-list.html" %}{% endwith %}
+
+  {% if posts %}
+  <ul>
+    {% for post in posts %}
+    {% include "blog/includes/post.html" %}
+    {% endfor %}
+  </ul>
+  {% include "blog/includes/pagination.html" %}
+  {% else %}
+  <p class="empty-state">No published posts carry this tag yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

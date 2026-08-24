@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Not allowed · {{ blog.title }}{% endblock %}
+
+{% block content %}
+<main class="simple-page">
+  <h2>Not allowed</h2>
+  <p>You don't have permission to view that page.</p>
+  <p><a href="{% url 'starting-page' %}">Back to the homepage</a></p>
+</main>
+{% endblock %}

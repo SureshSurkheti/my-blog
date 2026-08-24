@@ -1,83 +1,173 @@
-{% include 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
+{% load blog_extras %}
 
-{% block title %}
-{{ post.title }}
-{% endblock %}
+{% block title %}{{ post.title }} · {{ blog.title }}{% endblock %}
+
+{% block description %}{{ post.excerpt }}{% endblock %}
 
 {% block css_files %}
-<link rel="stylesheet" href="{% static "blog/post-detail.css" %}" />
+<link rel="stylesheet" href="{% static 'blog/post-detail.css' %}" />
+<link rel="stylesheet" href="{% static 'pygments.css' %}" />
 {% endblock %}
 
 {% block content %}
-<section id="summary">
-    <h2>{{ post.title }}</h2>
-    <div>{% for tag in post_tags %}
-        <span class="tag">{{ tag.caption }}</span>
-        {% endfor %}</div>
-        <div id="read_later">
-            <form action="{% url 'read-later' %}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" value="{{ post.id }}" name="post_id">
-                <button>
-                    {% if saved_for_later %}
-                        Remove from "Read Later" List
-                    {% else %}
-                        Read Later
-                    {% endif %}
-                </button>
-            </form>
-            </div>
-    <article>
-        <img src="{{ post.image.url }}" alt="{{ post.title }}"/>
-        <address>By <a href="mailto:{{ post.author.email_address}}"> {{ post.author }}</a></address>
-        <div>
-            Last updated on <time>{{ post.date|date:"d M Y" }}</time>
-        </div>
-    </article>
-</section>
-{% if comment_form.errors %}
-<div>
-    <h2> Saving the comment failed!</h2>
-    <p>Please check the comment form below the post and fix your errors.</p>
-</div>
+{% if not post.is_published %}
+<p class="draft-banner">Draft preview — this post is not visible to visitors.</p>
 {% endif %}
+
+<p class="back-link"><a href="{% url 'posts-page' %}">&larr; All posts</a></p>
+
+<section id="summary">
+  <h2>{{ post.title }}</h2>
+  <p>{{ post.excerpt }}</p>
+
+  {% with tags=post_tags %}{% include "blog/includes/tag-list.html" %}{% endwith %}
+
+  <div id="read_later">
+    <form action="{% url 'read-later' %}" method="POST">
+      {% csrf_token %}
+      <input type="hidden" value="{{ post.id }}" name="post_id" />
+      <input type="hidden" value="{{ request.get_full_path }}" name="next" />
+      <button>
+        {% if saved_for_later %}
+        Remove from saved
+        {% else %}
+        Save for later
+        {% endif %}
+      </button>
+    </form>
+  </div>
+
+  <article>
+    {% if post.image %}
+    <img src="{{ post.image.url }}" alt="{{ post.title }}"
+         style="object-position: {{ post.focal_css }}" />
+    {% endif %}
+    <address>
+      By
+      {% if post.author %}
+      <a href="{{ post.author.get_absolute_url }}">{{ post.author.full_name }}</a>
+      {% else %}
+      Unknown
+      {% endif %}
+    </address>
+    <div>
+      Published on
+      <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"d M Y" }}</time>
+      · {{ post.content|reading_time }} min read
+    </div>
+  </article>
+</section>
+
 <main>
-   {{ post.content|linebreaks }}
+  <div class="post-body">{{ post.content|markdown }}</div>
 </main>
 
-<section id="comments">
-    <ul>
-        {% for comment in comments %}
-        <li>
-            <h2>{{ comment.user_name }}</h2>
-            <p>{{ comment.text|linebreaks }}</p>
-        </li>
-
-        {% endfor %}
-    </ul>
+{% if gallery %}
+<section id="gallery">
+  <h2>Photos</h2>
+  <div class="gallery-grid" data-gallery>
+    {% for photo in gallery %}
+    <figure class="gallery-item">
+      <a href="{{ photo.image.url }}" target="_blank" rel="noopener"
+         data-gallery-item data-caption="{{ photo.caption|default:post.title }}">
+        <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}"
+             loading="lazy" style="object-position: {{ photo.focal_css }}" />
+      </a>
+      {% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+  </div>
+  <p class="gallery-hint">Click a photo to open it — then use the arrows or your keyboard to move between them.</p>
 </section>
-
-{% if comment_form.errors %}
-<div>
-    <h2> Saving the comment failed!</h2>
-    <p>Please check the comment form below the post and fix your errors.</p>
-</div>
 {% endif %}
 
-<section  id="comment-form">
-    <h2> Your Comments </h2>
-        <form action="{% url "post-detail-page" post.slug %}" method="POST">
-        {% csrf_token %}
-        {% for form_field in comment_form %}
-        <div class="form-control {% if form_field.errors %}invalid{% endif %}">
-            {{ form_field.label_tag}}
-            {{ form_field }}
-            {{ form_field.errors }}
-        </div>
-        {% endfor %}
-        <button> Save Comment</button>
-    </form>
+{% if newer_post or older_post %}
+<section id="post-nav" aria-labelledby="post-nav-heading">
+  <h2 id="post-nav-heading">Keep reading</h2>
+  <div class="post-nav__grid">
+    {% if newer_post %}
+    <a class="post-nav__card" href="{{ newer_post.get_absolute_url }}" rel="prev">
+      {% if newer_post.image %}
+      <img src="{{ newer_post.image.url }}" alt="" loading="lazy"
+           style="object-position: {{ newer_post.focal_css }}" />
+      {% endif %}
+      <span class="post-nav__body">
+        <span class="post-nav__dir">&larr; Newer post</span>
+        <span class="post-nav__title">{{ newer_post.title }}</span>
+        <span class="post-nav__date">{{ newer_post.published_at|date:"d M Y" }}</span>
+      </span>
+    </a>
+    {% endif %}
+
+    {% if older_post %}
+    <a class="post-nav__card post-nav__card--older" href="{{ older_post.get_absolute_url }}" rel="next">
+      {% if older_post.image %}
+      <img src="{{ older_post.image.url }}" alt="" loading="lazy"
+           style="object-position: {{ older_post.focal_css }}" />
+      {% endif %}
+      <span class="post-nav__body">
+        <span class="post-nav__dir">Older post &rarr;</span>
+        <span class="post-nav__title">{{ older_post.title }}</span>
+        <span class="post-nav__date">{{ older_post.published_at|date:"d M Y" }}</span>
+      </span>
+    </a>
+    {% endif %}
+  </div>
+
+  <p class="section-link"><a href="{% url 'posts-page' %}">See all posts &rarr;</a></p>
+</section>
+{% endif %}
+
+<section id="comments">
+  <h2>{{ comments|length }} Comment{{ comments|length|pluralize }}</h2>
+
+  {% if comments %}
+  <ul>
+    {% for comment in comments %}
+    <li>
+      <blockquote>{{ comment.text|linebreaks }}</blockquote>
+      <div class="comment-meta">
+        {{ comment.user_name }} ·
+        <time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|date:"d M Y" }}</time>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty-state">No comments yet — be the first.</p>
+  {% endif %}
 </section>
 
+<section id="comment-form">
+  <h2>Your Comment</h2>
+  <form action="{{ post.get_absolute_url }}" method="POST" novalidate>
+    {% csrf_token %}
+    {% if comment_form.non_field_errors %}
+    <div class="form-errors">{{ comment_form.non_field_errors }}</div>
+    {% endif %}
+    {% for field in comment_form %}
+      {% if field.name == "website" %}
+      <div class="honeypot" aria-hidden="true">
+        {{ field.label_tag }}{{ field }}
+      </div>
+      {% else %}
+      <div class="form-control {% if field.errors %}invalid{% endif %}">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+        {% for error in field.errors %}
+        <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endfor %}
+    <button type="submit">Post Comment</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if gallery %}<script src="{% static 'gallery.js' %}" defer></script>{% endif %}
 {% endblock %}

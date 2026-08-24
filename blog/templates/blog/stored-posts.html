@@ -1,23 +1,34 @@
-{% include 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-My Stored Posts
-{% endblock %}
+{% block title %}Saved · {{ blog.title }}{% endblock %}
 
 {% block css_files %}
-<link rel="stylesheet" href="{% static "blog/stored-posts.css" %}" />
+<link rel="stylesheet" href="{% static 'blog/stored-posts.css' %}" />
 {% endblock %}
 
 {% block content %}
- <section id="stored-posts">
-    {% if not has_posts %}
-     <p>Your didn't save any posts for later!</p>
-    {% endif %}
-    <ul>
-        {% for post in posts %}
-        <li><a href="{% url 'post-detail-page' post.slug %}">{{ post.title }}</a></li>
-        {% endfor %}
-    </ul>
- </section>
+<section id="stored-posts">
+  <h2>Saved</h2>
+  {% if not has_posts %}
+  <p class="empty-state">
+    You haven't saved any posts yet. Open a post and hit
+    <em>Save for later</em> to keep it here.
+  </p>
+  {% else %}
+  <ul>
+    {% for post in posts %}
+    <li>
+      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+      <form action="{% url 'read-later' %}" method="POST" class="inline-form">
+        {% csrf_token %}
+        <input type="hidden" name="post_id" value="{{ post.id }}" />
+        <input type="hidden" name="next" value="{% url 'read-later' %}" />
+        <button type="submit" class="link-button">Remove</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
 {% endblock %}

@@ -1,23 +1,28 @@
-{% include 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-My Blog
-{% endblock %}
+{% block title %}All Posts · {{ blog.title }}{% endblock %}
 
 {% block css_files %}
-<link rel="stylesheet" href="{% static "blog/post.css" %}" />
-<link rel="stylesheet" href="{% static "blog/all-posts.css" %}" />
+<link rel="stylesheet" href="{% static 'blog/post.css' %}" />
+<link rel="stylesheet" href="{% static 'blog/all-posts.css' %}" />
 {% endblock %}
 
 {% block content %}
 <section id="all-posts">
-    <h2>My Collected Posts</h2>
+  <h2>My Collected Posts</h2>
 
-    <ul>
-        {% for post in all_posts %}
-       {% include "blog/includes/post.html" %}
-       {% endfor %}
-    </ul>
+  {% with tags=all_tags %}{% include "blog/includes/tag-list.html" %}{% endwith %}
+
+  {% if posts %}
+  <ul>
+    {% for post in posts %}
+    {% include "blog/includes/post.html" %}
+    {% endfor %}
+  </ul>
+  {% include "blog/includes/pagination.html" %}
+  {% else %}
+  <p class="empty-state">No posts published yet.</p>
+  {% endif %}
 </section>
 {% endblock %}
