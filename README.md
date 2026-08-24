@@ -199,6 +199,7 @@ static/app.css       Shared styling
 static/gallery.js    Gallery lightbox (progressive enhancement)
 static/nav.js        Collapses the header search into an icon
 static/pygments.css  Generated syntax-highlighting theme
+static/favicon.*     Site icons (see scripts/make_favicon.py)
 ```
 
 ## Social profiles
@@ -241,6 +242,35 @@ city and your profession, so linking personal accounts ties all of that to a
 findable identity. Your author email address is stored in the database but is
 deliberately **not** rendered anywhere, and adding a raw `mailto:` link would
 expose it to scrapers.
+
+## Site icons
+
+`static/favicon.ico` is the source of truth. Every other size is generated from
+it, so all screen types are covered:
+
+| File | Used by |
+| ---- | ------- |
+| `favicon.ico` | Browser tabs, older browsers (16/32/48 in one file) |
+| `favicon-32.png` | Browsers that prefer a PNG |
+| `apple-touch-icon.png` | iOS home screen (180px, alpha flattened) |
+| `icon-192.png`, `icon-512.png` | Android and installable web apps |
+| `site.webmanifest` | App name, theme colour, icon list |
+
+Regenerate after replacing the icon:
+
+```bash
+.venv/bin/python scripts/make_favicon.py
+```
+
+The script also reads the icon's dominant colour and writes it into the
+manifest as the theme colour. `/favicon.ico` is routed at the root as well,
+since browsers request it there whatever the link tags say.
+
+**For sharp large icons**, drop a square `static/favicon-source.png` at 512px or
+larger next to the .ico and re-run. The script prefers it and rebuilds the .ico
+from it too. Without one it falls back to the .ico's largest frame — usually
+48px — and upscales, which the 180px and 512px icons show as softness. The
+script prints a warning when that happens.
 
 ## Getting around
 
