@@ -243,6 +243,31 @@ findable identity. Your author email address is stored in the database but is
 deliberately **not** rendered anywhere, and adding a raw `mailto:` link would
 expose it to scrapers.
 
+## SEO
+
+Every page carries:
+
+- a **canonical URL** — keeps `?page=` (real different pages) and drops
+  tracking parameters, so one piece of content is not indexed under many URLs
+- **Open Graph and Twitter card** tags, so a shared link shows a title,
+  description and picture. Posts use `og:type=article` with published/modified
+  times, the author and the tags; the image falls back to the site icon
+- **JSON-LD structured data** — `BlogPosting` on posts (headline, dates,
+  author, keywords, publisher), `WebSite` with a `SearchAction` on the homepage
+- **exactly one `<h1>`**, which is the page's own subject. The site name in the
+  header is a link, not a heading, so the post title is the h1 on a post page
+- **`width`/`height` on every image**, stored on the model, so the browser
+  reserves the space before the picture loads (no layout shift)
+
+`/robots.txt` points at the sitemap and keeps crawlers out of `/admin/`,
+`/search` and `/read-later`. The sitemap covers the homepage, the archive,
+every published post, and the tag and author pages. Search results, the saved
+list and unpublished drafts send `noindex,follow`.
+
+Metadata is built in `blog/seo.py` and rendered by
+`templates/includes/seo.html`, so a title is written once and feeds `<title>`,
+`og:title` and the structured data together.
+
 ## Site icons
 
 `static/favicon.ico` is the source of truth. Every other size is generated from

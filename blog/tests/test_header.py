@@ -1,5 +1,8 @@
 """The site header: active-section marking and the collapsible search."""
 
+from pathlib import Path
+
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
@@ -28,9 +31,12 @@ class ActiveSectionTests(TestCase):
     def test_read_later_marks_its_own_link(self):
         response = self.client.get(reverse("read-later"))
         body = response.content.decode()
+        # Search inside <nav> only: the URL also appears in <head> as the
+        # canonical link, which would otherwise match first.
+        nav = body[body.index("<nav") : body.index("</nav>")]
         # The marker sits on the Saved link, not the archive one.
-        stored_index = body.index(reverse("read-later"))
-        self.assertIn('aria-current="page"', body[stored_index : stored_index + 200])
+        stored_index = nav.index(reverse("read-later"))
+        self.assertIn('aria-current="page"', nav[stored_index : stored_index + 200])
 
     def test_homepage_marks_nothing(self):
         response = self.client.get(reverse("starting-page"))
@@ -101,7 +107,7 @@ class ConsistentNamingTests(TestCase):
 
     def test_the_list_page_calls_it_saved(self):
         response = self.client.get(reverse("read-later"))
-        self.assertContains(response, "<h2>Saved</h2>", html=True)
+        self.assertContains(response, "<h1>Saved</h1>", html=True)
         self.assertNotContains(response, "Read Later")
         # One label, not a longer variant on the page it belongs to.
         self.assertNotContains(response, "Saved posts")
@@ -131,3 +137,39 @@ class ConsistentNamingTests(TestCase):
             css = handle.read()
         title_block = css[css.index(".site-title {") : css.index(".site-title:focus")]
         self.assertNotIn("text-decoration: underline", title_block)
+
+
+class VisuallyHiddenTests(TestCase):
+    """Screen-reader-only labels must actually be hidden on screen.
+
+    This class went missing from the stylesheet during an unrelated edit and
+    the "Search posts" label rendered as visible black text in the header —
+    nothing failed, so it went unnoticed. These assertions make that loud.
+    """
+
+    def _stylesheet(self):
+        with open(Path(settings.BASE_DIR) / "static" / "app.css") as handle:
+            return handle.read()
+
+    def test_the_utility_class_is_defined(self):
+        css = self._stylesheet()
+
+        self.assertIn(".visually-hidden {", css)
+        rule = css[css.index(".visually-hidden {") :].split("}")[0]
+        # The clip pattern: off-screen but still announced.
+        self.assertIn("position: absolute", rule)
+        self.assertIn("clip-path", rule)
+        self.assertIn("width: 1px", rule)
+
+    def test_every_use_of_the_class_has_a_definition(self):
+        css = self._stylesheet()
+        for template in ("templates/base.html", "blog/templates/blog/search.html"):
+            with self.subTest(template=template):
+                with open(Path(settings.BASE_DIR) / template) as handle:
+                    markup = handle.read()
+                if "visually-hidden" in markup:
+                    self.assertIn(".visually-hidden {", css)
+
+    def test_the_search_label_is_present_for_assistive_tech(self):
+        response = self.client.get(reverse("posts-page"))
+        self.assertContains(response, 'class="visually-hidden" for="nav-search-input"')

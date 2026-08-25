@@ -7,6 +7,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import ListView
 
+from . import seo
 from .forms import CommentForm
 from .models import Author, Post, Tag
 
@@ -39,6 +40,12 @@ class StartingPageView(PublishedPostListView):
     def get_paginate_by(self, queryset):
         return None
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            seo=seo.build(self.request, json_ld=seo.website_schema(self.request)),
+            **kwargs,
+        )
+
     def get_queryset(self):
         limit = settings.BLOG_SETTINGS["latest_posts_count"]
         return super().get_queryset()[:limit]
@@ -46,6 +53,16 @@ class StartingPageView(PublishedPostListView):
 
 class AllPostsView(PublishedPostListView):
     template_name = "blog/all-posts.html"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            seo=seo.build(
+                self.request,
+                title=f"All posts · {settings.BLOG_SETTINGS['title']}",
+                description="Every post on the blog, newest first.",
+            ),
+            **kwargs,
+        )
 
 
 class TagPostsView(PublishedPostListView):
@@ -56,7 +73,15 @@ class TagPostsView(PublishedPostListView):
         return super().get_queryset().filter(tags=self.tag)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(tag=self.tag, **kwargs)
+        return super().get_context_data(
+            tag=self.tag,
+            seo=seo.build(
+                self.request,
+                title=f"Posts tagged “{self.tag.caption}”",
+                description=f"Every post tagged {self.tag.caption}.",
+            ),
+            **kwargs,
+        )
 
 
 class AuthorPostsView(PublishedPostListView):
@@ -67,7 +92,16 @@ class AuthorPostsView(PublishedPostListView):
         return super().get_queryset().filter(author=self.author)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(author=self.author, **kwargs)
+        return super().get_context_data(
+            author=self.author,
+            seo=seo.build(
+                self.request,
+                title=f"Posts by {self.author.full_name}",
+                description=self.author.bio
+                or f"Every post written by {self.author.full_name}.",
+            ),
+            **kwargs,
+        )
 
 
 class SearchView(PublishedPostListView):
@@ -80,7 +114,18 @@ class SearchView(PublishedPostListView):
         return super().get_queryset().search(self.query)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(query=self.query, **kwargs)
+        return super().get_context_data(
+            query=self.query,
+            seo=seo.build(
+                self.request,
+                title=f"Search: {self.query}" if self.query else "Search",
+                description="Search the archive.",
+                # Search results are thin and endless; useful to follow,
+                # not worth indexing.
+                noindex=True,
+            ),
+            **kwargs,
+        )
 
 
 class SinglePostView(View):
@@ -103,6 +148,19 @@ class SinglePostView(View):
             "saved_for_later": post.id in _stored_post_ids(request),
             "newer_post": post.get_newer_post(),
             "older_post": post.get_older_post(),
+            "seo": seo.build(
+                request,
+                title=post.title,
+                description=post.excerpt,
+                image=post.image.url if post.image else None,
+                og_type="article",
+                published=post.published_at,
+                modified=post.updated_at,
+                author=post.author.full_name if post.author else None,
+                tags=[tag.caption for tag in post.tags.all()],
+                noindex=not post.is_published,
+                json_ld=seo.post_schema(request, post),
+            ),
         }
 
     def get(self, request, slug):
@@ -144,7 +202,17 @@ class ReadLaterView(View):
             if stored
             else Post.objects.none()
         )
-        context = {"posts": posts, "has_posts": bool(posts)}
+        context = {
+            "posts": posts,
+            "has_posts": bool(posts),
+            "seo": seo.build(
+                request,
+                title="Saved",
+                description="Posts you have saved to read later.",
+                # Private to one visitor's session — nothing to index.
+                noindex=True,
+            ),
+        }
         return render(request, self.template_name, context)
 
     def post(self, request):

@@ -21,7 +21,7 @@ body {
   flex-direction: column;
 }
 
-#summary h2 {
+#summary h1 {
   color: white;
   font-size: clamp(2.25rem, 5vw, 4.5rem);
   line-height: 1.05;

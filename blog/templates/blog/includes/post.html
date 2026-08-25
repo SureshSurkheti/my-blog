@@ -4,6 +4,7 @@
     <a href="{{ post.get_absolute_url }}">
       {% if post.image %}
       <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy"
+           {% if post.image_width %}width="{{ post.image_width }}" height="{{ post.image_height }}"{% endif %}
            style="object-position: {{ post.focal_css }}" />
       {% endif %}
       <div class="post__content">
