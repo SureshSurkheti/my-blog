@@ -19,7 +19,7 @@
 <p class="back-link"><a href="{% url 'posts-page' %}">&larr; All posts</a></p>
 
 <section id="summary">
-  <h2>{{ post.title }}</h2>
+  <h1>{{ post.title }}</h1>
   <p>{{ post.excerpt }}</p>
 
   {% with tags=post_tags %}{% include "blog/includes/tag-list.html" %}{% endwith %}
@@ -42,6 +42,8 @@
   <article>
     {% if post.image %}
     <img src="{{ post.image.url }}" alt="{{ post.title }}"
+         {% if post.image_width %}width="{{ post.image_width }}" height="{{ post.image_height }}"{% endif %}
+         fetchpriority="high"
          style="object-position: {{ post.focal_css }}" />
     {% endif %}
     <address>
@@ -73,7 +75,9 @@
       <a href="{{ photo.image.url }}" target="_blank" rel="noopener"
          data-gallery-item data-caption="{{ photo.caption|default:post.title }}">
         <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}"
-             loading="lazy" style="object-position: {{ photo.focal_css }}" />
+             loading="lazy"
+             {% if photo.image_width %}width="{{ photo.image_width }}" height="{{ photo.image_height }}"{% endif %}
+             style="object-position: {{ photo.focal_css }}" />
       </a>
       {% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}
     </figure>
@@ -91,6 +95,7 @@
     <a class="post-nav__card" href="{{ newer_post.get_absolute_url }}" rel="prev">
       {% if newer_post.image %}
       <img src="{{ newer_post.image.url }}" alt="" loading="lazy"
+           {% if newer_post.image_width %}width="{{ newer_post.image_width }}" height="{{ newer_post.image_height }}"{% endif %}
            style="object-position: {{ newer_post.focal_css }}" />
       {% endif %}
       <span class="post-nav__body">
@@ -105,6 +110,7 @@
     <a class="post-nav__card post-nav__card--older" href="{{ older_post.get_absolute_url }}" rel="next">
       {% if older_post.image %}
       <img src="{{ older_post.image.url }}" alt="" loading="lazy"
+           {% if older_post.image_width %}width="{{ older_post.image_width }}" height="{{ older_post.image_height }}"{% endif %}
            style="object-position: {{ older_post.focal_css }}" />
       {% endif %}
       <span class="post-nav__body">

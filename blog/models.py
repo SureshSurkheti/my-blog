@@ -130,7 +130,17 @@ class Post(models.Model):
     title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True, db_index=True, max_length=100)
     excerpt = models.CharField(max_length=200)
-    image = models.ImageField(upload_to="posts", null=True, blank=True)
+    image = models.ImageField(
+        upload_to="posts",
+        null=True,
+        blank=True,
+        # Stored so templates can emit width/height without opening the file,
+        # which lets the browser reserve the space before the image loads.
+        width_field="image_width",
+        height_field="image_height",
+    )
+    image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     focal_point = models.CharField(
         max_length=10,
         choices=FocalPoint.choices,
@@ -175,7 +185,9 @@ class Post(models.Model):
         # later edits never reshuffle the post ordering.
         if self.status == self.Status.PUBLISHED and self.published_at is None:
             self.published_at = timezone.now()
-        optimize_uploaded_image(self.image)
+        processed = optimize_uploaded_image(self.image)
+        if processed:
+            self.image_width, self.image_height = processed
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -232,7 +244,13 @@ class PostImage(models.Model):
     """An extra picture in a post's gallery, beyond the header image."""
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="gallery")
-    image = models.ImageField(upload_to="gallery")
+    image = models.ImageField(
+        upload_to="gallery",
+        width_field="image_width",
+        height_field="image_height",
+    )
+    image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
     caption = models.CharField(max_length=200, blank=True)
     focal_point = models.CharField(
         max_length=10, choices=FocalPoint.choices, default=FocalPoint.TOP
@@ -249,7 +267,9 @@ class PostImage(models.Model):
         return self.caption or f"Image {self.pk} for {self.post}"
 
     def save(self, *args, **kwargs):
-        optimize_uploaded_image(self.image)
+        processed = optimize_uploaded_image(self.image)
+        if processed:
+            self.image_width, self.image_height = processed
         super().save(*args, **kwargs)
 
     @property

@@ -25,9 +25,14 @@ def _has_transparency(image):
 def optimize_uploaded_image(field_file, max_dimension=None, quality=None):
     """Re-encode a freshly uploaded image in place.
 
-    Returns True when the file was processed. Files already stored (i.e. any
-    save that didn't come with a new upload) are left untouched, so editing a
-    post's title never re-compresses its picture.
+    Returns ``(width, height)`` of the stored image when it was processed, or
+    False when there was nothing to do — files already stored (any save that
+    didn't come with a new upload) are left untouched, so editing a post's
+    title never re-compresses its picture.
+
+    The size is returned because re-saving through ``FieldFile.save()`` makes
+    Django clear the model's width/height fields; the caller writes the real
+    values back from here rather than letting Django re-open the file.
     """
     if not field_file:
         return False
@@ -61,6 +66,7 @@ def optimize_uploaded_image(field_file, max_dimension=None, quality=None):
         buffer = BytesIO()
         image.save(buffer, format=fmt, **save_kwargs)
 
+    width, height = image.size
     name = Path(field_file.name).with_suffix(suffix).name
     field_file.save(name, ContentFile(buffer.getvalue()), save=False)
-    return True
+    return width, height

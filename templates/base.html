@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{{ blog.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ blog.description }}{% endblock %}" />
+    {% include "includes/seo.html" %}
     <link rel="alternate" type="application/rss+xml" title="{{ blog.title }} RSS" href="{% url 'post-feed-rss' %}" />
     <link rel="alternate" type="application/atom+xml" title="{{ blog.title }} Atom" href="{% url 'post-feed-atom' %}" />
     <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any" />
