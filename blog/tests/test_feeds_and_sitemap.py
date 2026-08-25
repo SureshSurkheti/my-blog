@@ -51,3 +51,27 @@ class SitemapTests(TestCase):
         self.assertIn(tag.get_absolute_url(), body)
         self.assertIn(author.get_absolute_url(), body)
         self.assertNotIn("/posts/draft-copy", body)
+
+
+class FeedVisibilityTests(TestCase):
+    """The feeds exist and are discoverable, but aren't advertised in the footer."""
+
+    def test_the_footer_does_not_link_them(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+        footer = body[body.index("site-footer") :]
+
+        self.assertNotIn(">RSS<", footer)
+        self.assertNotIn(">Atom<", footer)
+
+    def test_they_stay_discoverable_in_the_head(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+        head = body[: body.index("</head>")]
+
+        self.assertIn('type="application/rss+xml"', head)
+        self.assertIn('type="application/atom+xml"', head)
+
+    def test_the_urls_still_work(self):
+        make_post("Still fed")
+        for name in ("post-feed-rss", "post-feed-atom"):
+            with self.subTest(feed=name):
+                self.assertEqual(self.client.get(reverse(name)).status_code, 200)
