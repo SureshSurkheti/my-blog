@@ -67,11 +67,12 @@
     <footer class="site-footer">
       {% include "includes/social-links.html" %}
       <p>&copy; {% now "Y" %} {{ blog.title }}</p>
-      <p>
-        <a href="{% url 'post-feed-rss' %}">RSS</a>
-        ·
-        <a href="{% url 'post-feed-atom' %}">Atom</a>
-      </p>
+      {% comment %}
+      The feeds are deliberately not linked here: "RSS" means nothing to
+      most readers. They stay discoverable through the <link rel="alternate">
+      tags in <head> — which is what feed readers and aggregators actually
+      use — and the URLs keep working for anyone who wants them.
+      {% endcomment %}
     </footer>
 
     <script src="{% static 'nav.js' %}" defer></script>

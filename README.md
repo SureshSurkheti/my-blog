@@ -144,8 +144,8 @@ then paste the output under the hand-written container rules in
 | `/authors/<slug>`   | Posts by one author                         |
 | `/search?q=`        | Search titles, excerpts, bodies and tags    |
 | `/read-later`       | Saved posts (session-based, no login)       |
-| `/feed/rss`         | RSS feed                                    |
-| `/feed/atom`        | Atom feed                                   |
+| `/feed/rss`         | RSS feed (not linked in the footer)         |
+| `/feed/atom`        | Atom feed (not linked in the footer)        |
 | `/sitemap.xml`      | Sitemap for search engines                  |
 | `/admin/`           | Django admin                                |
 
@@ -267,6 +267,15 @@ list and unpublished drafts send `noindex,follow`.
 Metadata is built in `blog/seo.py` and rendered by
 `templates/includes/seo.html`, so a title is written once and feeds `<title>`,
 `og:title` and the structured data together.
+
+## Feeds
+
+The RSS and Atom feeds work but are **not linked in the footer** — "RSS" means
+little to a general reader, and the two links were jargon taking up space. They
+stay discoverable through the `<link rel="alternate">` tags in `<head>`, which
+is what feed readers, aggregators and Google actually read, so anyone who
+subscribes still can. To advertise them again, add the links back to the footer
+in `templates/base.html`.
 
 ## Site icons
 
