@@ -15,6 +15,15 @@ from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 class SilentManifestStaticFilesStorage(ManifestStaticFilesStorage):
     manifest_strict = False
 
+    def hashed_name(self, name, content=None, filename=None):
+        try:
+            return super().hashed_name(name, content, filename)
+        except ValueError:
+            # A referenced asset (e.g. an admin CSS background-image) doesn't
+            # exist on disk. Don't fail the whole build over it — just keep
+            # the original, unhashed filename for that one reference.
+            return name
+
 from .social import build_social_links
 
 BASE_DIR = Path(__file__).resolve().parent.parent
