@@ -38,6 +38,7 @@ body {
 .summary__main > p,
 .summary__main > .tags {
   margin: 0;
+  color: darkgrey;
 }
 
 #summary h1 {
