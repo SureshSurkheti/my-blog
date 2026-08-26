@@ -46,7 +46,6 @@ if not SECRET_KEY:
 # Application definition
 
 INSTALLED_APPS = [
-    "blog",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -55,6 +54,7 @@ INSTALLED_APPS = [
     "cloudinary_storage",
     "django.contrib.staticfiles",
     "cloudinary",
+    "blog",
     "django.contrib.sitemaps",
 ]
 
@@ -133,6 +133,8 @@ STORAGES = {
         else "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
 }
+
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": env("CLOUDINARY_CLOUD_NAME"),
