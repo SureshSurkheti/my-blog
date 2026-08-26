@@ -88,33 +88,57 @@ class SocialCardTests(TestCase):
 
 
 class StructuredDataTests(TestCase):
-    def test_post_carries_blogposting_schema(self):
-        author = make_author("Ada", "Lovelace")
-        post = make_post("Structured", author=author, tags=[make_tag("Japan")])
-
-        body = self.client.get(post.get_absolute_url()).content.decode()
+    @staticmethod
+    def _schema(body):
+        """Every JSON-LD object on the page, keyed by @type."""
         payload = json.loads(
             re.search(
                 r'<script type="application/ld\+json">(.*?)</script>', body, re.S
             ).group(1)
         )
+        blocks = payload if isinstance(payload, list) else [payload]
+        return {block["@type"]: block for block in blocks}
 
-        self.assertEqual(payload["@type"], "BlogPosting")
+    def test_post_carries_blogposting_schema(self):
+        author = make_author("Ada", "Lovelace")
+        post = make_post("Structured", author=author, tags=[make_tag("Japan")])
+
+        body = self.client.get(post.get_absolute_url()).content.decode()
+        payload = self._schema(body)["BlogPosting"]
+
         self.assertEqual(payload["headline"], "Structured")
         self.assertEqual(payload["author"]["name"], "Ada Lovelace")
         self.assertIn("datePublished", payload)
         self.assertIn("dateModified", payload)
         self.assertEqual(payload["keywords"], ["Japan"])
 
+    def test_post_carries_a_breadcrumb_trail(self):
+        # Google renders this in place of the raw URL under a search result.
+        post = make_post("Structured", slug="structured")
+
+        body = self.client.get(post.get_absolute_url()).content.decode()
+        crumbs = self._schema(body)["BreadcrumbList"]["itemListElement"]
+
+        self.assertEqual(
+            [c["name"] for c in crumbs], ["Home", "All posts", "Structured"]
+        )
+        self.assertEqual([c["position"] for c in crumbs], [1, 2, 3])
+        for crumb in crumbs:
+            with self.subTest(name=crumb["name"]):
+                self.assertTrue(crumb["item"].startswith("http"))
+
+    def test_the_trail_ends_on_the_page_it_is_served_from(self):
+        post = make_post("Structured", slug="structured")
+
+        body = self.client.get(post.get_absolute_url()).content.decode()
+        crumbs = self._schema(body)["BreadcrumbList"]["itemListElement"]
+
+        self.assertTrue(crumbs[-1]["item"].endswith(post.get_absolute_url()))
+
     def test_homepage_carries_website_schema_with_search(self):
         body = self.client.get(reverse("starting-page")).content.decode()
-        payload = json.loads(
-            re.search(
-                r'<script type="application/ld\+json">(.*?)</script>', body, re.S
-            ).group(1)
-        )
+        payload = self._schema(body)["WebSite"]
 
-        self.assertEqual(payload["@type"], "WebSite")
         self.assertIn("search?q={search_term_string}", json.dumps(payload))
 
     def test_script_content_cannot_break_out_of_the_tag(self):

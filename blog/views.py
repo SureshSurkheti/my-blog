@@ -187,7 +187,20 @@ class SinglePostView(View):
                 author=post.author.full_name if post.author else None,
                 tags=[tag.caption for tag in post.tags.all()],
                 noindex=not post.is_published,
-                json_ld=seo.post_schema(request, post),
+                # A list, so the post and its breadcrumb trail both ship.
+                # Breadcrumbs are what Google renders in place of the raw URL
+                # under a search result.
+                json_ld=[
+                    seo.post_schema(request, post),
+                    seo.breadcrumbs(
+                        request,
+                        [
+                            ("Home", reverse("starting-page")),
+                            ("All posts", reverse("posts-page")),
+                            (post.title, post.get_absolute_url()),
+                        ],
+                    ),
+                ],
             ),
         }
 
