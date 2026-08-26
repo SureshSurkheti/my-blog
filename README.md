@@ -30,6 +30,44 @@ cp .env.example .env
 .venv/bin/python manage.py runserver 8001
 ```
 
+That gives you a **working but empty** blog: the database is not in version
+control, so a fresh clone has no posts. Two ways to fill it:
+
+- **Write your own** — log in at `/admin/` and add a post.
+- **Load the twelve Kyushu posts** — see [Seeding the Kyushu
+  posts](#seeding-the-kyushu-posts). The first step downloads their photos, so
+  it needs a network connection and takes a couple of minutes.
+
+## Moving the blog to another machine
+
+`uploads/` is in git, so the photographs come with the clone. Two files do not,
+and both have to be copied by hand — `db.sqlite3`, because it holds sessions
+and unapproved comments that have no business on a public repo, and `.env`,
+because it holds the secret key.
+
+On the old machine, commit and push anything outstanding. Then:
+
+```bash
+git clone https://github.com/<you>/my-blog.git
+cd my-blog
+
+# The two files git does not carry — over scp, a USB stick, anything.
+cp /path/from/old/machine/db.sqlite3 .
+cp /path/from/old/machine/.env .
+
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python manage.py migrate      # no-op if the database is current
+.venv/bin/python manage.py runserver 8001
+```
+
+Every post, comment, gallery picture and admin login comes across intact. Run
+`manage.py test` afterwards if you want the reassurance.
+
+Without `.env` the site still runs — Django falls back to the defaults in
+`settings.py` — but the social links disappear and you get a fresh throwaway
+secret key, which signs out every existing session.
+
 ## Everyday commands
 
 | Command         | What it does                                  |

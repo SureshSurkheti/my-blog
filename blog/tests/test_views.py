@@ -1,8 +1,10 @@
+import shutil
+import tempfile
 from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from blog.models import Comment
@@ -514,8 +516,18 @@ class StickyFooterTests(TestCase):
                 self.assertIn("grid-auto-rows: 1fr", rule)
 
 
+# Uploads in this test go to a throwaway directory, never the real uploads/.
+SAVED_MEDIA_ROOT = tempfile.mkdtemp(prefix="blog-saved-test-")
+
+
+@override_settings(MEDIA_ROOT=SAVED_MEDIA_ROOT)
 class SavedPageTests(TestCase):
     """The reading list: enough on each row to choose from, and safe markup."""
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(SAVED_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         self.post = make_post(
@@ -573,3 +585,27 @@ class SavedPageTests(TestCase):
 
         response = self.client.get(reverse("read-later"))
         self.assertContains(response, "saved-item__thumb--empty")
+
+
+class TestIsolationTests(TestCase):
+    """Running the suite must not leave anything behind in the real project."""
+
+    def test_no_test_writes_into_the_real_uploads_directory(self):
+        # A test that saves an ImageField without overriding MEDIA_ROOT writes
+        # a file into uploads/ on every run, which then shows up in git status.
+        import re
+
+        suite_dir = Path(settings.BASE_DIR) / "blog" / "tests"
+        for path in sorted(suite_dir.glob("test_*.py")):
+            source = path.read_text()
+            with self.subTest(module=path.name):
+                if (
+                    "make_image_file" not in source
+                    and "make_gallery_image" not in source
+                ):
+                    continue
+                self.assertTrue(
+                    re.search(r"MEDIA_ROOT\s*=", source),
+                    f"{path.name} creates image uploads but never overrides "
+                    "MEDIA_ROOT, so it writes into the real uploads/ folder",
+                )
