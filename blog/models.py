@@ -134,10 +134,9 @@ class Post(models.Model):
         upload_to="posts",
         null=True,
         blank=True,
-        # Stored so templates can emit width/height without opening the file,
-        # which lets the browser reserve the space before the image loads.
         width_field="image_width",
         height_field="image_height",
+        max_length=500,
     )
     image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
     image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)
@@ -248,6 +247,7 @@ class PostImage(models.Model):
         upload_to="gallery",
         width_field="image_width",
         height_field="image_height",
+        max_length=500,
     )
     image_width = models.PositiveIntegerField(null=True, blank=True, editable=False)
     image_height = models.PositiveIntegerField(null=True, blank=True, editable=False)

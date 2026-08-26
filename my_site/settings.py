@@ -153,6 +153,8 @@ STORAGES = {
     },
 }
 
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
+
 # Required because django-cloudinary-storage still checks this setting
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
