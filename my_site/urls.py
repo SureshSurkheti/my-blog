@@ -69,6 +69,4 @@ urlpatterns = [
     path("", include("blog.urls")),
 ]
 
-if settings.DEBUG:
-    # In production the web server serves uploads; Django only does it locally.
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
