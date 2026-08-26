@@ -7,7 +7,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import ListView
 
-from . import seo
+from . import credits, seo
 from .forms import CommentForm
 from .models import Author, Post, Tag
 
@@ -42,6 +42,9 @@ class StartingPageView(PublishedPostListView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(
+            # The card list is capped at latest_posts_count, so the archive
+            # total has to be counted separately for the hero.
+            total_posts=Post.objects.published().count(),
             seo=seo.build(self.request, json_ld=seo.website_schema(self.request)),
             **kwargs,
         )
@@ -125,6 +128,31 @@ class SearchView(PublishedPostListView):
                 noindex=True,
             ),
             **kwargs,
+        )
+
+
+class PhotoCreditsView(View):
+    """Attribution for the photographs that are not the owner's own work."""
+
+    template_name = "blog/credits.html"
+
+    def get(self, request):
+        return render(
+            request,
+            self.template_name,
+            {
+                "groups": credits.grouped(),
+                "seo": seo.build(
+                    request,
+                    title="Photo credits",
+                    description=(
+                        "Photographers and licences for the pictures used on this blog."
+                    ),
+                    # A credit list is for readers and for the licences, not
+                    # something search engines need in their index.
+                    noindex=True,
+                ),
+            },
         )
 
 

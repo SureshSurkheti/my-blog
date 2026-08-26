@@ -5,43 +5,69 @@ body {
 #summary {
   /* No top margin: the .back-link above already clears the header. */
   margin: 0 auto 3rem auto;
-  padding: 2rem;
-  /* Room for the absolutely positioned author card on the right. */
-  padding-right: 20rem;
-  width: 90%;
-  max-width: 90rem;
+  padding: 2rem 2rem 1.5rem 2rem;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   border-radius: 16px;
-  background-color: #5706c0;
-  position: relative;
+  /* The same gradient as the home hero, so the two biggest coloured surfaces
+     on the site are one colour rather than two shades of purple. */
+  background: linear-gradient(160deg, var(--brand) 0%, var(--brand-deep) 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  /* Grows with the title and excerpt instead of clipping them; the button is
-     pinned to the bottom so it sits in the same place on every post. */
-  min-height: 22rem;
+  /* Two columns in the flow. The panel grows to whichever side is taller, so
+     the author card can never spill out of the bottom the way it did when it
+     was absolutely positioned. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Stretches to the row height, so the Save button still sits on the bottom
+   line of the panel on every post.
+
+   One gap rather than per-child margins: flex items do not collapse their
+   margins the way blocks do, so the excerpt's 1em bottom and the tag row's
+   1rem top were stacking into 32px of dead space instead of overlapping. */
+.summary__main {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.summary__main > h1,
+.summary__main > p,
+.summary__main > .tags {
+  margin: 0;
 }
 
 #summary h1 {
   color: white;
-  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  /* Capped lower than the old 4.5rem: the hero is 72rem wide now, not 90rem,
+     and the author column takes a share of that. */
+  font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: 1.05;
-  margin: 0 0 0.5rem 0;
+  /* Spacing below comes from .summary__main's gap. */
+  margin: 0;
   overflow-wrap: break-word;
 }
 
 #summary article {
-  position: absolute;
-  top: 2rem;
-  right: 3rem;
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  width: 15rem;
   text-align: right;
   color: white;
+  /* Bottom-aligned, like the Save button opposite it. Whichever column is the
+     shorter takes its slack at the top, so the two always finish on the same
+     line however many lines the title runs to. */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 #summary article img {
-  width: 12rem;
-  height: 12rem;
+  /* Shorter than it was: the author column sets the panel height, so every
+     pixel here is a pixel of empty space above the Save button on the left. */
+  width: 10.5rem;
+  height: 9.5rem;
   object-fit: cover;
   background-color: #ede1fb;
   border-radius: 12px;
@@ -54,6 +80,10 @@ body {
   font-weight: bold;
 }
 
+#summary .post-meta span {
+  display: block;
+}
+
 #summary a {
   color: white;
   text-decoration: none;
@@ -64,11 +94,15 @@ body {
 } 
 
 main {
-  width: 90%;
-  max-width: 90rem;
+  /* Same width as the hero and the gallery — a narrower card here read as a
+     mistake rather than a choice. The reading measure is set on .post-body
+     inside instead, so the panels line up and the prose still doesn't run to
+     140 characters a line. */
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   margin: 3rem auto;
   background-color: white;
-  padding: 1rem;
+  padding: 3rem clamp(1.25rem, 3vw, 3rem);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
@@ -82,19 +116,77 @@ main {
 
 #comment-form {
   margin: 3rem auto;
-  width: 90%;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
+  border-radius: 12px;
+  /* No panel while the form is folded: a full-width white card wrapped around
+     one small button was a lot of empty background. The card appears with the
+     form. */
+  padding: 0;
+}
+
+#comment-form details > summary {
+  text-align: center;
+}
+
+/* The form keeps its own narrower column, centred under the button. */
+#comment-form form {
   max-width: 40rem;
+  margin-inline: auto;
+  padding: 1.5rem;
   border-radius: 12px;
   background-color: white;
   box-shadow: 0 2px 8px rgb(0, 0, 0, 0.25);
-  padding: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Comment form disclosure. The form is four fields tall and most readers never
+   use it, so it stays folded behind a button; the comments themselves are
+   always visible, because those are content.
+   -------------------------------------------------------------------------- */
+
+#comment-form details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+#comment-form details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.comment-form__toggle {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  border: 1px solid var(--brand-deep);
+  border-radius: 6px;
+  color: var(--brand-deep);
+  font-weight: bold;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+summary:hover .comment-form__toggle,
+summary:focus-visible .comment-form__toggle {
+  background-color: var(--brand-deep);
+  color: white;
+}
+
+/* The label is a promise about what the button does, so it has to change when
+   the form is already showing. */
+#comment-form details[open] .comment-form__toggle::after {
+  content: " ×";
+}
+
+#comment-form details[open] > summary {
+  margin-bottom: 1.5rem;
 }
 
 #comment-form button {
   font: inherit;
-  background-color: #390281;
+  background-color: var(--brand-deep);
   color: white;
-  border: 1px solid #390281;
+  border: 1px solid var(--brand-deep);
   padding: 0.5rem 1.5rem;
   border-radius: 6px;
   cursor: pointer;
@@ -102,8 +194,8 @@ main {
 
 #comment-form button:hover,
 #comment-form button:active {
-  background-color: #390281;
-  border-color: #390281;
+  background-color: var(--brand-deep);
+  border-color: var(--brand-deep);
 }
 
 .form-control {
@@ -146,8 +238,8 @@ main {
 
 #comments {
   margin: 3rem auto;
-  width: 90%;
-  max-width: 60rem;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   border-radius: 12px;
   background-color: white;
   box-shadow: 0 2px 8px rgb(0, 0, 0, 0.25);
@@ -161,13 +253,33 @@ main {
 }
 
 #comments li {
+  padding-bottom: 1rem;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #ccc;
+  border-bottom: 1px solid #e4e4e4;
 }
 
 #comments li:last-of-type {
+  padding-bottom: 0;
+  margin-bottom: 0;
   border-bottom: none;
 }
+
+/* A blockquote carries a 40px browser margin, which indented the comment text
+   away from the name sitting under it. The two now share a left edge. */
+#comments blockquote {
+  margin: 0;
+}
+
+#comments blockquote p {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.6;
+  color: #2e2e2e;
+}
+
+#comments blockquote p:last-child {
+  margin-bottom: 0;
+}
+
 
 #comments h2 {
   color: #464646;
@@ -175,9 +287,12 @@ main {
 
 
 #read_later {
-  /* Pushes the button to the bottom of the hero on every post. */
+  /* Pushed to the bottom of the column so the Save button finishes on the same
+     line as the author's date on the right, whatever length the title runs to.
+     The author column already ends on that line — it fills its own column — so
+     only this side needed pinning. */
   margin-top: auto;
-  padding-top: 1.5rem;
+  padding-top: 0.25rem;
 }
 
 #read_later button {
@@ -191,7 +306,7 @@ main {
 #read_later button:hover,
 #read_later button:active {
   background-color: white;
-  color: #390281;
+  color: var(--brand-deep);
 }
 @media (max-width: 60rem) {
   #summary {
@@ -219,10 +334,51 @@ main {
     border-radius: 12px;
   }
 
+  #summary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  /* flex-start suits the desktop panel, where the Save button hugs its label.
+     On a phone that button is the full-width primary action, so the column
+     stretches instead. */
+  /* Spacing set per element here rather than by one gap. Most of what you see
+     between the excerpt and the tags is not the gap at all: the paragraph's
+     line box carries ~3px of leading under its last line and the tag pills add
+     their own padding on top, so a 3px gap reads as 10px. */
+  .summary__main {
+    align-items: stretch;
+    gap: 0;
+  }
+
+  #summary .tags {
+    margin-top: 0;
+  }
+
+  /* Tighter pills, which takes another 2px out of the apparent gap. */
+  #summary a.tag {
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+  }
+
+  /* The button still needs real room; only the tag gap was too big. */
+  #read_later {
+    padding-top: 0.75rem;
+  }
+
+  /* The title needs more room than the rest of the stack; the tight gap is
+     only wanted between the excerpt and the tags. Scoped through #summary so
+     it outranks the `#summary h1 { margin: 0 }` above. */
+  #summary h1 {
+    margin-bottom: 0.4rem;
+  }
+
   #summary article {
+    width: auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
   }
 
   #summary article img {

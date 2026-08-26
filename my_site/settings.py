@@ -150,7 +150,7 @@ BLOG_SETTINGS = {
         default="A software engineer in Japan, writing about the places I visit.",
     ),
     "posts_per_page": env.int("BLOG_POSTS_PER_PAGE", default=6),
-    "latest_posts_count": env.int("BLOG_LATEST_POSTS_COUNT", default=3),
+    "latest_posts_count": env.int("BLOG_LATEST_POSTS_COUNT", default=6),
 }
 
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(

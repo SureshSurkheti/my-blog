@@ -78,17 +78,37 @@ class BuildSocialLinksTests(SimpleTestCase):
 
 class SocialLinkRenderingTests(TestCase):
     @override_settings(SOCIAL_LINKS=LINKS)
-    def test_links_appear_in_the_footer_on_every_page(self):
+    def test_links_appear_in_the_footer_of_every_page(self):
+        # The whole point of the footer over the home hero: a reader who lands
+        # on a post from a search engine can still find them.
         post = make_post("Anywhere")
         for url in (
             reverse("starting-page"),
             reverse("posts-page"),
             post.get_absolute_url(),
             reverse("read-later"),
+            reverse("search-page"),
         ):
             with self.subTest(url=url):
-                response = self.client.get(url)
-                self.assertContains(response, "https://github.com/example")
+                body = self.client.get(url).content.decode()
+                footer = body[body.index("site-footer") :]
+                self.assertIn("https://github.com/example", footer)
+
+    @override_settings(SOCIAL_LINKS=LINKS)
+    def test_links_are_not_in_the_header(self):
+        # A follow button in the nav is a way off the site offered before any
+        # of the writing has been read.
+        body = self.client.get(reverse("starting-page")).content.decode()
+
+        header = body[body.index('id="main-navigation"') : body.index("</header>")]
+        self.assertNotIn("social-link", header)
+
+    @override_settings(SOCIAL_LINKS=LINKS)
+    def test_links_are_not_duplicated_in_the_home_hero(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+
+        hero = body[body.index('id="welcome"') : body.index('id="latest-posts"')]
+        self.assertNotIn("social-link", hero)
 
     @override_settings(SOCIAL_LINKS=LINKS)
     def test_links_open_safely_and_claim_identity(self):
@@ -97,13 +117,9 @@ class SocialLinkRenderingTests(TestCase):
         self.assertContains(response, 'target="_blank"')
 
     @override_settings(SOCIAL_LINKS=LINKS)
-    def test_they_appear_once_per_page_in_the_footer_only(self):
+    def test_they_render_once_per_page(self):
         body = self.client.get(reverse("starting-page")).content.decode()
-
         self.assertEqual(body.count('class="social-links'), 1)
-        # Not repeated inside the homepage bio panel.
-        bio = body[body.index('id="about"') : body.index("site-footer")]
-        self.assertNotIn("social-link", bio)
 
     @override_settings(SOCIAL_LINKS=[])
     def test_nothing_renders_when_none_are_configured(self):
@@ -111,7 +127,64 @@ class SocialLinkRenderingTests(TestCase):
         self.assertNotContains(response, "social-link")
 
     @override_settings(SOCIAL_LINKS=LINKS)
-    def test_labels_are_the_link_text_so_no_aria_label_is_needed(self):
+    def test_every_platform_name_is_still_readable(self):
         response = self.client.get(reverse("starting-page"))
         self.assertContains(response, "GitHub")
         self.assertContains(response, "Instagram")
+
+
+class SocialIconTests(TestCase):
+    """Every configured platform must render a glyph, and stay reachable."""
+
+    @override_settings(
+        SOCIAL_LINKS=[
+            {"key": "instagram", "label": "Instagram", "url": "https://i.test/me"},
+            {"key": "linkedin", "label": "LinkedIn", "url": "https://l.test/me"},
+        ]
+    )
+    def test_each_link_renders_an_icon(self):
+        response = self.client.get("/")
+        body = response.content.decode()
+
+        self.assertEqual(body.count('class="social-link__icon"'), 2)
+        self.assertEqual(body.count("<svg"), body.count("</svg>"))
+
+    @override_settings(
+        SOCIAL_LINKS=[
+            {"key": "instagram", "label": "Instagram", "url": "https://i.test/me"},
+        ]
+    )
+    def test_the_name_survives_for_people_who_cannot_see_the_glyph(self):
+        # An icon-only link is unreadable to a screen reader without this.
+        response = self.client.get("/")
+
+        self.assertContains(response, 'title="Instagram"')
+        self.assertContains(response, '<span class="visually-hidden">Instagram</span>')
+
+    @override_settings(
+        SOCIAL_LINKS=[
+            {"key": "instagram", "label": "Instagram", "url": "https://i.test/me"},
+        ]
+    )
+    def test_the_follow_heading_appears_with_the_links(self):
+        self.assertContains(self.client.get("/"), "Follow me")
+
+    @override_settings(SOCIAL_LINKS=[])
+    def test_no_heading_when_nothing_is_configured(self):
+        response = self.client.get("/")
+
+        self.assertNotContains(response, "Follow me")
+        self.assertNotContains(response, "social-link")
+
+    @override_settings(
+        SOCIAL_LINKS=[
+            {"key": "brand-new", "label": "Brand New", "url": "https://n.test/me"},
+        ]
+    )
+    def test_a_platform_with_no_glyph_still_renders_something(self):
+        # Otherwise adding a SOCIAL_* handle for a new platform would show an
+        # empty circle with no way to tell what it links to.
+        response = self.client.get("/")
+
+        self.assertContains(response, 'class="social-link__icon"')
+        self.assertContains(response, 'title="Brand New"')

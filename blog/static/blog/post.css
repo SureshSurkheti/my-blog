@@ -73,3 +73,28 @@
 .post a:hover time {
   color: #4a4a4a;
 }
+
+/* --------------------------------------------------------------------------
+   The "read more" cue. Not everyone realises a whole card is clickable, so the
+   card says so. Pushed to the bottom of the card, which keeps it on one line
+   across a row whatever length the excerpts are.
+   -------------------------------------------------------------------------- */
+
+.post__more {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  color: #5706c0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.post__more span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.post a:hover .post__more span,
+.post a:focus-visible .post__more span {
+  transform: translateX(3px);
+}

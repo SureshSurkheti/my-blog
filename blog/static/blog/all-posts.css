@@ -5,7 +5,7 @@ body {
 #all-posts {
   margin: 2.5rem auto 4rem auto;
   width: 90%;
-  max-width: 68rem;
+  max-width: var(--container);
 }
 
 #all-posts h1 {
@@ -22,6 +22,10 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: 1.75rem;
+  /* Every row as tall as the tallest, so a card in row two is the same height
+     as one in row one and "Read more" sits on the same line down the whole
+     page — not just across a single row. */
+  grid-auto-rows: 1fr;
 }
 
 /* Every card in a row shares that row's height, so short excerpts no longer

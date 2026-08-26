@@ -35,6 +35,7 @@ def robots_txt(request):
         "Disallow: /admin/",
         "Disallow: /search",
         "Disallow: /read-later",
+        "Disallow: /credits",
         "Allow: /",
         "",
         f"Sitemap: {sitemap_url}",

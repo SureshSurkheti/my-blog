@@ -1,10 +1,20 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
 from blog.models import Comment
 
-from .factories import make_author, make_comment, make_future_post, make_post, make_tag
+from .factories import (
+    make_author,
+    make_comment,
+    make_future_post,
+    make_image_file,
+    make_post,
+    make_tag,
+)
 
 SETTINGS_TWO_PER_PAGE = {
     "title": "Test Blog",
@@ -218,10 +228,13 @@ class ReadLaterTests(TestCase):
     def setUp(self):
         self.post = make_post("Saveable")
 
-    def test_empty_list_shows_a_prompt(self):
+    def test_empty_list_shows_a_prompt_and_a_way_onward(self):
         response = self.client.get(reverse("read-later"))
+
         self.assertFalse(response.context["has_posts"])
-        self.assertContains(response, "haven't saved any posts")
+        self.assertContains(response, "Nothing saved yet")
+        # A dead end otherwise: nothing to click and nowhere obvious to go.
+        self.assertContains(response, "Browse all posts")
 
     def test_posting_adds_then_removes_the_post(self):
         url = reverse("read-later")
@@ -333,3 +346,230 @@ class PageSizeTests(TestCase):
         response = self.client.get(reverse("search-page"), {"q": "unicorn"})
 
         self.assertEqual(len(response.context["posts"]), 6)
+
+
+class TemplateCommentLeakTests(TestCase):
+    """Django's ``{# #}`` is single-line only.
+
+    Spread over two lines it stops being a comment: the opening text renders
+    as visible page content and the rest of the tag swallows the markup after
+    it. That failure still passes ordinary ``assertContains`` checks, because
+    the words are all technically present — so it needs its own test.
+    """
+
+    def setUp(self):
+        self.post = make_post("Leak Check", tags=[make_tag("Oita")])
+        make_comment(self.post)
+
+    def test_no_page_renders_a_raw_template_comment(self):
+        paths = [
+            "/",
+            "/posts",
+            self.post.get_absolute_url(),
+            "/tags/oita",
+            "/search?q=leak",
+            "/read-later",
+            "/credits",
+        ]
+        for path in paths:
+            with self.subTest(path=path):
+                body = self.client.get(path).content.decode()
+                self.assertNotIn("{#", body)
+                self.assertNotIn("#}", body)
+                self.assertNotIn("{%", body)
+
+
+class HeroPostCountTests(TestCase):
+    """The hero's "N posts so far" is counted per request, never stored."""
+
+    def test_it_counts_the_whole_archive_not_the_cards_shown(self):
+        # The home page shows a handful of cards; the count is the full total.
+        for i in range(9):
+            make_post(f"Post {i}", slug=f"post-{i}")
+
+        response = self.client.get("/")
+
+        self.assertEqual(response.context["total_posts"], 9)
+        self.assertContains(response, "9")
+
+    def test_it_goes_up_when_a_post_is_added(self):
+        make_post("First", slug="first")
+        self.assertEqual(self.client.get("/").context["total_posts"], 1)
+
+        make_post("Second", slug="second")
+        self.assertEqual(self.client.get("/").context["total_posts"], 2)
+
+    def test_it_goes_down_when_a_post_is_deleted(self):
+        first = make_post("First", slug="first")
+        make_post("Second", slug="second")
+        self.assertEqual(self.client.get("/").context["total_posts"], 2)
+
+        first.delete()
+        self.assertEqual(self.client.get("/").context["total_posts"], 1)
+
+    def test_drafts_and_future_posts_are_not_counted(self):
+        make_post("Live", slug="live")
+        make_post("Hidden", slug="hidden", published=False)
+        make_future_post("Later", slug="later")
+
+        self.assertEqual(self.client.get("/").context["total_posts"], 1)
+
+    def test_the_wording_agrees_with_the_number(self):
+        make_post("Only One", slug="only-one")
+        self.assertContains(self.client.get("/"), "post so far")
+
+        make_post("And Another", slug="and-another")
+        self.assertContains(self.client.get("/"), "posts so far")
+
+    def test_an_empty_blog_shows_no_count_at_all(self):
+        self.assertNotContains(self.client.get("/"), "posts so far")
+
+
+class PostCardTests(TestCase):
+    """The card is one link; the cue inside it must not be a second one."""
+
+    def setUp(self):
+        self.post = make_post("Clickable", slug="clickable")
+
+    def test_every_card_shows_a_read_more_cue(self):
+        for url in ("/", "/posts"):
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), "Read more")
+
+    def test_the_cue_is_not_a_nested_link(self):
+        # <a> inside <a> is invalid and browsers handle it unpredictably.
+        body = self.client.get("/").content.decode()
+        card = body[body.index('class="post"') : body.index("</article>")]
+
+        self.assertIn('class="post__more"', card)
+        self.assertEqual(card.count("<a "), 1)
+
+    def test_the_whole_card_is_still_the_link(self):
+        body = self.client.get("/").content.decode()
+        card = body[body.index('class="post"') : body.index("</article>")]
+
+        self.assertIn(self.post.get_absolute_url(), card)
+        # Picture and text both sit inside the single anchor.
+        anchor = card[card.index("<a ") :]
+        self.assertIn("post__content", anchor)
+
+    def test_the_arrow_is_hidden_from_screen_readers(self):
+        # "Read more →" should be announced as "Read more", not "Read more
+        # right arrow".
+        self.assertContains(self.client.get("/"), '<span aria-hidden="true">')
+
+
+class StickyFooterTests(TestCase):
+    """A short page must not leave the footer floating mid-window."""
+
+    def _css(self):
+        with open(Path(settings.BASE_DIR) / "static" / "app.css") as handle:
+            return handle.read()
+
+    def test_content_sits_in_a_growing_wrapper(self):
+        for url in ("/", "/read-later", "/posts"):
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), '<div class="page">')
+
+    def test_the_body_is_a_full_height_column(self):
+        css = self._css()
+        rule = css[css.index("body {") :].split("}")[0]
+
+        self.assertIn("flex-direction: column", rule)
+        self.assertIn("min-height: 100dvh", rule)
+
+    def test_the_wrapper_grows_to_fill_the_window(self):
+        css = self._css()
+        rule = css[css.index(".page {") :].split("}")[0]
+        self.assertIn("flex: 1 0 auto", rule)
+
+    def test_the_home_page_is_flagged_for_its_white_footer(self):
+        # A body class, not an adjacent-sibling selector: the content wrapper
+        # now sits between #about and the footer.
+        self.assertContains(self.client.get("/"), 'class="has-about"')
+        self.assertNotContains(self.client.get("/posts"), 'class="has-about"')
+
+    def test_the_read_more_cue_is_pinned_to_the_bottom_of_the_card(self):
+        # Without margin-top:auto it floats up under short excerpts, so it
+        # lands on a different line in every card of a row.
+        with open(
+            Path(settings.BASE_DIR) / "blog" / "static" / "blog" / "post.css"
+        ) as f:
+            css = f.read()
+        rule = css[css.index(".post__more {") :].split("}")[0]
+        self.assertIn("margin-top: auto", rule)
+
+    def test_card_grids_give_every_row_the_same_height(self):
+        # Otherwise row two can be taller than row one and the cue sits on a
+        # different line down the page.
+        base = Path(settings.BASE_DIR) / "blog" / "static" / "blog"
+        for name, selector in (
+            ("index.css", "#latest-posts ul {"),
+            ("all-posts.css", "#all-posts ul {"),
+        ):
+            with self.subTest(stylesheet=name):
+                with open(base / name) as handle:
+                    css = handle.read()
+                rule = css[css.index(selector) :].split("}")[0]
+                self.assertIn("grid-auto-rows: 1fr", rule)
+
+
+class SavedPageTests(TestCase):
+    """The reading list: enough on each row to choose from, and safe markup."""
+
+    def setUp(self):
+        self.post = make_post(
+            "A Saved Post", slug="a-saved-post", image=make_image_file("saved.jpg")
+        )
+        self.client.post(reverse("read-later"), {"post_id": self.post.id})
+
+    def test_each_row_shows_the_picture_title_date_and_length(self):
+        response = self.client.get(reverse("read-later"))
+
+        self.assertContains(response, "saved-item__thumb")
+        self.assertContains(response, "A Saved Post")
+        self.assertContains(response, self.post.published_at.strftime("%d %b %Y"))
+        self.assertContains(response, "min read")
+
+    def test_the_count_agrees_with_the_list(self):
+        response = self.client.get(reverse("read-later"))
+        self.assertContains(response, "1 post waiting")
+
+        second = make_post("Another", slug="another")
+        self.client.post(reverse("read-later"), {"post_id": second.id})
+        self.assertContains(self.client.get(reverse("read-later")), "2 posts waiting")
+
+    def test_the_remove_button_is_not_nested_inside_the_link(self):
+        # A <button> inside an <a> is invalid, and clicking it would follow the
+        # link instead of removing the post.
+        body = self.client.get(reverse("read-later")).content.decode()
+        # Search for the closing tag from the row's own position: other <li>
+        # elements on the page would otherwise end the slice early.
+        start = body.index('class="saved-item"')
+        row = body[start : body.index("</li>", start)]
+
+        link = row[row.index("<a ") : row.index("</a>")]
+        self.assertNotIn("<button", link)
+        self.assertNotIn("<form", link)
+
+    def test_the_remove_button_says_what_it_removes(self):
+        # The visible control is just "×", which tells a screen reader nothing.
+        response = self.client.get(reverse("read-later"))
+        self.assertContains(response, "Remove “A Saved Post” from saved")
+
+    def test_removing_from_the_list_works_and_returns_here(self):
+        response = self.client.post(
+            reverse("read-later"),
+            {"post_id": self.post.id, "next": reverse("read-later")},
+            follow=True,
+        )
+
+        self.assertContains(response, "Nothing saved yet")
+        self.assertNotContains(response, "saved-item__thumb")
+
+    def test_a_post_without_a_picture_still_lines_up(self):
+        plain = make_post("No Picture", slug="no-picture")
+        self.client.post(reverse("read-later"), {"post_id": plain.id})
+
+        response = self.client.get(reverse("read-later"))
+        self.assertContains(response, "saved-item__thumb--empty")

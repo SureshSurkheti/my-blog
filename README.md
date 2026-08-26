@@ -144,6 +144,7 @@ then paste the output under the hand-written container rules in
 | `/authors/<slug>`   | Posts by one author                         |
 | `/search?q=`        | Search titles, excerpts, bodies and tags    |
 | `/read-later`       | Saved posts (session-based, no login)       |
+| `/credits`          | Photographers and licences for borrowed photos |
 | `/feed/rss`         | RSS feed (not linked in the footer)         |
 | `/feed/atom`        | Atom feed (not linked in the footer)        |
 | `/sitemap.xml`      | Sitemap for search engines                  |
@@ -166,7 +167,7 @@ Settings that vary by machine live in `.env` (git-ignored). See
 | `IMAGE_MAX_DIMENSION`     | `1600`               | Longest edge kept on upload           |
 | `IMAGE_JPEG_QUALITY`      | `80`                 | JPEG quality on upload                |
 | `MEDIA_ROOT`              | `uploads/`           | Where uploads are written             |
-| `BLOG_LATEST_POSTS_COUNT` | `3`                  | Posts shown on the homepage          |
+| `BLOG_LATEST_POSTS_COUNT` | `6`                  | Posts shown on the homepage (3 on phones — see below) |
 
 HTTPS-only protections (SSL redirect, secure cookies, HSTS) switch on
 automatically whenever `DEBUG=False`, so local HTTP development is unaffected.
@@ -276,6 +277,50 @@ stay discoverable through the `<link rel="alternate">` tags in `<head>`, which
 is what feed readers, aggregators and Google actually read, so anyone who
 subscribes still can. To advertise them again, add the links back to the footer
 in `templates/base.html`.
+
+## Layout widths
+
+Every page block — the home hero, the card panel, the post hero, the article,
+the gallery, the comments — shares one `--container` width defined in
+`static/app.css`. Change it there and the whole site follows. Reading measures
+are set separately and are deliberately narrower than the panels holding them:
+a full-width column of prose runs to about 140 characters a line.
+
+The home page always renders `BLOG_LATEST_POSTS_COUNT` posts, but CSS hides all
+but the first three below `37.5rem`. The cut-off is where the card grid drops
+to a single column — hiding three above it would leave one card alone on the
+last row of a two-column grid.
+
+## Seeding the Kyushu posts
+
+Twelve travel posts covering all seven Kyushu prefectures live in
+`blog/seed_data.py`, together with the Wikimedia Commons file each one borrows
+its pictures from. Two management commands load them:
+
+```bash
+.venv/bin/python manage.py fetch_seed_photos          # downloads into seed_photos/
+.venv/bin/python manage.py seed_kyushu --replace      # writes the posts
+```
+
+The steps are separate on purpose: the download needs the network and runs
+once, and the seeding step is then offline and safe to re-run. `--replace`
+deletes every existing post first — **including its comments** — so it is
+opt-in rather than the default.
+
+`fetch_seed_photos` refuses any photo whose licence is not free. `CC0`,
+`CC BY`, `CC BY-SA` and public domain pass; `CC BY-NC` and `CC BY-ND` are
+rejected, because the upload pipeline resizes and re-encodes every picture and
+that produces a derivative work.
+
+Credit lives on a `/credits` page, built from `blog/photo_credits.json` which
+seeding writes. That page is **not linked from anywhere** on the site, by
+choice. CC BY and CC BY-SA require attribution a reader can find, so the blog
+is only properly clear of that obligation once the borrowed photographs are
+replaced with your own — at which point delete the JSON file and the page
+empties out by itself.
+
+`seed_photos/` is not in version control — re-run `fetch_seed_photos` to
+rebuild it.
 
 ## Site icons
 

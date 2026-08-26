@@ -24,3 +24,6 @@ htmlcov/
 .idea/
 .vscode/
 *.swp
+
+# Seed photos, rebuilt by `manage.py fetch_seed_photos`
+/seed_photos/
