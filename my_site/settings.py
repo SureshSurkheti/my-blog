@@ -136,9 +136,12 @@ USE_TZ = True
 
 # Static files and uploads
 
+# Static files and uploads
+
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -149,6 +152,12 @@ STORAGES = {
         else "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
 }
+
+# Required because django-cloudinary-storage still checks this setting
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
+
+MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "uploads"))
+MEDIA_URL = "files/"
 
 # Configurable so a throwaway/demo run can be pointed at a scratch directory
 # instead of writing into (or cleaning up) the real uploads.
