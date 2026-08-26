@@ -1,8 +1,13 @@
 asgiref==3.12.1
+coverage==7.13.2
 Django==5.2.17
 django-environ==0.14.0
+gunicorn==26.2.0
 Markdown==3.10.3
 nh3==0.3.7
 pillow==12.3.0
+psycopg2-binary==2.9.12
 Pygments==2.19.2
+ruff==0.15.6
 sqlparse==0.6.0
+whitenoise==6.12.0
