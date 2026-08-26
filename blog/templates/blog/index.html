@@ -3,6 +3,9 @@
 
 {% block title %}{{ blog.title }}{% endblock %}
 
+{# Drives the white footer: the about panel above it is already cream. #}
+{% block body_class %}has-about{% endblock %}
+
 {% block css_files %}
 <link rel="stylesheet" href="{% static 'blog/post.css' %}" />
 <link rel="stylesheet" href="{% static 'blog/index.css' %}" />
@@ -10,14 +13,24 @@
 
 {% block content %}
 <section id="welcome">
-  <header>
-    <img src="{% static 'blog/images/suresh.jpg' %}" alt="Suresh, the author of this blog" />
-    <h1>{{ blog.title }}</h1>
-  </header>
-  <p>
-    Hi, I'm Suresh — a full-stack developer living in Japan. I write about the
-    places I visit and what I take away from them.
-  </p>
+  {# The band spans the window; this holds its contents to the shared column. #}
+  <div class="welcome__inner">
+    <div class="welcome__text">
+      <h1>{{ blog.title }}</h1>
+      <p class="welcome__bio">
+        Hi, I'm Suresh — a software engineer living in Japan. I write about the
+        places I visit and what I take away from them.
+      </p>
+      {% if total_posts %}
+      <p class="welcome__count">
+        <strong>{{ total_posts }}</strong>
+        post{{ total_posts|pluralize }} so far
+      </p>
+      {% endif %}
+    </div>
+    <img class="welcome__portrait" src="{% static 'blog/images/suresh.jpg' %}"
+         alt="Suresh, the author of this blog" />
+  </div>
 </section>
 
 <section id="latest-posts">
@@ -36,19 +49,23 @@
 
 {# Edit this copy directly — it's the one hand-written block on the site. #}
 <section id="about">
-  <h2>A Little About Me</h2>
-  <p>
-    I'm a full-stack developer, and I've been working as a software engineer
-    since 2022 — the last three years at an IT company here in Japan.
-  </p>
-  <p>
-    Outside of work, I travel. Japan has a way of putting an onsen town, a
-    mountain trail and a quiet shrine within a few hours of each other, and
-    I'd rather see those places than read about them.
-  </p>
-  <p>
-    This blog is where the two sides meet: the places I go, the photos I take,
-    and what I learn along the way — some of it about code, most of it not.
-  </p>
+  <div class="about__inner">
+    <h2>A Little About Me</h2>
+    <p>
+      I've been working as a software engineer since 2022 — the last three
+      years at an IT company here in Japan.
+    </p>
+    <p>
+      Outside of work, I travel. Japan has a way of putting an onsen town, a
+      mountain trail and a quiet shrine within a few hours of each other, and
+      I'd rather see those places than read about them.
+    </p>
+    <p>
+      This blog is where the two sides meet: the places I go, the photos I
+      take, and what I learn along the way — some of it about code, most of
+      it not.
+    </p>
+  </div>
 </section>
+
 {% endblock %}

@@ -14,6 +14,12 @@
           · {{ post.content|reading_time }} min read
         </p>
         <p>{{ post.excerpt }}</p>
+        {% comment %}
+        A span, not a second link: the whole card is already one anchor, and an
+        <a> inside an <a> is invalid and unreliable in browsers. This is the
+        visible cue that the card is clickable.
+        {% endcomment %}
+        <span class="post__more">Read more <span aria-hidden="true">&rarr;</span></span>
       </div>
     </a>
   </article>

@@ -19,6 +19,12 @@
 <p class="back-link"><a href="{% url 'posts-page' %}">&larr; All posts</a></p>
 
 <section id="summary">
+  {% comment %}
+  Two real columns rather than an absolutely positioned author card. The card
+  used to be lifted out of the flow, so on a post with a short title it was
+  taller than the panel behind it and spilled out of the bottom.
+  {% endcomment %}
+  <div class="summary__main">
   <h1>{{ post.title }}</h1>
   <p>{{ post.excerpt }}</p>
 
@@ -38,6 +44,7 @@
       </button>
     </form>
   </div>
+  </div>
 
   <article>
     {% if post.image %}
@@ -54,10 +61,15 @@
       Unknown
       {% endif %}
     </address>
-    <div>
-      Published on
-      <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"d M Y" }}</time>
-      · {{ post.content|reading_time }} min read
+    {% comment %}
+    Date and reading time on their own lines: on one line they wrapped mid-
+    phrase in the narrow author column ("· 2 min / read").
+    {% endcomment %}
+    <div class="post-meta">
+      <span>Published on
+        <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"d M Y" }}</time>
+      </span>
+      <span>{{ post.content|reading_time }} min read</span>
     </div>
   </article>
 </section>
@@ -147,7 +159,15 @@
 </section>
 
 <section id="comment-form">
-  <h2>Your Comment</h2>
+  {% comment %}
+  A <details> rather than a script: the form still opens with JavaScript off,
+  and it reopens itself when a submission comes back with errors so the reader
+  can see what to fix.
+  {% endcomment %}
+  <details {% if comment_form.errors %}open{% endif %}>
+    <summary>
+      <span class="comment-form__toggle">Leave a comment</span>
+    </summary>
   <form action="{{ post.get_absolute_url }}" method="POST" novalidate>
     {% csrf_token %}
     {% if comment_form.non_field_errors %}
@@ -171,6 +191,7 @@
     {% endfor %}
     <button type="submit">Post Comment</button>
   </form>
+  </details>
 </section>
 {% endblock %}
 

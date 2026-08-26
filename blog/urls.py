@@ -15,6 +15,7 @@ urlpatterns = [
     ),
     path("search", views.SearchView.as_view(), name="search-page"),
     path("read-later", views.ReadLaterView.as_view(), name="read-later"),
+    path("credits", views.PhotoCreditsView.as_view(), name="photo-credits"),
     path("feed/rss", LatestPostsFeed(), name="post-feed-rss"),
     path("feed/atom", LatestPostsAtomFeed(), name="post-feed-atom"),
 ]

@@ -1,52 +1,88 @@
+/* --------------------------------------------------------------------------
+   Home page.
+
+   Everything down the page — the hero text, the card grid, the about copy —
+   sits in the same --container column, so the left and right edges line up as
+   you scroll instead of stepping in and out.
+   -------------------------------------------------------------------------- */
 
 #welcome {
-  background: linear-gradient(to right top, #6305dd, #390281);
-  /* The header sits above this now rather than floating over it. */
-  padding: 3rem 12% 6rem 12%;
+  background: linear-gradient(160deg, var(--brand) 0%, var(--brand-deep) 100%);
+  padding: 3rem var(--gutter) 6.5rem var(--gutter);
 }
 
-#welcome header {
+/* The background spans the window; its contents keep to the shared column, so
+   the hero lines up with the card panel below it. Words on the left, portrait
+   on the right — the text then uses the whole left half instead of ending in
+   the middle with an empty band beside it. */
+.welcome__inner {
+  max-width: var(--container);
+  margin-inline: auto;
   display: flex;
-  align-items: flex-start;
-  margin: 3rem auto;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
 }
 
-#welcome img {
-  width: 10rem;
-  height: 10rem;
+.welcome__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.welcome__portrait {
+  width: clamp(9rem, 17vw, 13rem);
+  aspect-ratio: 1;
+  flex-shrink: 0;
   object-fit: cover;
   object-position: top;
-  border: 5px solid white;
-  border-radius: 12px;
+  border: 6px solid white;
+  border-radius: 14px;
   background-color: #ffe1bf;
-  transform: rotateZ(-5deg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transform: rotateZ(-3deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 #welcome h1 {
-  font-size: clamp(2rem, 7vw, 3.5rem);
-  margin: 0 0 0 2rem;
-  color: #e4e4e4;
-  width: 10rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.1;
+  margin: 0 0 0.75rem 0;
+  color: #f4f0fb;
 }
 
-#welcome p {
+.welcome__bio {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.6;
+  /* No cap: the text column already stops where the portrait begins, so the
+     line runs the full width available to it. */
+  margin: 0;
+}
+
+.welcome__count {
+  margin: 1.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.welcome__count strong {
+  font-size: 1.15rem;
   color: white;
-  font-size: clamp(1.05rem, 2.5vw, 1.5rem);
 }
 
 #latest-posts {
   background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 60rem;
-  margin: -6rem auto 2rem auto;
-  box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.4);
+  padding: 2.25rem clamp(1.25rem, 3vw, 2.5rem);
+  border-radius: 14px;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
+  margin: -3.5rem auto 0 auto;
+  box-shadow: 0 10px 30px rgba(20, 4, 50, 0.22);
 }
 
 #latest-posts h2 {
   text-align: center;
+  margin: 0 0 1.75rem 0;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  color: #2e2e2e;
 }
 
 #latest-posts ul {
@@ -54,8 +90,12 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  /* Every row as tall as the tallest, so a card in row two is the same height
+     as one in row one and "Read more" sits on the same line down the whole
+     page — not just across a single row. */
+  grid-auto-rows: 1fr;
 }
 
 #latest-posts li {
@@ -68,71 +108,98 @@
   background-color: white;
 }
 
+/* --------------------------------------------------------------------------
+   About. A warm off-white rather than the old solid orange, which fought with
+   the purple hero. Heading centred over a centred column, matching the way
+   "My Latest Thoughts" sits above the cards.
+   -------------------------------------------------------------------------- */
+
 #about {
-  text-align: center;
-  padding: 3rem;
-  background-color: #e48900;
-  margin-top: 5rem;
+  margin-top: 4rem;
+  padding: 3.5rem var(--gutter) 3rem var(--gutter);
+  background-color: #f5f2ed;
+  border-top: 1px solid #e3ddd3;
+}
+
+.about__inner {
+  /* The same column as the card panel above, so the copy reaches the same
+     left and right edges as "See all posts". */
+  max-width: var(--container);
+  margin-inline: auto;
 }
 
 #about h2 {
-  font-size: clamp(1.85rem, 6vw, 3rem);
+  margin: 0 0 1.75rem 0;
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  color: #2e2e2e;
 }
 
 #about p {
-  /* Slightly smaller than the old 1.5rem cap so more words fit per line, and
-     a wider column so the text fills the panel instead of sitting in a narrow
-     ribbon. Together these land around 70 characters a line on a desktop —
-     comfortable to read, and no longer dwarfed by the empty space either side. */
-  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
-  line-height: 1.6;
-  color: #353535;
-  max-width: 58rem;
-  margin-inline: auto;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  line-height: 1.75;
+  color: #4a4a4a;
+  text-align: center;
+  margin: 0 0 1.1rem 0;
+}
+
+#about p:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 48rem) {
   #welcome {
-    padding: 2.5rem 1.25rem 3.5rem 1.25rem;
+    padding: 2rem var(--gutter) 4.5rem var(--gutter);
   }
 
-  /* Portrait and title stack and centre instead of sitting side by side in a
-     10rem-wide column. */
-  #welcome header {
+  /* Portrait and words stack and centre instead of sitting side by side. The
+     portrait leads, because a face is a better first thing to meet than a
+     heading. */
+  .welcome__inner {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin: 0 auto 1.5rem auto;
+    gap: 1.25rem;
   }
 
-  #welcome img {
+  .welcome__portrait {
+    order: -1;
     width: 8rem;
-    height: 8rem;
     transform: none;
   }
 
-  #welcome h1 {
-    width: auto;
-    margin: 1rem 0 0 0;
-  }
+
+
 
   #welcome p {
     text-align: center;
   }
 
   #latest-posts {
-    width: calc(100% - 2.5rem);
-    padding: 1.25rem;
-    margin: -2.5rem auto 0 auto;
+    padding: 1.5rem 1.25rem;
+    margin-top: -2.5rem;
   }
 
   #latest-posts h2 {
-    font-size: 1.4rem;
-    margin: 0.5rem 0 1rem 0;
+    margin-bottom: 1.25rem;
   }
 
   #about {
-    padding: 2.25rem 1.25rem;
     margin-top: 2.5rem;
+    padding: 2.5rem var(--gutter);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Three posts on a phone, six everywhere else. The server sends six either
+   way; six single-column cards make the home page a very long scroll before
+   the reader reaches anything else. The cut-off is where the grid drops to
+   one column — above it, hiding three would leave an orphan card alone on the
+   last row of a two-column grid. Hidden cards carry loading="lazy" images, so
+   their pictures are never fetched.
+   -------------------------------------------------------------------------- */
+@media (max-width: 37.5rem) {
+  #latest-posts li:nth-child(n + 4) {
+    display: none;
   }
 }

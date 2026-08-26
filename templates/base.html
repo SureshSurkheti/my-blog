@@ -16,12 +16,21 @@
     <link rel="stylesheet" href="{% static 'app.css' %}" />
     {% block css_files %}{% endblock %}
   </head>
-  <body>
+  <body class="{% block body_class %}{% endblock %}">
     {% with route=request.resolver_match.url_name %}
     <header id="main-navigation">
       <a class="site-title" href="{% url 'starting-page' %}">{{ blog.title }}</a>
 
       <nav aria-label="Main">
+        {% comment %}
+        A spelled-out Home link as well as the site title. The title is the
+        conventional way back, but it is a convention, and someone who has not
+        met it has no way out of a post other than the browser's back button.
+        {% endcomment %}
+        <a href="{% url 'starting-page' %}"
+           {% if route == 'starting-page' %}class="is-active" aria-current="page"{% endif %}>
+          Home
+        </a>
         <a href="{% url 'posts-page' %}"
            {% if route == 'posts-page' or route == 'post-detail-page' or route == 'tag-posts-page' or route == 'author-posts-page' or route == 'search-page' %}class="is-active" aria-current="page"{% endif %}>
           <span class="nav-label--full">All Posts</span>
@@ -62,9 +71,19 @@
     </ul>
     {% endif %}
 
-    {% block content %}{% endblock %}
+    {% comment %}
+    Wrapped so the body can be a flex column: this grows to fill a short page
+    and pushes the footer down to the bottom of the window.
+    {% endcomment %}
+    <div class="page">{% block content %}{% endblock %}</div>
 
     <footer class="site-footer">
+      {% comment %}
+      The social links belong here rather than in the header or the home hero.
+      The footer is on every page, so a reader who arrives at a post from a
+      search engine can still find them; and it comes after the writing rather
+      than offering a way off the site before any of it has been read.
+      {% endcomment %}
       {% include "includes/social-links.html" %}
       <p>&copy; {% now "Y" %} {{ blog.title }}</p>
       {% comment %}

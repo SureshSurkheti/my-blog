@@ -434,3 +434,56 @@ class CardSizingTests(TestCase):
     def test_an_explicit_focal_point_still_wins(self):
         post = make_post("Bottom kept", focal_point=FocalPoint.BOTTOM)
         self.assertEqual(post.focal_css, "50% 100%")
+
+
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+class CommentFormDisclosureTests(TestCase):
+    """The form is folded away by default, but must not hide a failed post."""
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def setUp(self):
+        self.post = make_post("Folded")
+
+    def test_the_form_is_closed_on_a_normal_visit(self):
+        response = self.client.get(self.post.get_absolute_url())
+
+        self.assertContains(response, "Leave a comment")
+        self.assertNotContains(response, "<details open>")
+
+    def test_the_form_stays_usable_without_javascript(self):
+        # <details> works with scripting off; a script-driven toggle would not.
+        response = self.client.get(self.post.get_absolute_url())
+        self.assertContains(response, "<details")
+        self.assertContains(response, "<summary>")
+        self.assertContains(response, 'name="text"')
+
+    def test_a_rejected_submission_reopens_the_form(self):
+        response = self.client.post(
+            self.post.get_absolute_url(),
+            {"user_name": "", "user_email": "not-an-email", "text": ""},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "<details open>", status_code=400)
+
+    def test_a_rejected_submission_keeps_what_was_typed(self):
+        response = self.client.post(
+            self.post.get_absolute_url(),
+            {"user_name": "Ada", "user_email": "bad", "text": "Worth keeping."},
+        )
+
+        self.assertContains(response, "Worth keeping.", status_code=400)
+        self.assertContains(response, "Ada", status_code=400)
+
+    def test_existing_comments_are_never_folded_away(self):
+        # The comments are content: only the form hides behind the button.
+        make_comment(self.post, user_name="Grace", text="Lovely photos.")
+
+        response = self.client.get(self.post.get_absolute_url())
+
+        self.assertContains(response, "Lovely photos.")
+        self.assertContains(response, "1 Comment")

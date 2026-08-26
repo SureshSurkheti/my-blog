@@ -38,9 +38,11 @@ class ActiveSectionTests(TestCase):
         stored_index = nav.index(reverse("read-later"))
         self.assertIn('aria-current="page"', nav[stored_index : stored_index + 200])
 
-    def test_homepage_marks_nothing(self):
+    def test_homepage_marks_home(self):
+        # Nothing was marked here before there was a Home link to mark.
         response = self.client.get(reverse("starting-page"))
-        self.assertNotContains(response, 'aria-current="page"')
+        self.assertContains(response, 'aria-current="page"')
+        self.assertEqual(response.content.decode().count('aria-current="page"'), 1)
 
     def test_only_one_link_is_ever_marked(self):
         response = self.client.get(reverse("posts-page"))
@@ -173,3 +175,45 @@ class VisuallyHiddenTests(TestCase):
     def test_the_search_label_is_present_for_assistive_tech(self):
         response = self.client.get(reverse("posts-page"))
         self.assertContains(response, 'class="visually-hidden" for="nav-search-input"')
+
+
+class HomeLinkTests(TestCase):
+    """A spelled-out way back, for readers who don't know the title is a link."""
+
+    def test_every_page_offers_a_home_link_by_name(self):
+        post = make_post("Somewhere", tags=[make_tag("Oita")])
+        for url in (
+            reverse("starting-page"),
+            reverse("posts-page"),
+            post.get_absolute_url(),
+            reverse("read-later"),
+            reverse("search-page"),
+            "/tags/oita",
+        ):
+            with self.subTest(url=url):
+                body = self.client.get(url).content.decode()
+                nav = body[body.index("<nav") : body.index("</nav>")]
+                self.assertIn(">\n          Home\n        <", nav)
+
+    def test_the_site_title_still_links_home_too(self):
+        response = self.client.get(reverse("posts-page"))
+        self.assertContains(response, 'class="site-title" href="/"')
+
+    def test_home_is_the_first_thing_in_the_nav(self):
+        # Left-to-right, the way back should come before the way deeper in.
+        body = self.client.get(reverse("posts-page")).content.decode()
+        nav = body[body.index("<nav") : body.index("</nav>")]
+        self.assertLess(nav.index("Home"), nav.index("All Posts"))
+
+    def test_home_is_marked_current_only_on_the_home_page(self):
+        self.assertContains(
+            self.client.get(reverse("starting-page")), 'aria-current="page"'
+        )
+
+        away = self.client.get(reverse("posts-page")).content.decode()
+        nav = away[away.index("<nav") : away.index("</nav>")]
+        # Just the Home anchor: slicing to "All Posts" would swallow the Posts
+        # link's own opening tag, which is the one legitimately marked here.
+        start = nav.index('<a href="/"')
+        home_anchor = nav[start : nav.index("</a>", start)]
+        self.assertNotIn('aria-current="page"', home_anchor)

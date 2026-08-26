@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
 
+/* --------------------------------------------------------------------------
+   Design tokens. One content width for every page, so the home hero, the card
+   grids and the archive all share the same left and right edges as you scroll
+   — they used to be 60rem, 68rem and 12% padding, which never lined up.
+   -------------------------------------------------------------------------- */
+:root {
+  --container: 72rem;
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+
+  /* Brand purple, deepened and pulled back from full saturation: the old
+     #6305dd competed with the photographs instead of framing them. */
+  --brand: #43148c;
+  --brand-deep: #29085c;
+  --brand-bar: #2c0d64;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,6 +26,16 @@ html {
 
 body {
   margin: 0;
+  /* A short page — an empty search, a tag with one post — used to leave the
+     footer floating in the middle of the window with blank space under it. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.page {
+  flex: 1 0 auto;
 }
 
 h1,
@@ -35,8 +61,8 @@ h3 {
   justify-content: space-between;
   gap: 1rem;
   height: 4rem;
-  padding: 0 clamp(1rem, 6vw, 10%);
-  background-color: #390281;
+  padding: 0 var(--gutter);
+  background-color: var(--brand-bar);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
@@ -44,13 +70,20 @@ h3 {
    readable behind the bar instead of cutting it off with a hard edge. */
 @supports (backdrop-filter: blur(8px)) {
   #main-navigation {
-    background-color: rgba(41, 1, 92, 0.82);
+    background-color: rgba(41, 8, 92, 0.85);
     backdrop-filter: blur(10px);
   }
 }
 
 .site-title {
   font-family: "Lato", sans-serif;
+  /* Shrinks and ellipsises instead of forcing the header wider than the
+     screen. With four nav items there is not room for a long blog name on a
+     320px phone, and a page that scrolls sideways is worse than a clipped
+     title — the name is still in the tab, and Home is right beside it. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* Scales with the viewport so it stays the biggest thing in the bar without
      crowding the links on a phone. */
   font-size: clamp(1.2rem, 2.2vw, 1.6rem);
@@ -79,6 +112,8 @@ h3 {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  /* The links keep their size; the title gives way instead. */
+  flex-shrink: 0;
 }
 
 #main-navigation nav a {
@@ -227,7 +262,7 @@ h3 {
   margin-bottom: 0.5rem;
   font-weight: bold;
   background-color: #ede1fb;
-  color: #390281;
+  color: var(--brand-deep);
   border-left: 5px solid #5706c0;
 }
 
@@ -259,7 +294,7 @@ a.tag {
 
 a.tag:hover,
 a.tag:active {
-  background-color: #390281;
+  background-color: var(--brand-deep);
 }
 
 /* Pagination */
@@ -320,7 +355,7 @@ a.tag:active {
 
 .search-form button:hover,
 .search-form button:active {
-  background-color: #390281;
+  background-color: var(--brand-deep);
 }
 
 .search-summary {
@@ -330,7 +365,9 @@ a.tag:active {
 
 /* Rendered markdown body */
 .post-body {
-  line-height: 1.7;
+  /* Spans the full card, matching the hero and the gallery either side of it. */
+  font-size: 1.06rem;
+  line-height: 1.75;
 }
 
 .post-body h1,
@@ -365,7 +402,7 @@ a.tag:active {
 
 .post-body :not(pre) > code {
   background-color: #ede1fb;
-  color: #390281;
+  color: var(--brand-deep);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
 }
@@ -478,18 +515,151 @@ a.tag:active {
   font-weight: bold;
 }
 
+/* The footer closes the page with a change of background rather than a rule.
+   A border here sat 4rem below the about panel's own edge, so the bottom of
+   the home page had two horizontal lines with a sliver of white between them.
+   Against the grey body on every other page the tone change reads clearly on
+   its own. */
 .site-footer {
   margin-top: 4rem;
-  padding: 2rem 0;
+  padding: 2.75rem var(--gutter) 2.25rem var(--gutter);
   text-align: center;
-  color: #6b6b6b;
+  color: #666;
   font-size: 0.9rem;
-  border-top: 1px solid #d5d5d5;
+  background-color: #f5f2ed;
+}
+
+/* On the home page the footer goes white against the about panel's cream. The
+   change of tone is the separator, so no gap and no rule are needed — the
+   earlier hairline was there only because the two blocks shared a colour.
+   Keyed off a body class rather than an adjacent-sibling selector, because the
+   page content now sits inside a wrapper. */
+.has-about .site-footer {
+  margin-top: 0;
+  background-color: white;
+}
+
+.site-footer .social {
+  /* Spacing alone separates this from the copyright. A rule here was invisible
+     anyway: the page background behind the footer is already grey. */
+  margin-bottom: 1.5rem;
 }
 
 .site-footer a {
   color: #5706c0;
   text-decoration: none;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-footer__sep {
+  margin: 0 0.4rem;
+  color: #b3b3b3;
+}
+
+/* --------------------------------------------------------------------------
+   Photo credits. A reference list rather than something to read through, so
+   it stays narrow, quiet and out of the way of the posts themselves.
+   -------------------------------------------------------------------------- */
+
+#credits {
+  max-width: 46rem;
+  margin: 6.5rem auto 3rem;
+  padding: 0 1.5rem;
+}
+
+#credits h1 {
+  margin-bottom: 0.5rem;
+  color: #3a3a3a;
+}
+
+.credits__intro {
+  margin-bottom: 2.5rem;
+  color: #6b6b6b;
+  line-height: 1.6;
+}
+
+.credits__group {
+  margin-bottom: 2rem;
+}
+
+.credits__group h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.credits__group h2 a {
+  color: #3a3a3a;
+  text-decoration: none;
+}
+
+.credits__group h2 a:hover,
+.credits__group h2 a:focus-visible {
+  color: #5706c0;
+}
+
+.credits__group ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.credits__group li {
+  margin-bottom: 0.35rem;
+  color: #6b6b6b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  /* Commons filenames are long and unbreakable; let them wrap on phones. */
+  overflow-wrap: anywhere;
+}
+
+.credits__group li a {
+  color: #5706c0;
+  text-decoration: none;
+}
+
+.credits__group li a:hover,
+.credits__group li a:focus-visible {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Very narrow phones. Four nav items plus the site title overflowed a 320px
+   screen once Home was added, so the links tighten up rather than the Home
+   link being dropped — it is the one someone unfamiliar with the site needs
+   most.
+   -------------------------------------------------------------------------- */
+@media (max-width: 23.5rem) {
+  #main-navigation {
+    gap: 0.35rem;
+    padding: 0 0.5rem;
+  }
+
+  #main-navigation nav {
+    gap: 0;
+  }
+
+  #main-navigation nav a {
+    padding: 0 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  #main-navigation nav a.is-active::after {
+    left: 0.3rem;
+    right: 0.3rem;
+  }
+
+  .nav-search__toggle {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .site-title {
+    font-size: 0.95rem;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -546,7 +716,7 @@ a.tag:active {
     left: 0;
     right: 0;
     padding: 0.6rem 0.9rem;
-    background-color: #390281;
+    background-color: var(--brand-deep);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   }
 
@@ -647,6 +817,9 @@ a.tag:active {
 
 #summary .tags {
   justify-content: flex-start;
+  /* Spacing here comes from .summary__main's gap; the shared .tags margins
+     would stack on top of it. */
+  margin: 0;
 }
 
 /* Current tag on a tag archive page */
@@ -661,8 +834,8 @@ a.tag--active:active {
 
 /* Gallery on a post page */
 #gallery {
-  width: 90%;
-  max-width: 90rem;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   margin: 3rem auto;
   background-color: white;
   padding: 1.5rem;
@@ -840,28 +1013,52 @@ body.lightbox-open {
 }
 
 /* Social profile links (footer, and the homepage bio) */
+.social__heading {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* #8a8a8a only managed 3.1:1 against the footer's cream, short of the 4.5:1
+     WCAG AA wants for text this size. */
+  color: #5f5f5f;
+}
+
 .social-links {
   list-style: none;
-  margin: 0 0 1.25rem 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem 0.75rem;
+  gap: 0.6rem;
 }
 
+/* Round icon buttons rather than word pills: the glyphs are recognisable at a
+   glance and take much less room in the footer. The label stays in the markup
+   for screen readers and as the hover title. */
 .social-link {
   display: inline-flex;
   align-items: center;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  border: 1px solid #c9b8e8;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  /* #c9b8e8 managed only 1.8:1 against the footer, so the ring all but
+     vanished. This clears the 3:1 WCAG asks of a UI boundary on both the
+     white home footer and the cream one elsewhere. */
+  border: 1px solid #9b7ecf;
   background-color: white;
   color: #5706c0;
-  font-size: 0.9rem;
-  font-weight: bold;
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.social-link__icon {
+  display: block;
 }
 
 .social-link:hover,
@@ -872,20 +1069,26 @@ body.lightbox-open {
   outline: none;
 }
 
+.social-link:focus-visible {
+  outline: 3px solid #cf79f1;
+  outline-offset: 3px;
+}
+
 @media (max-width: 48rem) {
   .social-link {
     /* Comfortable tap target alongside the other mobile controls. */
-    min-height: 2.75rem;
-    padding: 0.5rem 1.1rem;
+    width: 2.75rem;
+    height: 2.75rem;
   }
+
 }
 
 /* Back to the list, above the post hero */
 /* The header is in the flow now, so this is plain spacing rather than
    clearance for something floating above it. */
 .back-link {
-  width: 90%;
-  max-width: 90rem;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   margin: 1.5rem auto 0.75rem auto;
 }
 
@@ -908,8 +1111,8 @@ body.lightbox-open {
    floating between sections. A missing neighbour is omitted entirely; an empty
    placeholder just looked broken. */
 #post-nav {
-  width: 90%;
-  max-width: 90rem;
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
   margin: 3rem auto;
   padding: 1.5rem;
   background-color: white;

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load blog_extras %}
 
 {% block title %}Saved · {{ blog.title }}{% endblock %}
 
@@ -10,21 +11,48 @@
 {% block content %}
 <section id="stored-posts">
   <h1>Saved</h1>
+
   {% if not has_posts %}
-  <p class="empty-state">
-    You haven't saved any posts yet. Open a post and hit
-    <em>Save for later</em> to keep it here.
-  </p>
+  <div class="saved-empty">
+    <p>
+      Nothing saved yet. Open a post and hit <em>Save for later</em> to keep it
+      here — it stays in this browser, no account needed.
+    </p>
+    <a class="saved-empty__cta" href="{% url 'posts-page' %}">Browse all posts &rarr;</a>
+  </div>
   {% else %}
-  <ul>
+  <p class="saved-count">
+    {{ posts|length }} post{{ posts|length|pluralize }} waiting for you.
+  </p>
+
+  <ul class="saved-list">
     {% for post in posts %}
-    <li>
-      <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-      <form action="{% url 'read-later' %}" method="POST" class="inline-form">
+    <li class="saved-item">
+      <a class="saved-item__link" href="{{ post.get_absolute_url }}">
+        {% if post.image %}
+        <img class="saved-item__thumb" src="{{ post.image.url }}" alt=""
+             loading="lazy" width="96" height="96"
+             style="object-position: {{ post.focal_css }}" />
+        {% else %}
+        <span class="saved-item__thumb saved-item__thumb--empty" aria-hidden="true"></span>
+        {% endif %}
+        <span class="saved-item__text">
+          <span class="saved-item__title">{{ post.title }}</span>
+          <span class="saved-item__meta">
+            {{ post.published_at|date:"d M Y" }} · {{ post.content|reading_time }} min read
+          </span>
+        </span>
+      </a>
+
+      {# Outside the link: a button nested in an anchor is invalid markup. #}
+      <form action="{% url 'read-later' %}" method="POST" class="saved-item__form">
         {% csrf_token %}
         <input type="hidden" name="post_id" value="{{ post.id }}" />
         <input type="hidden" name="next" value="{% url 'read-later' %}" />
-        <button type="submit" class="link-button">Remove</button>
+        <button type="submit" class="saved-item__remove">
+          <span aria-hidden="true">&times;</span>
+          <span class="visually-hidden">Remove “{{ post.title }}” from saved</span>
+        </button>
       </form>
     </li>
     {% endfor %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Photo credits · {{ blog.title }}{% endblock %}
+
+{% block content %}
+<section id="credits">
+  <h1>Photo credits</h1>
+  <p class="credits__intro">
+    I haven't photographed all of these places myself yet. Where a picture
+    isn't mine, it comes from Wikimedia Commons under a licence that allows
+    reuse, and the photographer is credited below.
+  </p>
+
+  {% for group in groups %}
+  <article class="credits__group">
+    <h2><a href="{{ group.url }}">{{ group.title }}</a></h2>
+    <ul>
+      {% for photo in group.photos %}
+      <li>
+        <a href="{{ photo.source }}" rel="noopener">{{ photo.file }}</a>
+        by {{ photo.artist }} —
+        {% if photo.licence_url %}
+        <a href="{{ photo.licence_url }}" rel="license noopener">{{ photo.licence }}</a>
+        {% else %}{{ photo.licence }}{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </article>
+  {% empty %}
+  <p class="empty-state">Every picture on this blog is my own.</p>
+  {% endfor %}
+</section>
+{% endblock %}

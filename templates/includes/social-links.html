@@ -1,15 +1,22 @@
 {% comment %}
 Social profile links. Renders nothing until at least one SOCIAL_* handle is set
-in .env. `rel="me"` lets those profiles verify this site as yours.
+in .env. `rel="me"` lets those profiles verify this site as yours. The label is
+kept for screen readers and for the link's title, since the glyph alone tells a
+non-sighted reader nothing.
 {% endcomment %}
 {% if social_links %}
-<ul class="social-links {{ social_variant|default:'' }}">
-  {% for link in social_links %}
-  <li>
-    <a class="social-link" href="{{ link.url }}" target="_blank" rel="me noopener">
-      {{ link.label }}
-    </a>
-  </li>
-  {% endfor %}
-</ul>
+<div class="social {{ social_variant|default:'' }}">
+  <p class="social__heading">Follow me</p>
+  <ul class="social-links">
+    {% for link in social_links %}
+    <li>
+      <a class="social-link" href="{{ link.url }}" target="_blank"
+         rel="me noopener" title="{{ link.label }}">
+        {% include "includes/social-icon.html" with key=link.key %}
+        <span class="visually-hidden">{{ link.label }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 {% endif %}
