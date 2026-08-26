@@ -10,6 +10,11 @@ from pathlib import Path
 
 import environ
 
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
+
+class SilentManifestStaticFilesStorage(ManifestStaticFilesStorage):
+    manifest_strict = False
+
 from .social import build_social_links
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -128,7 +133,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STORAGES = {
     "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        "BACKEND": "my_site.settings.SilentManifestStaticFilesStorage"
         if not DEBUG
         else "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
