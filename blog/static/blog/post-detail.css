@@ -38,7 +38,10 @@ body {
 .summary__main > p,
 .summary__main > .tags {
   margin: 0;
-  color: darkgrey;
+  /* Translucent white, not grey. `darkgrey` on a purple gradient goes muddy
+     and reads as disabled text; this is the same treatment the home hero uses
+     for the same job, so the two purple panels finally match. */
+  color: rgba(255, 255, 255, 0.9);
 }
 
 #summary h1 {
