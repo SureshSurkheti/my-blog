@@ -39,6 +39,34 @@ class IconFileTests(TestCase):
         with Image.open(STATIC / "apple-touch-icon.png") as image:
             self.assertNotIn("A", image.getbands())
 
+    def test_the_mark_is_big_enough_to_read_in_a_tab(self):
+        """A tab favicon is 16px. A mark that fills a third of the tile is
+        about five pixels of letterform inside it, which is why this icon
+        looked smaller than every other tab even though the file was the
+        right size. The tile is not the icon — the mark is.
+        """
+        for name in ("favicon-32.png", "icon-192.png", "icon-512.png"):
+            with self.subTest(icon=name):
+                image = Image.open(STATIC / name).convert("RGBA")
+                width, height = image.size
+                pixels = image.load()
+                columns = [
+                    x
+                    for y in range(height)
+                    for x in range(width)
+                    if pixels[x, y][3] > 128 and min(pixels[x, y][:3]) > 180
+                ]
+
+                self.assertTrue(columns, f"{name} has no light mark on its tile")
+                share = (max(columns) - min(columns)) / width
+
+                self.assertGreater(
+                    share,
+                    0.40,
+                    f"the mark spans only {share:.0%} of {name}; it will read as "
+                    "a smaller icon than its neighbours in a tab strip",
+                )
+
     def test_manifest_is_valid_json_and_points_at_real_files(self):
         # Read as rendered, not off disk: the manifest is a template now, so
         # the file on disk is not what a browser receives.
