@@ -1,7 +1,3 @@
-body {
-  background-color: #e7e7e7;
-}
-
 #summary {
   /* No top margin: the .back-link above already clears the header. */
   margin: 0 auto 3rem auto;
