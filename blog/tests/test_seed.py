@@ -131,7 +131,13 @@ class PhotoHelperTests(TestCase):
 # still exercising the downscale: the fixtures are 600px, the limit is 400.
 @override_settings(
     MEDIA_ROOT=MEDIA_ROOT,
-    IMAGE_UPLOAD={"max_dimension": 400, "jpeg_quality": 70},
+    IMAGE_UPLOAD={
+        "max_dimension": 400,
+        "jpeg_quality": 70,
+        # Must be a complete dict: the settings module always supplies every
+        # key, so the code reads them directly rather than defensively.
+        "thumbnail_width": 200,
+    },
 )
 class SeedCommandTests(TestCase):
     """The seeding command, run against a fake photo directory."""

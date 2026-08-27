@@ -9,8 +9,10 @@ lives here in version control.
 from pathlib import Path
 
 import environ
-
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
+
+from .social import build_social_links
+
 
 class SilentManifestStaticFilesStorage(ManifestStaticFilesStorage):
     manifest_strict = False
@@ -24,7 +26,6 @@ class SilentManifestStaticFilesStorage(ManifestStaticFilesStorage):
             # the original, unhashed filename for that one reference.
             return name
 
-from .social import build_social_links
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,7 +75,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware", 
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -142,9 +143,17 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# Uploads go to Cloudinary only when it is actually configured. Naming the
+# backend unconditionally made the whole project unusable without credentials:
+# django-cloudinary-storage raises ImproperlyConfigured at import time, so
+# local development and every test touching an image died on it.
+USE_CLOUDINARY = bool(env("CLOUDINARY_URL", default=""))
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
+        if USE_CLOUDINARY
+        else "django.core.files.storage.FileSystemStorage"
     },
     "staticfiles": {
         "BACKEND": "my_site.settings.SilentManifestStaticFilesStorage"
@@ -153,13 +162,8 @@ STORAGES = {
     },
 }
 
+# django-cloudinary-storage still reads this older setting name.
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
-
-# Required because django-cloudinary-storage still checks this setting
-STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
-
-MEDIA_ROOT = env("MEDIA_ROOT", default=str(BASE_DIR / "uploads"))
-MEDIA_URL = "files/"
 
 # Configurable so a throwaway/demo run can be pointed at a scratch directory
 # instead of writing into (or cleaning up) the real uploads.
@@ -198,6 +202,9 @@ SOCIAL_LINKS = build_social_links(env)
 IMAGE_UPLOAD = {
     "max_dimension": env.int("IMAGE_MAX_DIMENSION", default=1600),
     "jpeg_quality": env.int("IMAGE_JPEG_QUALITY", default=80),
+    # Width of the small variant offered to cards and gallery tiles. 800 covers
+    # a ~400px slot on a 2x screen, which is what those layouts actually use.
+    "thumbnail_width": env.int("IMAGE_THUMBNAIL_WIDTH", default=800),
 }
 
 
@@ -210,6 +217,11 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
 if not DEBUG:
+    # Fly, Railway, Render and every other managed host terminate TLS at a
+    # proxy and forward plain HTTP. Without this Django never sees a secure
+    # request, so SECURE_SSL_REDIRECT below redirects to HTTPS forever — the
+    # site answers every request with a redirect loop.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

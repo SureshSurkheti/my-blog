@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;700&display=swap');
+/* Fonts are linked from <head> in base.html, not @imported here: an
+   @import cannot start downloading until this stylesheet has itself
+   arrived and been parsed, which serialises two round trips before any
+   text can be painted. */
 
 /* --------------------------------------------------------------------------
    Design tokens. One content width for every page, so the home hero, the card

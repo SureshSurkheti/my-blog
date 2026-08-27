@@ -48,7 +48,9 @@
 
   <article>
     {% if post.image %}
+    {% srcset post.image as hero_srcset %}
     <img src="{{ post.image.url }}" alt="{{ post.title }}"
+         {% if hero_srcset %}srcset="{{ hero_srcset }}" sizes="15rem"{% endif %}
          {% if post.image_width %}width="{{ post.image_width }}" height="{{ post.image_height }}"{% endif %}
          fetchpriority="high"
          style="object-position: {{ post.focal_css }}" />
@@ -86,8 +88,11 @@
     <figure class="gallery-item">
       <a href="{{ photo.image.url }}" target="_blank" rel="noopener"
          data-gallery-item data-caption="{{ photo.caption|default:post.title }}">
+        {% srcset photo.image as tile_srcset %}
         <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}"
              loading="lazy"
+             {% if tile_srcset %}srcset="{{ tile_srcset }}"
+             sizes="(max-width: 48rem) 92vw, 16rem"{% endif %}
              {% if photo.image_width %}width="{{ photo.image_width }}" height="{{ photo.image_height }}"{% endif %}
              style="object-position: {{ photo.focal_css }}" />
       </a>

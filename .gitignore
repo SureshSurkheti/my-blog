@@ -27,3 +27,5 @@ htmlcov/
 
 # Seed photos, rebuilt by `manage.py fetch_seed_photos`
 /seed_photos/
+# Generated image variants, rebuilt on demand from the originals.
+uploads/**/*.[0-9]*w.jpg

@@ -609,3 +609,79 @@ class TestIsolationTests(TestCase):
                     f"{path.name} creates image uploads but never overrides "
                     "MEDIA_ROOT, so it writes into the real uploads/ folder",
                 )
+
+
+PERF_MEDIA_ROOT = tempfile.mkdtemp(prefix="blog-perf-test-")
+
+
+@override_settings(MEDIA_ROOT=PERF_MEDIA_ROOT)
+class ResponsiveImageTests(TestCase):
+    """Cards ask for a card-sized file, not the full-size original."""
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(PERF_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def setUp(self):
+        self.post = make_post(
+            "Wide", slug="wide", image=make_image_file("wide.jpg", size=(1600, 1067))
+        )
+
+    def test_cards_offer_a_smaller_variant(self):
+        response = self.client.get("/")
+
+        self.assertContains(response, "srcset=")
+        self.assertContains(response, "800w")
+        self.assertContains(response, "sizes=")
+
+    def test_the_thumbnail_is_actually_smaller_than_the_original(self):
+        from blog.imaging import build_thumbnail
+
+        thumb = build_thumbnail(self.post.image.storage, self.post.image.name)
+        original = self.post.image.storage.size(self.post.image.name)
+        reduced = self.post.image.storage.size(thumb)
+
+        self.assertLess(reduced, original)
+
+    def test_src_still_names_the_full_image(self):
+        # A browser that ignores srcset must still get a working picture.
+        response = self.client.get("/")
+        self.assertContains(response, self.post.image.url)
+
+    def test_an_already_small_image_gets_no_pointless_variant(self):
+        small = make_post(
+            "Small", slug="small", image=make_image_file("small.jpg", size=(300, 200))
+        )
+        from blog.imaging import build_thumbnail
+
+        self.assertIsNone(build_thumbnail(small.image.storage, small.image.name))
+
+    def test_a_missing_file_does_not_break_the_page(self):
+        self.post.image.storage.delete(self.post.image.name)
+        self.assertEqual(self.client.get("/").status_code, 200)
+
+    def test_dimensions_are_still_emitted_so_layout_does_not_shift(self):
+        # Losing width/height while adding srcset would trade page weight for
+        # layout shift, which Google measures.
+        response = self.client.get("/")
+        self.assertContains(response, 'width="1600"')
+        self.assertContains(response, 'height="1067"')
+
+
+class FontLoadingTests(TestCase):
+    def test_fonts_are_linked_from_the_head_not_imported_from_css(self):
+        # An @import cannot start downloading until app.css has arrived and
+        # been parsed — two serial round trips before any text can paint.
+        import re
+
+        with open(Path(settings.BASE_DIR) / "static" / "app.css") as handle:
+            css = handle.read()
+        # Comments stripped first: the note explaining why there is no @import
+        # here naturally contains the word.
+        code = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+        self.assertNotIn("@import", code)
+
+        response = self.client.get("/")
+        self.assertContains(response, "fonts.googleapis.com/css2")
+        self.assertContains(response, 'rel="preconnect"')

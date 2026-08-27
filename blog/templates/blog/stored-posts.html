@@ -30,8 +30,10 @@
     <li class="saved-item">
       <a class="saved-item__link" href="{{ post.get_absolute_url }}">
         {% if post.image %}
+        {% srcset post.image as thumb_srcset %}
         <img class="saved-item__thumb" src="{{ post.image.url }}" alt=""
              loading="lazy" width="96" height="96"
+             {% if thumb_srcset %}srcset="{{ thumb_srcset }}" sizes="4rem"{% endif %}
              style="object-position: {{ post.focal_css }}" />
         {% else %}
         <span class="saved-item__thumb saved-item__thumb--empty" aria-hidden="true"></span>

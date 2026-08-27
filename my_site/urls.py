@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.contrib import admin
-from django.views.static import serve
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
 from django.urls import include, path, reverse
 from django.views.generic.base import RedirectView
+from django.views.static import serve
 
 from blog.sitemaps import (
     AuthorSitemap,
