@@ -18,7 +18,10 @@ Outputs (all committed, so deploying needs no image tooling):
   favicon-32.png         browsers that prefer a PNG
   apple-touch-icon.png   iOS home screen, 180px, alpha flattened
   icon-192/512.png       Android and installable web apps
-  site.webmanifest       app name, theme colour, icon list
+
+The manifest is not generated here: it lives at templates/site.webmanifest and
+is rendered by a view, because it has to name the hashed static filenames that
+only {% static %} can resolve.
 """
 
 from collections import Counter
@@ -40,19 +43,6 @@ PNG_SIZES = {
 APPLE_TOUCH_SIZE = 180
 ICO_SIZES = [(16, 16), (32, 32), (48, 48)]
 
-MANIFEST = """{{
-  "name": "{name}",
-  "short_name": "{name}",
-  "icons": [
-    {{ "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png" }},
-    {{ "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png" }}
-  ],
-  "theme_color": "{theme}",
-  "background_color": "{theme}",
-  "display": "standalone",
-  "start_url": "/"
-}}
-"""
 
 
 def load_source():
@@ -128,14 +118,11 @@ def main():
         resize(source, 48).save(STATIC / "favicon.ico", sizes=ICO_SIZES)
 
     theme = "#{:02x}{:02x}{:02x}".format(*background)
-    (STATIC / "site.webmanifest").write_text(
-        MANIFEST.format(name="Suresh's Blog", theme=theme)
-    )
-    print(f"  theme colour taken from the icon: {theme}")
+    print(f"  icon's dominant colour: {theme}")
+    print("  note: templates/site.webmanifest is rendered by a view and names")
+    print("        the hashed static files, so it is not written from here.")
 
-    for name in sorted(
-        ["favicon.ico", "apple-touch-icon.png", "site.webmanifest", *PNG_SIZES]
-    ):
+    for name in sorted(["favicon.ico", "apple-touch-icon.png", *PNG_SIZES]):
         path = STATIC / name
         print(f"  {name:24} {path.stat().st_size:>7,} bytes")
 
