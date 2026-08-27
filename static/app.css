@@ -547,31 +547,33 @@ a.tag:active {
   font-weight: bold;
 }
 
-/* The footer closes the page with a change of background rather than a rule.
-   A border here sat 4rem below the about panel's own edge, so the bottom of
-   the home page had two horizontal lines with a sliver of white between them.
-   Against the grey body on every other page the tone change reads clearly on
-   its own. */
+/* --------------------------------------------------------------------------
+   Footer. Dark, and the same colour as the header bar, so the page is book-
+   ended by the brand rather than trailing off into another pale band.
+
+   It used to be cream, which meant it had to turn white — then grey — on the
+   home page, because the about panel above it is cream too and the two would
+   have run together. Dark needs no exception: it separates from the grey page
+   at 12.6:1 and from the about panel's cream at 13.9:1, so one rule covers
+   every page.
+   -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: 4rem;
   padding: 2.75rem var(--gutter) 2.25rem var(--gutter);
   text-align: center;
-  color: #666;
+  /* 9.8:1 on this background. Not pure white — the copyright is the quietest
+     thing on the page and should not read as loudly as the links. */
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.9rem;
-  background-color: #f5f2ed;
+  background-color: var(--brand-bar);
 }
 
-/* The footer's one job is to close the page, so it takes whatever contrasts
-   with the block directly above it. Everywhere else that block is the grey
-   page, and the cream reads as a band. On the home page it is the about
-   panel, which is already cream — so here the footer steps down to the page
-   grey instead. White was the earlier answer and it worked, but it made the
-   page its brightest at the very bottom; stepping down grounds it.
+/* No gap on the home page: the about panel runs straight into the footer, so
+   the colour change is the join. Elsewhere the 4rem above it is grey page.
    Keyed off a body class rather than an adjacent-sibling selector, because the
    about panel is a block in the page, not a sibling of the footer. */
 .has-about .site-footer {
   margin-top: 0;
-  background-color: #e7e7e7;
 }
 
 .site-footer .social {
@@ -581,7 +583,10 @@ a.tag:active {
 }
 
 .site-footer a {
-  color: var(--accent);
+  /* White against the dimmer copyright text, so a link is distinguishable by
+     weight of colour and not by hue alone. The accent purple this used to be
+     is unreadable on a dark ground. */
+  color: white;
   text-decoration: none;
 }
 
@@ -592,7 +597,7 @@ a.tag:active {
 
 .site-footer__sep {
   margin: 0 0.4rem;
-  color: #b3b3b3;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 /* --------------------------------------------------------------------------
@@ -1061,9 +1066,10 @@ body.lightbox-open {
   font-weight: bold;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* #8a8a8a only managed 3.1:1 against the footer's cream, short of the 4.5:1
-     WCAG AA wants for text this size. */
-  color: #5f5f5f;
+  /* Was #5f5f5f for the old cream footer; on the dark one it needs to be
+     light. 8.5:1 here, dimmed just enough to sit under the icons rather than
+     compete with them. */
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .social-links {
@@ -1086,12 +1092,12 @@ body.lightbox-open {
   width: 2.6rem;
   height: 2.6rem;
   border-radius: 50%;
-  /* #c9b8e8 managed only 1.8:1 against the footer, so the ring all but
-     vanished. This clears the 3:1 WCAG asks of a UI boundary on both the
-     white home footer and the cream one elsewhere. */
-  border: 1px solid #9b7ecf;
-  background-color: white;
-  color: var(--accent);
+  /* Outlined on the dark ground rather than filled: two white discs would be
+     the brightest thing on the page, which is not what the footer is for. The
+     ring is 4.1:1, past the 3:1 a UI boundary needs. */
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background-color: transparent;
+  color: white;
   text-decoration: none;
   transition:
     background-color 0.15s ease,
@@ -1105,9 +1111,12 @@ body.lightbox-open {
 
 .social-link:hover,
 .social-link:focus-visible {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: white;
+  /* Inverts to white. Filling with the accent purple, as it did on the pale
+     footer, is only 1.63:1 against this background — the hover would have
+     looked like nothing had happened at all. */
+  background-color: white;
+  border-color: white;
+  color: var(--accent);
   outline: none;
 }
 
