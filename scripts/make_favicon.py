@@ -4,14 +4,17 @@ Run from the project root:
 
     .venv/bin/python scripts/make_favicon.py
 
-Source, in order of preference:
+The master artwork is ``static/favicon.svg``. Nothing here reads it — there is
+no SVG rasteriser in the dependencies — so the PNGs beside it were exported
+from the same drawing. Edit the SVG, re-export, and the rest follows.
 
-1. ``static/favicon-source.png`` — a square PNG, 512x512 or larger. Use this if
-   you have the original artwork; it is the only way the large iOS and Android
-   icons come out sharp.
-2. ``static/favicon.ico`` — the largest frame inside it. An .ico usually tops
-   out at 48x48, so the 180px and 512px icons are then upscaled and will look
-   soft. The script says so when that happens.
+Raster source, in order of preference:
+
+1. ``static/favicon-source.png`` — a square PNG, 512x512 or larger.
+2. ``static/icon-512.png`` — the largest icon already in the tree.
+3. ``static/favicon.ico`` — the largest frame inside it. An .ico tops out at
+   48x48, so the 180px and 512px icons are then upscaled and will look soft.
+   The script says so when that happens.
 
 Outputs (all committed, so deploying needs no image tooling):
   favicon.ico            16/32/48 in one file, for older browsers
@@ -33,6 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "static"
 
 SOURCE_PNG = STATIC / "favicon-source.png"
+SOURCE_512 = STATIC / "icon-512.png"
 SOURCE_ICO = STATIC / "favicon.ico"
 
 PNG_SIZES = {
@@ -47,9 +51,10 @@ ICO_SIZES = [(16, 16), (32, 32), (48, 48)]
 
 def load_source():
     """Return (image, native_size, description)."""
-    if SOURCE_PNG.exists():
-        image = Image.open(SOURCE_PNG).convert("RGBA")
-        return image, min(image.size), f"{SOURCE_PNG.name} ({image.size[0]}px)"
+    for candidate in (SOURCE_PNG, SOURCE_512):
+        if candidate.exists():
+            image = Image.open(candidate).convert("RGBA")
+            return image, min(image.size), f"{candidate.name} ({image.size[0]}px)"
 
     if not SOURCE_ICO.exists():
         raise SystemExit(
