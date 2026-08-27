@@ -17,6 +17,17 @@
   --brand: #43148c;
   --brand-deep: #29085c;
   --brand-bar: #2c0d64;
+
+  /* A lighter purple for things you can click. Large surfaces take --brand;
+     links, buttons and accents sit on white, where the brighter tone reads as
+     interactive without going muddy. It was repeated as a raw hex in sixteen
+     places before it was a token. */
+  --accent: #5706c0;
+  /* The pill palette. --accent-line is the lightest purple that still clears
+     3:1 against the grey page behind it, which is what a component boundary
+     needs to be seen at all. */
+  --accent-tint: #f1ebfb;
+  --accent-line: #9068d4;
 }
 
 * {
@@ -266,7 +277,7 @@ h3 {
   font-weight: bold;
   background-color: #ede1fb;
   color: var(--brand-deep);
-  border-left: 5px solid #5706c0;
+  border-left: 5px solid var(--accent);
 }
 
 .message--error {
@@ -284,20 +295,33 @@ h3 {
   margin: 1rem 0 2rem 0;
 }
 
+/* Quiet by default, solid on hover. A dozen tags rendered as a dozen filled
+   purple buttons is a wall of colour that outweighs the posts they belong to;
+   tinted, they read as the navigation they are and let the photographs lead.
+   The border is what makes each pill a distinct shape — without it the tint is
+   too close to the page behind it to see. */
 a.tag {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  background-color: #5706c0;
-  color: white;
+  background-color: var(--accent-tint);
+  border: 1px solid var(--accent-line);
+  color: var(--brand);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: bold;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 a.tag:hover,
+a.tag:focus-visible,
 a.tag:active {
-  background-color: var(--brand-deep);
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
 
 /* Pagination */
@@ -311,7 +335,7 @@ a.tag:active {
 }
 
 .pagination a {
-  color: #5706c0;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -351,7 +375,7 @@ a.tag:active {
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
-  background-color: #5706c0;
+  background-color: var(--accent);
   color: white;
   cursor: pointer;
 }
@@ -381,7 +405,7 @@ a.tag:active {
 }
 
 .post-body a {
-  color: #5706c0;
+  color: var(--accent);
 }
 
 .post-body img {
@@ -413,7 +437,7 @@ a.tag:active {
 .post-body blockquote {
   margin: 1.5rem 0;
   padding: 0.5rem 1.25rem;
-  border-left: 4px solid #5706c0;
+  border-left: 4px solid var(--accent);
   color: #4a4a4a;
   font-style: italic;
 }
@@ -450,7 +474,7 @@ a.tag:active {
 }
 
 .section-link a {
-  color: #5706c0;
+  color: var(--accent);
   font-weight: bold;
   text-decoration: none;
 }
@@ -514,7 +538,7 @@ a.tag:active {
 }
 
 .simple-page a {
-  color: #5706c0;
+  color: var(--accent);
   font-weight: bold;
 }
 
@@ -549,7 +573,7 @@ a.tag:active {
 }
 
 .site-footer a {
-  color: #5706c0;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -601,7 +625,7 @@ a.tag:active {
 
 .credits__group h2 a:hover,
 .credits__group h2 a:focus-visible {
-  color: #5706c0;
+  color: var(--accent);
 }
 
 .credits__group ul {
@@ -620,7 +644,7 @@ a.tag:active {
 }
 
 .credits__group li a {
-  color: #5706c0;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -808,14 +832,21 @@ a.tag:active {
   max-width: 44rem;
 }
 
+/* On the purple panel the pills invert: a wash of white rather than the tint,
+   and the border restated in white — the accent line is nearly invisible
+   against this background. */
 #summary a.tag {
   background-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
   color: white;
 }
 
 #summary a.tag:hover,
+#summary a.tag:focus-visible,
 #summary a.tag:active {
   background-color: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: white;
 }
 
 #summary .tags {
@@ -1052,7 +1083,7 @@ body.lightbox-open {
      white home footer and the cream one elsewhere. */
   border: 1px solid #9b7ecf;
   background-color: white;
-  color: #5706c0;
+  color: var(--accent);
   text-decoration: none;
   transition:
     background-color 0.15s ease,
@@ -1066,8 +1097,8 @@ body.lightbox-open {
 
 .social-link:hover,
 .social-link:focus-visible {
-  background-color: #5706c0;
-  border-color: #5706c0;
+  background-color: var(--accent);
+  border-color: var(--accent);
   color: white;
   outline: none;
 }
@@ -1096,7 +1127,7 @@ body.lightbox-open {
 }
 
 .back-link a {
-  color: #5706c0;
+  color: var(--accent);
   font-weight: bold;
   text-decoration: none;
   display: inline-flex;
@@ -1185,7 +1216,7 @@ body.lightbox-open {
 .post-nav__dir {
   font-size: 0.72rem;
   font-weight: bold;
-  color: #5706c0;
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
