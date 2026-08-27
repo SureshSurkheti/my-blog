@@ -559,7 +559,7 @@ a.tag:active {
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: 4rem;
-  padding: 1.85rem var(--gutter) 1.6rem var(--gutter);
+  padding: 2.75rem var(--gutter) 2.25rem var(--gutter);
   text-align: center;
   color: #666;
   font-size: 0.9rem;
@@ -586,17 +586,6 @@ a.tag:active {
   justify-content: center;
   gap: 0.9rem;
   margin-bottom: 1.15rem;
-}
-
-/* The copyright's own margin was the largest gap in the footer — a browser
-   default nobody chose, sitting under the last line and making the band look
-   bottom-heavy. The padding decides the spacing here, not the paragraph.
-
-   Direct child only. "Follow me" is a <p> too, and an unscoped `.site-footer p`
-   outranks `.social__heading` on specificity — it flattened the gap under the
-   heading and pushed it onto the icons. */
-.site-footer > p {
-  margin: 0;
 }
 
 .site-footer a {
@@ -830,7 +819,7 @@ a.tag:active {
 
   .site-footer {
     margin-top: 2.5rem;
-    padding: 1.35rem 1.25rem;
+    padding: 1.5rem 1.25rem;
   }
 }
 
