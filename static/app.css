@@ -561,14 +561,17 @@ a.tag:active {
   background-color: #f5f2ed;
 }
 
-/* On the home page the footer goes white against the about panel's cream. The
-   change of tone is the separator, so no gap and no rule are needed — the
-   earlier hairline was there only because the two blocks shared a colour.
+/* The footer's one job is to close the page, so it takes whatever contrasts
+   with the block directly above it. Everywhere else that block is the grey
+   page, and the cream reads as a band. On the home page it is the about
+   panel, which is already cream — so here the footer steps down to the page
+   grey instead. White was the earlier answer and it worked, but it made the
+   page its brightest at the very bottom; stepping down grounds it.
    Keyed off a body class rather than an adjacent-sibling selector, because the
-   page content now sits inside a wrapper. */
+   about panel is a block in the page, not a sibling of the footer. */
 .has-about .site-footer {
   margin-top: 0;
-  background-color: white;
+  background-color: #e7e7e7;
 }
 
 .site-footer .social {
