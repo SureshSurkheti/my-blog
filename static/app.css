@@ -40,6 +40,11 @@ html {
 
 body {
   margin: 0;
+  /* The page behind every card. It used to be declared in all-posts.css and
+     again in post-detail.css, which meant the pages that load neither — Saved
+     and Credits — sat on the browser's default white, so a white panel had
+     nothing to sit against. */
+  background-color: #e7e7e7;
   /* A short page — an empty search, a tag with one post — used to leave the
      footer floating in the middle of the window with blank space under it. */
   display: flex;
