@@ -1,0 +1,791 @@
+[
+{
+  "model": "blog.tag",
+  "pk": 4,
+  "fields": {
+    "slug": "oita",
+    "caption": "Oita"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 5,
+  "fields": {
+    "slug": "onsen",
+    "caption": "Onsen"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 6,
+  "fields": {
+    "slug": "nature",
+    "caption": "Nature"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 7,
+  "fields": {
+    "slug": "fukuoka",
+    "caption": "Fukuoka"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 8,
+  "fields": {
+    "slug": "history",
+    "caption": "History"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 9,
+  "fields": {
+    "slug": "kumamoto",
+    "caption": "Kumamoto"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 10,
+  "fields": {
+    "slug": "miyazaki",
+    "caption": "Miyazaki"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 11,
+  "fields": {
+    "slug": "hiking",
+    "caption": "Hiking"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 12,
+  "fields": {
+    "slug": "food",
+    "caption": "Food"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 13,
+  "fields": {
+    "slug": "nagasaki",
+    "caption": "Nagasaki"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 14,
+  "fields": {
+    "slug": "saga",
+    "caption": "Saga"
+  }
+},
+{
+  "model": "blog.tag",
+  "pk": 15,
+  "fields": {
+    "slug": "kagoshima",
+    "caption": "Kagoshima"
+  }
+},
+{
+  "model": "blog.author",
+  "pk": 1,
+  "fields": {
+    "slug": "suresh-surkheti",
+    "first_name": "Suresh",
+    "last_name": "Surkheti",
+    "email_address": "suresh@gmail.com",
+    "bio": "Full-stack software engineer, writing from Oita in Kyushu. I have worked in Japanese IT since 2022. On weekends I take a train somewhere new and write down what I saw."
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 145,
+  "fields": {
+    "title": "The Steaming Streets of Beppu",
+    "slug": "the-steaming-streets-of-beppu",
+    "excerpt": "My own town on a cold morning, when the whole valley looks like it is quietly boiling.",
+    "image": "posts/beppu-umi-jigoku04n4272.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "focal_point": "center",
+    "content": "Beppu is the closest hot spring town to me, so I go there often. But in\nJanuary it feels like a different place. The air is cold, the ground is warm,\nand white steam comes out of the hills, the drains and even the gaps between\nhouses. From the train you can see it before you see the town.\n\n## The eight hells\n\nThe famous walk here is the *jigoku meguri*, the \"hell tour\". These are eight\nhot springs that are too hot to bathe in. You only look at them.\n\nMy favourite is **Umi Jigoku**, the Sea Hell. The water is a strong blue,\nalmost like paint, and it is about 98 degrees. Standing next to it in winter\nis very comfortable. Nearby is **Chinoike Jigoku**, the Blood Pond Hell, which\nis deep red because of the iron in the clay.\n\nA pass for all of them costs 2,200 yen. If you only have time for two, go to\nUmi Jigoku and Chinoike Jigoku. They are the two that look nothing like the\nothers.\n\n## Kannawa\n\nKannawa is the older part of town, up the hill. The streets are narrow and\nsteam comes straight out of the pipes at the side of the road. Small shops let\nyou cook eggs and vegetables in the steam. I did this once and it took about\nten minutes. The eggs tasted a little of sulphur, which I liked more than I\nexpected.\n\nThere is also a *mushiyu*, a steam bath, that has been used for hundreds of\nyears. You lie on a floor covered with a herb called *sekisho*. Ten minutes is\nenough. I came out feeling like I had slept for a full night.\n\n## A small tip\n\nDo not try to see all eight hells in one afternoon. I did that on my first\nvisit and by the fifth one I stopped looking properly. Two or three, then a\nlong bath and a bowl of noodles, is a much better day.\n\n## Getting there\n\nFrom Oita Station it is about 15 minutes by train and costs 280 yen. The hells\nare split into two areas, and a bus runs between them.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-01-18T00:20:00Z",
+    "created_at": "2026-08-26T04:43:17.262Z",
+    "updated_at": "2026-08-26T04:43:17.262Z",
+    "tags": [
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 146,
+  "fields": {
+    "title": "A Slow Morning in Yufuin",
+    "slug": "a-slow-morning-in-yufuin",
+    "excerpt": "A small hot spring town under a twin-peaked mountain, best seen before the tour buses arrive.",
+    "image": "posts/mount-yufudake-and-yufumi-dori-street-in-front-of-yufuin-station.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "focal_point": "center",
+    "content": "Yufuin is only about an hour from Oita, so I went for the day. I took an early\ntrain on purpose. Everybody told me the same thing: come before ten, or you\nwill spend the day walking behind a tour group.\n\nThey were right.\n\n## The main street\n\nWhen you leave the station, there is one long road called Yunotsubo Kaido that\nleads towards the lake. It takes about 20 minutes to walk. On both sides there\nare small shops selling cheese cake, croquettes, honey and roasted chestnuts.\n\nAt eight in the morning most of them were still closed and the road was almost\nempty. Mount Yufu stood straight ahead with snow on both peaks. I stopped\nseveral times just to look at it.\n\n## Lake Kinrin\n\nThe lake at the end of the road is small. You can walk around it in fifteen\nminutes. What makes it special is that hot spring water and cold spring water\nboth flow into it, so on a cold morning the surface steams.\n\nI sat on a bench with a coffee and watched the mist move across the water. A\nfew ducks. One old man taking photographs. That was all. By the time I walked\nback, the street was full.\n\n## Food\n\nI ate a croquette made with Bungo beef from a stall near the middle of the\nroad, 300 yen. Later I had a *toriten* set — Oita-style chicken tempura — for\nlunch. Toriten is the food of my prefecture and I still think it is better\nthan normal fried chicken.\n\n## Would I go again\n\nYes, but next time I want to stay one night. The day trippers all leave on the\nlate afternoon train, and people say the town becomes very quiet again after\nthat. I want to see it.\n\n## Getting there\n\nThe local train from Oita takes about an hour and costs 1,130 yen. There is\nalso a famous sightseeing train called the Yufuin no Mori from Hakata, but you\nneed to book it early.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-02-21T23:10:00Z",
+    "created_at": "2026-08-26T04:43:17.472Z",
+    "updated_at": "2026-08-26T04:43:17.472Z",
+    "tags": [
+      6,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 147,
+  "fields": {
+    "title": "Plum Trees and Old Prayers at Dazaifu",
+    "slug": "plum-trees-and-old-prayers-at-dazaifu",
+    "excerpt": "A shrine near Fukuoka where students come to pray before exams, and 6,000 plum trees flower in early spring.",
+    "image": "posts/20100719-dazaifu-tenmangu-shrine-3328.jpg",
+    "image_width": 1600,
+    "image_height": 1064,
+    "focal_point": "center",
+    "content": "Dazaifu Tenmangu is about 30 minutes from Fukuoka city. It is dedicated to\nSugawara no Michizane, a scholar and government official who was sent away\nfrom the capital about 1,100 years ago and died here.\n\nBecause he was a great scholar, people now come to pray for success in study.\nIn February and March the shrine is full of students before their exams.\n\n## The plum trees\n\nMichizane loved plum blossom. There are now around 6,000 plum trees in the\ngrounds. I went in the first week of March and most of them were open — white\nand light pink, and the smell is much stronger than cherry blossom.\n\nThere is one tree in front of the main hall called *Tobiume*, the \"flying plum\ntree\". The story says it flew from Kyoto to Dazaifu to follow him. It is\nalways the first tree in the grounds to flower.\n\n## The path to the shrine\n\nFrom the station to the shrine is a short street full of shops. Almost all of\nthem sell the same thing: *umegae mochi*, a small round rice cake with red\nbean inside, grilled until the outside is crisp. They cost 130 yen and are\nbest eaten immediately, while still hot. I ate two.\n\n## Something I did not expect\n\nBehind the shrine there is a very modern Starbucks designed by the architect\nKengo Kuma. The whole front is built from thousands of thin wooden sticks\ncrossing each other. It looks strange next to an old shrine, but somehow it\nworks.\n\n## A note on writing your wish\n\nYou buy a small wooden board called an *ema* for 500 yen, write your wish, and\nhang it up. I read a few while I was there. Most were about university\nentrance exams. One said only \"please let my mother get better\".\n\n## Getting there\n\nTake the Nishitetsu line from Fukuoka (Tenjin) and change at Futsukaichi. It\ntakes about 30 minutes and costs 420 yen.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-03-08T02:45:00Z",
+    "created_at": "2026-08-26T04:43:17.714Z",
+    "updated_at": "2026-08-26T04:43:17.714Z",
+    "tags": [
+      7,
+      8
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 148,
+  "fields": {
+    "title": "Kumamoto Castle, Standing Again",
+    "slug": "kumamoto-castle-standing-again",
+    "excerpt": "One of Japan's great castles, badly damaged by an earthquake in 2016 and slowly being rebuilt stone by stone.",
+    "image": "posts/kumamoto-castle-04n4272.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "focal_point": "center",
+    "content": "Kumamoto Castle is black. Most Japanese castles you see in photographs are\nwhite, so the first sight of this one is a surprise. It was built in 1607 by\nKato Kiyomasa, a general who was famous for building things that were very\nhard to attack.\n\n## The walls\n\nThe stone walls are the part people talk about most. They start almost gently\nat the bottom and then curve up until they are nearly vertical at the top.\nThis shape is called *musha-gaeshi*, which means something like \"sends the\nwarrior back\". The idea is that a person can begin to climb, but cannot\nfinish.\n\nStanding at the bottom and looking up, it is easy to believe.\n\n## The earthquake\n\nIn April 2016 two large earthquakes hit Kumamoto. Around 30 percent of the\ncastle's stone walls collapsed. Roof tiles fell. One small turret survived\nstanding on a single narrow line of stones, and the photograph of it was in\nnewspapers all over Japan.\n\nThe repair work is still going on and will take until the 2050s. Every stone\nthat fell is being numbered, cleaned and put back in the same place. When I\nvisited, there were still rows of numbered stones lying on the ground in the\npark.\n\n## What you can see now\n\nThe main keep reopened in 2021 and you can go inside and up to the top floor.\nThere is also a raised walkway that takes you over the construction area, so\nyou can look down at the broken walls and the work happening below.\n\nHonestly, that walkway was the most interesting part for me. A finished castle\nis a nice photograph. A castle being put back together, slowly, by hand, is a\nbetter story.\n\n## Food\n\nKumamoto is known for *basashi*, raw horse meat. I tried it. It is softer than\nI expected and does not taste strong. I am glad I tried it once. I am not sure\nI will order it again.\n\n## Getting there\n\nFrom Kumamoto Station take the tram towards Kengunmachi and get off at\nKumamotojo-mae. About 15 minutes, 180 yen. Entry to the castle is 800 yen.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-04-05T04:30:00Z",
+    "created_at": "2026-08-26T04:43:17.887Z",
+    "updated_at": "2026-08-26T04:43:17.887Z",
+    "tags": [
+      8,
+      9
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 149,
+  "fields": {
+    "title": "Rowing a Boat Through Takachiho Gorge",
+    "slug": "rowing-a-boat-through-takachiho-gorge",
+    "excerpt": "Thirty minutes in a small blue boat between cliffs of old lava, under a waterfall.",
+    "image": "posts/manai-falls-at-takachiho-gorge.jpg",
+    "image_width": 1600,
+    "image_height": 900,
+    "focal_point": "center",
+    "content": "Takachiho is not easy to reach. There is no train any more — the line closed\nyears ago — so you have to take a bus, and from Oita it took me most of the\nmorning. I still think it was worth it.\n\n## What the gorge is\n\nA long time ago, Mount Aso erupted and hot lava flowed into this valley. The\nriver then cut through the cooled rock. The result is a narrow gorge with tall\ncliffs on both sides, and the rock has straight vertical lines in it, like\nsomebody pressed it into shape.\n\nIn the middle, the Manai Falls drops about 17 metres straight into the water.\n\n## The boat\n\nYou can rent a small rowing boat for 30 minutes. It costs 4,100 yen for the\nboat, and up to three people can sit in it. You row it yourself.\n\nI should say clearly: I am not good at rowing. My first five minutes were\nspent turning in a circle while other boats went past me. After that it became\neasier, and I got close enough to the waterfall that water landed on my\nshoulder.\n\nBook online before you go. When I arrived, the same-day tickets were already\nfinished for the afternoon.\n\n## The walking path\n\nIf you do not want to row, there is a path along the top of the gorge, about\none kilometre long, and it is free. You look down at the boats from above. In\nsome ways the view is better from up there.\n\n## The old story\n\nTakachiho is also important in Japanese mythology. The story says the sun\ngoddess Amaterasu hid in a cave here and the world went dark, until the other\ngods made her curious enough to come out. There is a shrine, Amano Iwato, that\nmarks the place. In the evening, Takachiho Shrine performs a short version of\nthe *kagura* dance that tells this story. It costs 1,000 yen and lasts about\nan hour.\n\n## Getting there\n\nBuses run from Kumamoto and from Nobeoka. Plan a full day, or stay one night.\nDo not plan to arrive and leave in the same afternoon.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-05-17T01:00:00Z",
+    "created_at": "2026-08-26T04:43:18.065Z",
+    "updated_at": "2026-08-26T04:43:18.065Z",
+    "tags": [
+      10,
+      6
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 150,
+  "fields": {
+    "title": "The Wide Open Grass of Mount Aso",
+    "slug": "the-wide-open-grass-of-mount-aso",
+    "excerpt": "One of the largest volcanic craters in the world, with horses grazing inside it.",
+    "image": "posts/aso-kusasenri-horses-52133462269.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "focal_point": "center",
+    "content": "Mount Aso is not one mountain. It is a huge old crater, about 25 kilometres\nacross, with five peaks inside it and towns, rice fields, roads and railway\nlines on the flat ground in between. Around 50,000 people live inside the\ncrater.\n\nWhen the bus came over the edge and started going down, I understood the size\nfor the first time. It does not look like a volcano. It looks like a country.\n\n## Kusasenri\n\nKusasenri is a wide grass plain with a small lake in the middle. Horses graze\nthere and you can ride one for about 1,500 yen. I did not ride. I sat on the\ngrass for an hour and watched the clouds move over the hills, which was\nexactly what I needed after a working week.\n\nBring a jacket. Even in June the wind up there was cold.\n\n## The active crater\n\nNakadake is still active. When the gas level is safe, you can go up to the rim\nby road and look down into it — grey rock, a green-blue pool, and white smoke\ncoming out constantly.\n\nWhen the gas level is too high, the road closes. This can happen with very\nlittle warning, and it happened while I was there. So I saw the crater from\nKusasenri instead, from a few kilometres away.\n\n**Check the volcano status on the morning you go.** The Aso city website posts\nthe level every day. If it says level 2 or higher, the crater road will\nprobably be closed and you should plan something else.\n\n## What I did instead\n\nI went to the Aso Volcano Museum, which was more interesting than I expected —\nthere are live cameras pointing into the crater — and then to a small\nrestaurant for *akaushi* beef, the red-brown cattle raised on these hills. A\nrice bowl with it cost 1,800 yen and was one of the best meals I have eaten in\nJapan.\n\n## Getting there\n\nTake the train to Aso Station on the Hohi line, then the bus up the mountain.\nFrom Oita it is about two and a half hours by train.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-06-14T00:40:00Z",
+    "created_at": "2026-08-26T04:43:18.219Z",
+    "updated_at": "2026-08-26T04:43:18.219Z",
+    "tags": [
+      11,
+      9,
+      6
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 151,
+  "fields": {
+    "title": "Dinner at a Yatai in Fukuoka",
+    "slug": "dinner-at-a-yatai-in-fukuoka",
+    "excerpt": "Eating at a small street stall by the river, on a plastic stool, next to strangers.",
+    "image": "posts/yatai-beside-naka-gawa-fukuoka-japan-20110525-01.jpg",
+    "image_width": 1600,
+    "image_height": 1071,
+    "focal_point": "center",
+    "content": "A *yatai* is a small food stall on wheels. The owner pushes it into place in\nthe early evening, puts up a cloth roof, sets out about eight stools, and\ncooks until late. In the morning it is gone and the pavement is empty again.\n\nFukuoka has more than 100 of them — more than the rest of Japan together.\nNakasu, an island in the middle of the river, has the largest group.\n\n## Sitting down\n\nThis was the part I was nervous about. You cannot see inside from the street,\nthe seats are close together, and there is no menu outside.\n\nIt turned out to be simple. You look for a stall with one free seat, you say\n*sumimasen*, and the owner points at the stool. That is all. Nobody minds that\nyour Japanese is not perfect.\n\n## What I ate\n\n- **Tonkotsu ramen** — the Hakata style, made from pork bone, white and rich.\n  The noodles are thin and straight. 700 yen.\n- **Yakitori** — grilled chicken on sticks, 150 yen each.\n- **Mentaiko tamagoyaki** — rolled omelette with spicy cod roe inside. 600\n  yen. This was the best thing on the table.\n- One beer, 500 yen.\n\nIf you finish your ramen and want more noodles, you can say *kaedama* and they\ngive you a second portion for about 150 yen. You keep the soup.\n\n## The people\n\nI sat between a man who worked at a bank and had clearly not gone home yet,\nand a couple visiting from Osaka. Within ten minutes we were all talking. The\nowner joined in while cooking. Nobody exchanged contact details and nobody\nexpected to. It was just an hour of easy conversation with people I will never\nsee again.\n\nThat is the real reason to eat at a yatai. The food is good, but you can get\ngood ramen in a normal shop. You cannot get this.\n\n## Practical notes\n\n- Stalls open around 6 pm and close around 2 am.\n- Most are cash only.\n- Expect to pay 2,000 to 3,000 yen per person.\n- Some close in bad weather. If it is raining hard, have a second plan.\n- There is no toilet. Go before you sit down.\n\n## Getting there\n\nNakasu-Kawabata Station on the subway. From Hakata Station it is two stops.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-07-19T11:15:00Z",
+    "created_at": "2026-08-26T04:43:18.372Z",
+    "updated_at": "2026-08-26T04:43:18.372Z",
+    "tags": [
+      12,
+      7
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 152,
+  "fields": {
+    "title": "A Quiet Day in Nagasaki",
+    "slug": "a-quiet-day-in-nagasaki",
+    "excerpt": "A harbour city with a long foreign history, a painful memory, and one of the best night views in Japan.",
+    "image": "posts/nagasaki-city-view-from-mt-inasa07s.jpg",
+    "image_width": 1600,
+    "image_height": 1063,
+    "focal_point": "center",
+    "content": "For more than 200 years, when Japan was closed to the outside world, Nagasaki\nwas the one place where foreign ships could come. Because of that, the city\ndoes not feel like anywhere else in Kyushu. There are churches on the hills,\nChinese temples near the centre, and European houses above the harbour.\n\nI went for two days. This is what I would do again.\n\n## The Peace Park and the museum\n\nOn 9 August 1945 an atomic bomb was dropped on this city. About 74,000 people\ndied.\n\nThe Atomic Bomb Museum is not easy to walk through. There is a clock that\nstopped at 11:02. There are pieces of wall, a water tank, a school lunch box.\nThe explanations are calm and short, which somehow makes it harder.\n\nNearby is the Hypocentre Park, with a simple black stone marking the exact\npoint below the explosion, and the Peace Park with its large statue: one hand\npointing up at the sky, one hand held out flat.\n\nI stayed about two hours and then sat outside for a while before I could go on\nwith the day. If you visit Nagasaki, please go. It costs 200 yen.\n\n## Glover Garden\n\nIn the afternoon I went to Glover Garden, on the hill above the port. These\nare the houses of the foreign traders who lived here in the 1800s, kept as\nthey were, with gardens and a wide view over the water. Thomas Glover, a\nScottish merchant, built the oldest wooden Western-style house still standing\nin Japan.\n\nIt is a bright, easy place, and after the morning I was grateful for that.\n\n## Mount Inasa at night\n\nIn the evening I took the ropeway up Mount Inasa. From the top you see the\nwhole city: the harbour, the bridges, and the lights going up all the hills\naround the bay. People here call it one of the three best night views in\nJapan, and I would not argue.\n\nGo about 30 minutes before sunset so you see it in daylight first, then again\nin the dark. The ropeway is 1,250 yen return.\n\n## Food\n\n**Champon** — noodles in a milky pork and seafood soup, with cabbage, pork,\nsquid and fish cake piled on top. It was invented in this city for Chinese\nstudents who needed a cheap, filling meal. Around 900 yen. Perfect after a\ncold evening on the mountain.\n\n## Getting there\n\nFrom Oita it is a long trip — around four hours by train with a change at\nTosu. From Fukuoka it is about two hours. The city itself is easy: trams go\neverywhere and cost 140 yen.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-09-13T01:30:00Z",
+    "created_at": "2026-08-26T04:43:18.564Z",
+    "updated_at": "2026-08-26T04:43:18.564Z",
+    "tags": [
+      8,
+      13
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 153,
+  "fields": {
+    "title": "Karatsu Castle and the Pine Forest by the Sea",
+    "slug": "karatsu-castle-and-the-pine-forest-by-the-sea",
+    "excerpt": "A white castle on the water in Saga, and a wall of pine trees planted 400 years ago to hold back the wind.",
+    "image": "posts/view-of-tenshu-of-karatsu-castle-from-jonaibashi-bridge.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "focal_point": "center",
+    "content": "Saga is the prefecture that visitors to Kyushu usually skip. It sits between\nFukuoka and Nagasaki, and most people pass straight through it on the train. I\ndid the same for two years. Then I got off at Karatsu, and I was annoyed with\nmyself for waiting so long.\n\n## The castle\n\nKaratsu Castle stands on a small hill right at the mouth of the river, with\nthe sea on one side and the town on the other. It is white, and against blue\nwater on a clear day it looks almost too neat to be real. People here call it\nMaizuru-jo, the \"dancing crane castle\", because of the way the walls spread\nout like wings.\n\nThe building you see now is a reconstruction from 1966, so the inside is a\nmuseum rather than an old interior. Go for the top floor. From there you can\nsee the whole bay, the pine forest, and the mountains behind.\n\nThere is a lift up the hill for 100 yen, or stairs for free. I took the stairs\ngoing up and regretted it about halfway.\n\n## Nijinomatsubara\n\nAlong the bay there is a forest of about one million black pine trees. It runs\nfor five kilometres and is only a few hundred metres deep, curving with the\nbeach — the name means \"rainbow pine grove\".\n\nIt was not an accident. The local lord had it planted in the early 1600s to\nstop the sea wind and the blowing sand from damaging the rice fields behind\nit. Four hundred years later it is still doing that job.\n\nYou can walk or cycle through it. The trees are low and twisted from the wind,\nand the light comes through in pieces. It was quiet enough that I could hear\nthe sea without seeing it.\n\n## Pottery\n\nKaratsu is also one of the old pottery towns of Japan. Karatsu ware is plain,\nrough and grey-brown, made for daily use rather than decoration. There are\nsmall workshops around the town where you can watch and buy. I bought one\nteacup for 2,000 yen and I use it every morning.\n\n## Food\n\n*Ika* — squid — is the local speciality, and here it is served alive and\ntransparent, sliced very thin. It is expensive, around 3,000 yen. It is also\nvery fresh, and the legs are taken away and brought back fried.\n\n## Getting there\n\nFrom Fukuoka take the subway to Meinohama and stay on the same train — it runs\nstraight through onto the JR Chikuhi line to Karatsu. About 70 minutes, 1,170\nyen.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-10-25T02:00:00Z",
+    "created_at": "2026-08-26T04:43:18.816Z",
+    "updated_at": "2026-08-26T04:43:18.816Z",
+    "tags": [
+      8,
+      6,
+      14
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 154,
+  "fields": {
+    "title": "Onsen Hopping in Kurokawa",
+    "slug": "onsen-hopping-in-kurokawa",
+    "excerpt": "A small mountain village where one wooden pass lets you into three different outdoor baths.",
+    "image": "posts/kurokawa-onsen-light-up.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "focal_point": "center",
+    "content": "Kurokawa is a village of about 30 small inns in a river valley in the\nmountains of Kumamoto. It is not near a train station. You have to want to go\nthere.\n\nWhat makes it different is a decision the innkeepers made together many years\nago. Instead of each inn competing with big signs and concrete buildings, they\nagreed to treat the whole village as one inn: dark wood, no bright signs, and\ntrees everywhere. Walking in, it feels older than it is.\n\n## The wooden pass\n\nYou buy a round wooden pass called a *nyuto tegata* for 1,500 yen. It lets you\nuse the outdoor baths of any three inns in the village, even if you are not\nstaying there. It is valid for six months, so you do not have to use all three\nin one day.\n\nEach bath is different. I chose:\n\n1. One built into the rock beside the river, with the water running past just\n   below.\n2. One inside a small cave, dark and very hot, where I could not see the other\n   end.\n3. One high on the hill with an open view of the valley.\n\nBetween baths you walk through the village in the cold with wet hair, which is\npart of the fun.\n\n## In late November\n\nI went at the end of November. The autumn leaves had mostly fallen but the\nmountains were still red-brown, and it was cold enough that steam came off my\nskin when I got out of the water.\n\nIn winter the village lights hundreds of small bamboo lanterns along the river\nin the evening. That runs from December to April. I missed it by about two\nweeks, which is my own fault for not checking the dates.\n\n## If you have never used an onsen\n\n- Wash and rinse fully at the shower before entering the bath.\n- No swimwear.\n- The small towel does not go in the water. Put it on your head or on the\n  side.\n- Tie up long hair.\n- Tattoos are still a problem at some inns. Kurokawa is more relaxed than most\n  places, but check first if this matters to you.\n\n## Getting there\n\nBuses run from Kumamoto, from Fukuoka (Hakata) and from Aso Station. From\nAso it is about 50 minutes. There is no train. A car is easiest if you have\none.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2025-11-29T05:20:00Z",
+    "created_at": "2026-08-26T04:43:18.977Z",
+    "updated_at": "2026-08-26T04:43:18.977Z",
+    "tags": [
+      9,
+      5
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 155,
+  "fields": {
+    "title": "Sakurajima, the Volcano Next Door",
+    "slug": "sakurajima-the-volcano-next-door",
+    "excerpt": "An active volcano fifteen minutes by ferry from a city of 600,000 people, and it erupts almost every day.",
+    "image": "posts/kagoshima-city-and-mount-sakurajima-from-mount-shiroyama-3.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "focal_point": "center",
+    "content": "From the centre of Kagoshima city you look across the water and there is a\nvolcano. Not far away — about four kilometres. It is smoking. It smokes most\ndays, and it has small eruptions hundreds of times a year.\n\nPeople here live with it completely normally. Weather reports include the ash\ndirection. Streets have yellow bags for collecting ash. Schools have hard\nhats. Nobody looks up.\n\n## The ferry\n\nThe ferry from Kagoshima port takes 15 minutes, costs 200 yen, and runs 24\nhours a day, every day. You pay when you get off. There is a famous udon shop\non board, and the ferry is short enough that eating a bowl in time is\ngenuinely a small challenge.\n\n## What you can do on the island\n\nYou cannot climb it. Going near the summit is not allowed, for obvious\nreasons.\n\nWhat you can do:\n\n- **Yunohira Observatory** — the highest point visitors can reach, at 373\n  metres. From there you look straight up at the peak, and back across the bay\n  at the city. This was the best view of the day.\n- **Nagisa foot bath** — a free outdoor foot bath 100 metres long, right by\n  the sea, heated by the volcano.\n- **Buried torii gate** — after the great eruption of 1914, a shrine gate\n  three metres tall was left with only the very top showing above the ash. It\n  is still there, exactly as it was, and it is the clearest way to understand\n  what happened.\n\nThere is a sightseeing bus that connects these stops for 500 yen, or a day\npass for 700 yen.\n\n## The 1914 eruption\n\nThat eruption was the largest in Japan in the twentieth century. So much lava\ncame out that it filled the channel on the eastern side and joined the island\nto the mainland permanently. Sakurajima is still called an island, but it has\nnot been one for over a hundred years.\n\n## A small thing I liked\n\nSakurajima grows the largest radish in the world — *sakurajima daikon* — some\nweighing over 30 kilograms. It also grows the smallest mandarin orange in the\nworld. Both from the same volcanic soil, on the same island. I bought a small\nbag of the oranges at the ferry terminal and ate them on the boat back.\n\n## Getting there\n\nFly or take the shinkansen to Kagoshima-Chuo, then a tram to the port. From\nOita the train takes most of a day, so I flew from Oita airport instead — one\nhour.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2026-02-14T00:00:00Z",
+    "created_at": "2026-08-26T04:43:19.163Z",
+    "updated_at": "2026-08-26T04:43:19.163Z",
+    "tags": [
+      15,
+      6
+    ]
+  }
+},
+{
+  "model": "blog.post",
+  "pk": 156,
+  "fields": {
+    "title": "Walking Among Old Trees on Yakushima",
+    "slug": "walking-among-old-trees-on-yakushima",
+    "excerpt": "An island of rain, moss and cedar trees that were already old when Rome was young.",
+    "image": "posts/shiratani-unsui-gorge-18.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "focal_point": "center",
+    "content": "Yakushima is a round island south of Kagoshima, about two hours by fast ferry.\nIt is small — you can drive around it in half a day — but the mountains in the\nmiddle rise to almost 2,000 metres, and they catch an enormous amount of rain.\n\nPeople say it rains 35 days a month here. That is a joke, but not much of one.\nIt rained on both of my days.\n\n## The old cedars\n\nThe island's cedar trees are called *yakusugi*. Because the soil is poor and\nthin, they grow extremely slowly, and slow growth makes dense wood that\nresists rot. So they live a very long time. The oldest, Jomon Sugi, is at\nleast 2,000 years old and possibly much older.\n\nReaching Jomon Sugi is a serious walk: 10 hours there and back, starting\nbefore sunrise, much of it along an old railway line. I did not have the time\nor, honestly, the fitness. I will go back for it.\n\n## Shiratani Unsuikyo\n\nInstead I walked in Shiratani Unsuikyo, and I do not feel that I missed out.\n\nThis is the forest that inspired the setting of the film *Princess Mononoke*.\nEverything is covered in moss — the ground, the rocks, the fallen trees, the\nstanding trees. The rain makes the green so strong it does not look natural.\nWater runs everywhere, in dozens of small streams, and the sound never stops.\n\nThere are three marked routes. I took the middle one, about three hours, which\ngoes up to a viewpoint called Taiko-iwa where the cloud opens and closes over\nthe valley below. Entry to the area is 1,000 yen.\n\n## What to bring\n\n- **Proper rain gear.** Not an umbrella. A jacket, and trousers too.\n- **Shoes with grip.** Wet moss on rock is exactly as slippery as it sounds. I\n  fell once.\n- **A dry bag** for your phone and camera.\n- **Cash.** There are very few ATMs on the island.\n\n## Deer and monkeys\n\nThere are more deer and more monkeys on Yakushima than there are people. I met\nboth on the path. The deer let me walk past at two metres and did not move.\nThe monkeys sat in the road and made the bus wait.\n\n## Getting there\n\nFast ferry from Kagoshima port, about two hours, around 9,000 yen each way.\nThere are also short flights. Book accommodation before you go — the island is\nsmall and fills up.\n",
+    "author": 1,
+    "status": "published",
+    "published_at": "2026-05-08T22:30:00Z",
+    "created_at": "2026-08-26T04:43:19.349Z",
+    "updated_at": "2026-08-26T04:43:19.349Z",
+    "tags": [
+      11,
+      15,
+      6
+    ]
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 306,
+  "fields": {
+    "post": 145,
+    "image": "gallery/beppu-city.jpg",
+    "image_width": 1600,
+    "image_height": 900,
+    "caption": "Steam coming straight off the street.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:17.306Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 307,
+  "fields": {
+    "post": 145,
+    "image": "gallery/beppu-chinoike-jigoku01n4272.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "Chinoike Jigoku, the red one.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:17.367Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 308,
+  "fields": {
+    "post": 145,
+    "image": "gallery/kannawamushiyu.jpg",
+    "image_width": 1600,
+    "image_height": 1000,
+    "caption": "The old steam bath house in Kannawa.",
+    "focal_point": "center",
+    "sort_order": 2,
+    "created_at": "2026-08-26T04:43:17.414Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 309,
+  "fields": {
+    "post": 146,
+    "image": "gallery/stream-near-tenso-shrine-and-lake-kinrinko.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The stream that feeds Lake Kinrin.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:17.542Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 310,
+  "fields": {
+    "post": 146,
+    "image": "gallery/yufudake-2.jpg",
+    "image_width": 1600,
+    "image_height": 900,
+    "caption": "Mount Yufu, with its two peaks.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:17.591Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 311,
+  "fields": {
+    "post": 146,
+    "image": "gallery/forest-of-quercus-serrata-and-chagall-museum-on-side-of-lake-kinrinko.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The quiet side of the lake.",
+    "focal_point": "center",
+    "sort_order": 2,
+    "created_at": "2026-08-26T04:43:17.654Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 312,
+  "fields": {
+    "post": 147,
+    "image": "gallery/dazaifu-tenmangu-plum-tree-2004-03-07.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "Plum blossom in early March.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:17.776Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 313,
+  "fields": {
+    "post": 147,
+    "image": "gallery/dazaifu-tenmangu-shrine-honden-main-prayer-hall.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The main hall, where people leave their wishes.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:17.831Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 314,
+  "fields": {
+    "post": 148,
+    "image": "gallery/kumamoto-castle-06s5s4272.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The keep, black against the sky.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:17.943Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 315,
+  "fields": {
+    "post": 148,
+    "image": "gallery/kumamoto-castle-02n3200.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The curved stone base, called musha-gaeshi.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.008Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 316,
+  "fields": {
+    "post": 149,
+    "image": "gallery/takachiho-gorge-by-boat.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The rowing boats, waiting their turn.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:18.117Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 317,
+  "fields": {
+    "post": 149,
+    "image": "gallery/takachiho-gorge-may-5-2015.jpg",
+    "image_width": 1600,
+    "image_height": 900,
+    "caption": "Looking down into the gorge from the path.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.165Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 318,
+  "fields": {
+    "post": 150,
+    "image": "gallery/mount-nakadake-aso-san.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The active crater at Nakadake.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:18.285Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 319,
+  "fields": {
+    "post": 150,
+    "image": "gallery/mountasocrater-from-kusasenri-viewpoint.jpg",
+    "image_width": 1600,
+    "image_height": 942,
+    "caption": "The view from the Kusasenri grass plain.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.324Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 320,
+  "fields": {
+    "post": 151,
+    "image": "gallery/yatai-selling-ramen-beside-naka-gawa-fukuoka-japan-20110525.jpg",
+    "image_width": 1600,
+    "image_height": 1071,
+    "caption": "A ramen yatai getting ready.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:18.422Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 321,
+  "fields": {
+    "post": 151,
+    "image": "gallery/skewers-of-meat-at-a-yatai-beside-naka-gawa-fukuoka-japan-20110525.jpg",
+    "image_width": 1600,
+    "image_height": 1071,
+    "caption": "Yakitori on the grill.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.471Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 322,
+  "fields": {
+    "post": 151,
+    "image": "gallery/fukuhaku-deai-bridge-nakasu-hakata-ku-nishi-nakasu-hakata-ku-fukuoka-city-202211.jpg",
+    "image_width": 1600,
+    "image_height": 903,
+    "caption": "The Naka river at Nakasu, where most of the stalls are.",
+    "focal_point": "center",
+    "sort_order": 2,
+    "created_at": "2026-08-26T04:43:18.516Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 323,
+  "fields": {
+    "post": 152,
+    "image": "gallery/trip-to-nagasaki-october-2008-06.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The Peace Statue — one hand up, one hand held out flat.",
+    "focal_point": "top",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:18.616Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 324,
+  "fields": {
+    "post": 152,
+    "image": "gallery/glover-garden-nagasaki-150821367.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "Glover Garden, above the harbour.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.676Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 325,
+  "fields": {
+    "post": 153,
+    "image": "gallery/nijinomatsubara-from-hamasaki-beach.jpg",
+    "image_width": 1600,
+    "image_height": 800,
+    "caption": "The pine forest, curving along the bay.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:18.857Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 326,
+  "fields": {
+    "post": 153,
+    "image": "gallery/view-from-tenshu-of-karatsu-castle-nijino-matsubara-and-mount-kagamiyama.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "Looking down at the coast from the castle tower.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:18.916Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 327,
+  "fields": {
+    "post": 154,
+    "image": "gallery/street-in-kurokawa-onsen.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The village street, following the river.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:19.044Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 328,
+  "fields": {
+    "post": 154,
+    "image": "gallery/2014-08-08-bathing-token-at-kurokawa-onsen-kumamoto.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The wooden pass — good for three baths.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:19.106Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 329,
+  "fields": {
+    "post": 155,
+    "image": "gallery/sakurajima-ferry.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "The ferry that runs all day and all night.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:19.229Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 330,
+  "fields": {
+    "post": 155,
+    "image": "gallery/sunrise-from-sakurajima-kagoshima-jul-29-2012.jpg",
+    "image_width": 1600,
+    "image_height": 1200,
+    "caption": "Early morning across the bay.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:19.281Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 331,
+  "fields": {
+    "post": 156,
+    "image": "gallery/shiratani-unsuikyo-yakushima-island-4196057333.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "The moss forest at Shiratani Unsuikyo.",
+    "focal_point": "center",
+    "sort_order": 0,
+    "created_at": "2026-08-26T04:43:19.412Z"
+  }
+},
+{
+  "model": "blog.postimage",
+  "pk": 332,
+  "fields": {
+    "post": 156,
+    "image": "gallery/shiratani-unsui-gorge-11.jpg",
+    "image_width": 1600,
+    "image_height": 1067,
+    "caption": "Rain, rock and cedar.",
+    "focal_point": "center",
+    "sort_order": 1,
+    "created_at": "2026-08-26T04:43:19.479Z"
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 7,
+  "fields": {
+    "post": 155,
+    "user_name": "suresh",
+    "user_email": "example@gmail.com",
+    "text": "this is the good picture",
+    "is_approved": true,
+    "created_at": "2026-08-26T05:07:56.568Z"
+  }
+},
+{
+  "model": "blog.comment",
+  "pk": 9,
+  "fields": {
+    "post": 153,
+    "user_name": "suresh",
+    "user_email": "example@gmail.com",
+    "text": "this is the very beautiful place.",
+    "is_approved": true,
+    "created_at": "2026-08-26T05:53:59.260Z"
+  }
+}
+]
