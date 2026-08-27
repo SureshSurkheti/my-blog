@@ -214,6 +214,12 @@ IMAGE_UPLOAD = {
     # Width of the small variant offered to cards and gallery tiles. 800 covers
     # a ~400px slot on a 2x screen, which is what those layouts actually use.
     "thumbnail_width": env.int("IMAGE_THUMBNAIL_WIDTH", default=800),
+    # Every width offered in srcset. The browser picks the smallest candidate
+    # that still covers the slot, so the gaps matter: with only 800 and the
+    # 1600 original, a phone at 3x needs ~1085px, finds nothing between them
+    # and downloads the full-size file. 1200 catches exactly that case, and
+    # 400 serves the small cards on a 1x screen.
+    "srcset_widths": [400, 800, 1200],
 }
 
 

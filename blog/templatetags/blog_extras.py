@@ -91,25 +91,36 @@ def query_replace(context, **kwargs):
 
 @register.simple_tag
 def srcset(image):
-    """A two-entry ``srcset`` for a stored image, small variant first.
+    """The ``srcset`` for a stored image: every variant, smallest first.
 
     Cards and gallery tiles are a few hundred pixels wide but the stored file
-    is up to 1600px. This offers the browser both and lets it pick, which is
-    the whole saving — the markup still names the full-size file in ``src``,
+    is up to 1600px. This offers the browser the whole ladder and lets it pick,
+    which is the saving — the markup still names the full-size file in ``src``,
     so a browser that ignores srcset loses nothing.
 
-    Returns an empty string when there is no smaller variant to offer, so the
-    attribute can be omitted entirely rather than repeating one file twice.
+    The rungs matter as much as their existence. A browser picks the smallest
+    candidate that still covers the slot, so a wide gap sends it to the next
+    rung up: with only 800 and a 1600 original, a phone at 3x needs ~1085px
+    and takes the full-size file. Intermediate widths keep that from happening.
+
+    Returns an empty string when no variant is smaller than the original, so
+    the attribute can be omitted rather than naming one file twice.
     """
     if not image:
         return ""
-    try:
-        thumb = build_thumbnail(image.storage, image.name)
-    except (FileNotFoundError, OSError):
-        # A missing or unreadable file must not take the page down with it.
-        return ""
-    if not thumb:
+
+    candidates = []
+    for width in sorted(settings.IMAGE_UPLOAD["srcset_widths"]):
+        try:
+            variant = build_thumbnail(image.storage, image.name, width=width)
+        except (FileNotFoundError, OSError):
+            # A missing or unreadable file must not take the page down with it.
+            return ""
+        if variant:
+            candidates.append(f"{image.storage.url(variant)} {width}w")
+
+    if not candidates:
         return ""
 
-    width = settings.IMAGE_UPLOAD["thumbnail_width"]
-    return mark_safe(f"{image.storage.url(thumb)} {width}w, {image.url} {image.width}w")
+    candidates.append(f"{image.url} {image.width}w")
+    return mark_safe(", ".join(candidates))

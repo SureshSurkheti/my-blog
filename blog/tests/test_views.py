@@ -661,6 +661,41 @@ class ResponsiveImageTests(TestCase):
         self.post.image.storage.delete(self.post.image.name)
         self.assertEqual(self.client.get("/").status_code, 200)
 
+    @staticmethod
+    def _candidates(body):
+        """The srcset widths on the page, ascending."""
+        import re
+
+        entry = re.search(r'srcset="([^"]+)"', body).group(1)
+        return sorted(int(w) for w in re.findall(r"\s(\d+)w", entry))
+
+    def test_a_phone_at_3x_is_not_sent_the_full_size_original(self):
+        # The bug this guards. Cards are sized 92vw on a phone, so a 393px
+        # handset at 3x asks for ~1085 device px. A browser takes the smallest
+        # candidate that still covers that; with only 800w and the 1600w
+        # original in the list, 800 does not cover it and it downloads the
+        # original — the single heaviest thing on the page, three times over.
+        widths = self._candidates(self.client.get("/").content.decode())
+        needed = round(393 * 0.92 * 3)
+
+        chosen = min((w for w in widths if w >= needed), default=max(widths))
+
+        self.assertLess(
+            chosen,
+            1600,
+            f"a phone needing {needed}px is served the {chosen}px original; "
+            f"candidates were {widths}",
+        )
+
+    def test_variants_are_offered_smallest_first(self):
+        import re
+
+        body = self.client.get("/").content.decode()
+        entries = re.search(r'srcset="([^"]+)"', body).group(1).split(",")
+        widths = [int(e.strip().split(" ")[1].rstrip("w")) for e in entries]
+
+        self.assertEqual(widths, sorted(widths))
+
     def test_dimensions_are_still_emitted_so_layout_does_not_shift(self):
         # Losing width/height while adding srcset would trade page weight for
         # layout shift, which Google measures.
