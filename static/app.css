@@ -23,6 +23,12 @@
      interactive without going muddy. It was repeated as a raw hex in sixteen
      places before it was a token. */
   --accent: #5706c0;
+  /* The footer. A step lighter than the header bar and pulled back from full
+     saturation: the bar is a 64px strip, the footer is a 167px block, and the
+     same colour over two and a half times the area reads far heavier than it
+     does up top. Same family, lower energy — a footer should settle the page,
+     not shout at the bottom of it. */
+  --brand-soft: #4a2d7d;
   /* The pill palette. --accent-line is the lightest purple that still clears
      3:1 against the grey page behind it, which is what a component boundary
      needs to be seen at all. */
@@ -548,8 +554,9 @@ a.tag:active {
 }
 
 /* --------------------------------------------------------------------------
-   Footer. Dark, and the same colour as the header bar, so the page is book-
-   ended by the brand rather than trailing off into another pale band.
+   Footer. Dark enough to close the page and clearly the same purple as the
+   header, but a step lighter than that bar — see --brand-soft for why the
+   same hex does not work over this much more area.
 
    It used to be cream, which meant it had to turn white — then grey — on the
    home page, because the about panel above it is cream too and the two would
@@ -565,7 +572,7 @@ a.tag:active {
      thing on the page and should not read as loudly as the links. */
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.9rem;
-  background-color: var(--brand-bar);
+  background-color: var(--brand-soft);
 }
 
 /* No gap on the home page: the about panel runs straight into the footer, so
