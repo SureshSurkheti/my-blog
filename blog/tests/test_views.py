@@ -696,6 +696,51 @@ class ResponsiveImageTests(TestCase):
 
         self.assertEqual(widths, sorted(widths))
 
+    @override_settings(USE_CLOUDINARY=True)
+    def test_remote_storage_never_opens_the_file_to_render_a_page(self):
+        """The regression that took production down.
+
+        With a remote store, `image.width` downloads the whole original and
+        `build_thumbnail` adds an exists/download/upload round trip per width.
+        Six images at three widths is dozens of sequential HTTP calls — past
+        the worker timeout, so every page with a photo on it returned 500.
+        Nothing in the render path may touch the file.
+        """
+        opened = []
+        original_open = self.post.image.storage.__class__.open
+
+        def spy(storage_self, name, mode="rb"):
+            opened.append(name)
+            return original_open(storage_self, name, mode)
+
+        self.post.image.storage.__class__.open = spy
+        try:
+            response = self.client.get("/")
+        finally:
+            self.post.image.storage.__class__.open = original_open
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(opened, [], f"opened {opened} while rendering")
+
+    @override_settings(USE_CLOUDINARY=True)
+    def test_remote_variants_are_delivery_urls_not_generated_files(self):
+        from blog.imaging import cloudinary_variant
+
+        url = cloudinary_variant(
+            "https://res.cloudinary.com/demo/image/upload/v1/files/posts/a.jpg", 800
+        )
+
+        self.assertEqual(
+            url,
+            "https://res.cloudinary.com/demo/image/upload/"
+            "w_800,c_limit,q_auto,f_auto/v1/files/posts/a.jpg",
+        )
+
+    def test_a_non_cloudinary_url_yields_no_variant(self):
+        from blog.imaging import cloudinary_variant
+
+        self.assertIsNone(cloudinary_variant("https://example.com/a.jpg", 800))
+
     def test_dimensions_are_still_emitted_so_layout_does_not_shift(self):
         # Losing width/height while adding srcset would trade page weight for
         # layout shift, which Google measures.

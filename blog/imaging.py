@@ -112,3 +112,31 @@ def build_thumbnail(storage, name, width=None, quality=None):
 
     storage.save(target, ContentFile(buffer.getvalue()))
     return target
+
+
+# Cloudinary delivery URLs carry their transformations as a path segment right
+# after "/image/upload/", so a variant is a string edit rather than a request.
+CLOUDINARY_UPLOAD_MARKER = "/image/upload/"
+
+
+def cloudinary_variant(url, width):
+    """A resized delivery URL for an image already hosted on Cloudinary.
+
+    Cloudinary resizes at its own edge, so the variant costs nothing to make:
+    no download, no re-encode, no upload, and no API call from us. That is the
+    whole point of using it here. Generating thumbnails ourselves against a
+    remote storage means a round trip per width per image on every render —
+    six images at three widths is eighteen sequential HTTP calls, which is
+    slower than the worker timeout and takes the page down with it.
+
+    ``c_limit`` only ever shrinks, so an image narrower than ``width`` is left
+    alone rather than being blown up. ``q_auto,f_auto`` let Cloudinary pick the
+    quality and hand WebP or AVIF to browsers that accept them.
+
+    Returns None if the URL is not a Cloudinary delivery URL, so the caller can
+    fall back rather than emit something broken.
+    """
+    if CLOUDINARY_UPLOAD_MARKER not in url:
+        return None
+    head, tail = url.split(CLOUDINARY_UPLOAD_MARKER, 1)
+    return f"{head}{CLOUDINARY_UPLOAD_MARKER}w_{width},c_limit,q_auto,f_auto/{tail}"
