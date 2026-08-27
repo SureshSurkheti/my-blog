@@ -8,6 +8,13 @@
     {% include "includes/seo.html" %}
     <link rel="alternate" type="application/rss+xml" title="{{ blog.title }} RSS" href="{% url 'post-feed-rss' %}" />
     <link rel="alternate" type="application/atom+xml" title="{{ blog.title }} Atom" href="{% url 'post-feed-atom' %}" />
+    {% comment %}
+    The SVG first: a browser that understands it renders the mark at whatever
+    size it needs, so the icon stays sharp on a high-density tab strip instead
+    of being resampled from a 32px bitmap. The .ico and the PNG stay for the
+    browsers that ignore it — the order is the fallback chain.
+    {% endcomment %}
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
     <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any" />
     <link rel="icon" href="{% static 'favicon-32.png' %}" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}" />

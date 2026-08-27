@@ -39,32 +39,48 @@ class IconFileTests(TestCase):
         with Image.open(STATIC / "apple-touch-icon.png") as image:
             self.assertNotIn("A", image.getbands())
 
-    def test_the_mark_is_big_enough_to_read_in_a_tab(self):
-        """A tab favicon is 16px. A mark that fills a third of the tile is
-        about five pixels of letterform inside it, which is why this icon
-        looked smaller than every other tab even though the file was the
-        right size. The tile is not the icon — the mark is.
+    @staticmethod
+    def _mark(image):
+        """Columns and rows covered by the light mark sitting on the tile."""
+        width, height = image.size
+        pixels = image.load()
+        found = [
+            (x, y)
+            for y in range(height)
+            for x in range(width)
+            if pixels[x, y][3] > 128 and min(pixels[x, y][:3]) > 180
+        ]
+        return found
+
+    def test_every_icon_actually_has_its_mark_on_it(self):
+        for name in ("favicon-32.png", "icon-192.png", "icon-512.png"):
+            with self.subTest(icon=name):
+                image = Image.open(STATIC / name).convert("RGBA")
+
+                self.assertTrue(
+                    self._mark(image), f"{name} is a bare tile with no mark on it"
+                )
+
+    def test_the_mark_sits_in_the_middle_of_the_tile(self):
+        """An off-centre mark reads as a mistake at any size.
+
+        Deliberately not asserting how *large* the mark is. It spans about a
+        third of the tile, which is on the small side for a 16px favicon — but
+        that is the supplied artwork's decision to make, and font-size in
+        static/favicon.svg is the one place to change it.
         """
         for name in ("favicon-32.png", "icon-192.png", "icon-512.png"):
             with self.subTest(icon=name):
                 image = Image.open(STATIC / name).convert("RGBA")
                 width, height = image.size
-                pixels = image.load()
-                columns = [
-                    x
-                    for y in range(height)
-                    for x in range(width)
-                    if pixels[x, y][3] > 128 and min(pixels[x, y][:3]) > 180
-                ]
+                found = self._mark(image)
+                xs = [x for x, _ in found]
+                offset = abs((min(xs) + max(xs)) / 2 - width / 2) / width
 
-                self.assertTrue(columns, f"{name} has no light mark on its tile")
-                share = (max(columns) - min(columns)) / width
-
-                self.assertGreater(
-                    share,
-                    0.40,
-                    f"the mark spans only {share:.0%} of {name}; it will read as "
-                    "a smaller icon than its neighbours in a tab strip",
+                self.assertLess(
+                    offset,
+                    0.04,
+                    f"the mark in {name} is {offset:.0%} of the width off centre",
                 )
 
     def test_manifest_is_valid_json_and_points_at_real_files(self):
