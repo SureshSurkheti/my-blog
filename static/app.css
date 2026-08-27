@@ -575,17 +575,10 @@ a.tag:active {
   margin-top: 0;
 }
 
-/* Label and icons on one line. Stacked, they made the footer three rows deep
-   for what is really one item, and the label had to sit tight against the
-   icons to keep the band from growing — close enough to look crowded. Beside
-   them it has room, and the footer loses a row. */
 .site-footer .social {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.9rem;
-  margin-bottom: 1.15rem;
+  /* Spacing alone separates this from the copyright; a rule between them would
+     be one line too many for two short items. */
+  margin-bottom: 1.5rem;
 }
 
 .site-footer a {
@@ -1064,8 +1057,7 @@ body.lightbox-open {
 
 /* Social profile links (footer, and the homepage bio) */
 .social__heading {
-  /* No bottom margin: it sits beside the icons now, not above them. */
-  margin: 0;
+  margin: 0 0 0.75rem 0;
   font-size: 0.8rem;
   font-weight: bold;
   letter-spacing: 0.08em;
