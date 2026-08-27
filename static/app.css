@@ -559,7 +559,7 @@ a.tag:active {
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: 4rem;
-  padding: 2.75rem var(--gutter) 2.25rem var(--gutter);
+  padding: 2.25rem var(--gutter) 2rem var(--gutter);
   text-align: center;
   /* 9.8:1 on this background. Not pure white — the copyright is the quietest
      thing on the page and should not read as loudly as the links. */
@@ -577,9 +577,16 @@ a.tag:active {
 }
 
 .site-footer .social {
-  /* Spacing alone separates this from the copyright. A rule here was invisible
-     anyway: the page background behind the footer is already grey. */
-  margin-bottom: 1.5rem;
+  /* Spacing alone separates this from the copyright; a rule between them would
+     be one line too many for two short items. */
+  margin-bottom: 1.25rem;
+}
+
+/* The copyright's own margin was the largest gap in the footer — a browser
+   default nobody chose, sitting under the last line and making the band look
+   bottom-heavy. The padding decides the spacing here, not the paragraph. */
+.site-footer p {
+  margin: 0;
 }
 
 .site-footer a {
