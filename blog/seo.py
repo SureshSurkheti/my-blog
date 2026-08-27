@@ -70,11 +70,34 @@ def _dump(payload):
     return json.dumps(payload, ensure_ascii=False).replace("<", "\\u003c")
 
 
+def author_schema():
+    """The person behind the site, as one entity with every profile attached.
+
+    ``sameAs`` is how a search engine learns that this blog, the portfolio at
+    the author's own domain and the social profiles are one person rather than
+    several who share a name. Without it each is judged on its own; with it the
+    reputation of all of them is pooled. Returns None if nothing is configured
+    beyond a bare name, since a Person with no identifiers asserts nothing.
+    """
+    author = settings.AUTHOR_SITE
+    profiles = [link["url"] for link in settings.SOCIAL_LINKS]
+    if author["url"] and author["url"] not in profiles:
+        profiles.insert(0, author["url"])
+    if not profiles:
+        return None
+
+    schema = {"@type": "Person", "name": author["name"], "sameAs": profiles}
+    if author["url"]:
+        schema["url"] = author["url"]
+    return schema
+
+
 def website_schema(request):
     """Site-level schema, including the search box Google may surface."""
     blog = settings.BLOG_SETTINGS
     home = absolute(request, "/")
-    return {
+    author = author_schema()
+    schema = {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": blog["title"],
@@ -89,6 +112,9 @@ def website_schema(request):
             "query-input": "required name=search_term_string",
         },
     }
+    if author:
+        schema["author"] = author
+    return schema
 
 
 def post_schema(request, post):
@@ -118,11 +144,19 @@ def post_schema(request, post):
         },
     }
     if post.author:
-        schema["author"] = {
+        author = {
             "@type": "Person",
             "name": post.author.full_name,
             "url": absolute(request, post.author.get_absolute_url()),
         }
+        # Only the site owner gets the external profiles attached. A guest
+        # author shares the byline, not the identity, and claiming otherwise
+        # would tell search engines something untrue.
+        if post.author.full_name == settings.AUTHOR_SITE["name"]:
+            identity = author_schema()
+            if identity:
+                author["sameAs"] = identity["sameAs"]
+        schema["author"] = author
     return {key: value for key, value in schema.items() if value is not None}
 
 

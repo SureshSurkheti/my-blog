@@ -147,6 +147,32 @@
   margin-bottom: 0;
 }
 
+/* Set apart from the copy above it: this is the one line that leaves the site,
+   so it reads as a footnote to the introduction rather than another sentence
+   of it. */
+#about .about__site {
+  /* Scoped through the ID: `#about p` above sets the size, colour and margin,
+     and an ID beats a class, so a bare `.about__site` would lose all three. */
+  margin: 1.75rem 0 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2ddd4;
+  font-size: 0.98rem;
+  color: #5f5f5f;
+}
+
+.about__site a {
+  color: var(--brand);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+.about__site a:hover,
+.about__site a:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
 @media (max-width: 48rem) {
   #welcome {
     padding: 2rem var(--gutter) 4.5rem var(--gutter);
