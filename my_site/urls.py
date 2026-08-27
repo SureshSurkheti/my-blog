@@ -4,7 +4,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
 from django.urls import include, path, reverse
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 from django.views.static import serve
 
 from blog.sitemaps import (
@@ -60,6 +60,16 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("favicon.ico", FaviconView.as_view()),
     path("robots.txt", robots_txt, name="robots-txt"),
+    path(
+        # Rendered, not served from disk: it names hashed static files, and
+        # only a template can resolve those names.
+        "site.webmanifest",
+        TemplateView.as_view(
+            template_name="site.webmanifest",
+            content_type="application/manifest+json",
+        ),
+        name="webmanifest",
+    ),
     path(
         "sitemap.xml",
         sitemap,

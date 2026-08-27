@@ -1,10 +1,13 @@
 """Site icons: present in the markup, served, and valid image files."""
 
 import json
+import shutil
+import tempfile
 from pathlib import Path
 
 from django.conf import settings
-from django.test import TestCase
+from django.core.management import call_command
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 
@@ -37,7 +40,9 @@ class IconFileTests(TestCase):
             self.assertNotIn("A", image.getbands())
 
     def test_manifest_is_valid_json_and_points_at_real_files(self):
-        manifest = json.loads((STATIC / "site.webmanifest").read_text())
+        # Read as rendered, not off disk: the manifest is a template now, so
+        # the file on disk is not what a browser receives.
+        manifest = json.loads(self.client.get("/site.webmanifest").content)
 
         self.assertEqual(manifest["name"], "Suresh's Blog")
         for icon in manifest["icons"]:
@@ -46,7 +51,7 @@ class IconFileTests(TestCase):
                 self.assertTrue((STATIC / name).exists())
 
     def test_the_theme_colour_matches_the_icon(self):
-        manifest = json.loads((STATIC / "site.webmanifest").read_text())
+        manifest = json.loads(self.client.get("/site.webmanifest").content)
         with open(Path(settings.BASE_DIR) / "templates" / "base.html") as handle:
             markup = handle.read()
 
@@ -82,3 +87,73 @@ class IconMarkupTests(TestCase):
 
         self.assertEqual(response.status_code, 301)
         self.assertIn("favicon.ico", response["Location"])
+
+
+STATIC_ROOT = tempfile.mkdtemp(prefix="blog-manifest-static-")
+
+
+@override_settings(
+    STATIC_ROOT=STATIC_ROOT,
+    STORAGES={
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "my_site.settings.SilentManifestStaticFilesStorage"},
+    },
+)
+class WebManifestTests(TestCase):
+    """The PWA manifest, under the hashed-filename storage production uses.
+
+    Collects the static files for real: the bug being guarded only appears
+    once filenames carry a content hash, so testing against the plain
+    development storage would prove nothing.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        with override_settings(
+            STATIC_ROOT=STATIC_ROOT,
+            STORAGES={
+                "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+                "staticfiles": {
+                    "BACKEND": "my_site.settings.SilentManifestStaticFilesStorage"
+                },
+            },
+        ):
+            call_command("collectstatic", "--no-input", verbosity=0)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(STATIC_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def test_the_manifest_is_served_as_json(self):
+        response = self.client.get("/site.webmanifest")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/manifest+json")
+        json.loads(response.content)
+
+    def test_every_icon_it_names_is_a_hashed_file_that_exists(self):
+        """The bug this guards.
+
+        Production renames static files with a content hash. Django rewrites
+        such references inside CSS but not inside a manifest, so a hard-coded
+        "/static/icon-192.png" 404s on the live site while working perfectly
+        in development.
+        """
+        icons = json.loads(self.client.get("/site.webmanifest").content)["icons"]
+
+        self.assertTrue(icons, "the manifest lists no icons at all")
+        for icon in icons:
+            with self.subTest(icon=icon["src"]):
+                relative = icon["src"].removeprefix(settings.STATIC_URL)
+                self.assertRegex(relative, r"\.[0-9a-f]{12}\.png$")
+                self.assertTrue(
+                    (Path(STATIC_ROOT) / relative).exists(),
+                    f"{icon['src']} is named but was never collected",
+                )
+
+    def test_the_page_links_the_rendered_manifest(self):
+        response = self.client.get("/")
+
+        self.assertContains(response, 'rel="manifest" href="/site.webmanifest"')
