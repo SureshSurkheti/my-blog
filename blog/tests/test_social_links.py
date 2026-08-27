@@ -1,5 +1,7 @@
 """Social profile links: built from the environment, rendered site-wide."""
 
+import re
+
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
@@ -207,10 +209,37 @@ class AuthorSiteTests(TestCase):
         AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
     )
     def test_the_link_claims_the_site_as_the_same_person(self):
-        # rel="me" is what lets the two sites verify each other.
+        # rel="me" is what lets the two sites verify each other. Matched as a
+        # token, not as the whole attribute: rel carries noopener alongside it.
+        response = self.client.get(reverse("starting-page"))
+        link = re.search(
+            r'<a href="https://sureshsurkheti\.com"[^>]*>', response.content.decode()
+        ).group(0)
+        rel = re.search(r'rel="([^"]*)"', link).group(1)
+
+        self.assertIn("me", rel.split())
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
+    )
+    def test_the_link_opens_in_a_new_tab_without_handing_over_the_opener(self):
+        # target="_blank" alone lets the opened page reach back through
+        # window.opener, so the two must be asserted together.
+        response = self.client.get(reverse("starting-page"))
+        link = re.search(
+            r'<a href="https://sureshsurkheti\.com"[^>]*>', response.content.decode()
+        ).group(0)
+
+        self.assertIn('target="_blank"', link)
+        self.assertIn("noopener", link)
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
+    )
+    def test_a_screen_reader_is_told_the_tab_will_change(self):
         response = self.client.get(reverse("starting-page"))
 
-        self.assertContains(response, 'rel="me"')
+        self.assertContains(response, "(opens in a new tab)")
 
     @override_settings(AUTHOR_SITE={"name": "Suresh Surkheti", "url": ""})
     def test_nothing_renders_when_no_site_is_configured(self):

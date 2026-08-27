@@ -73,7 +73,14 @@
     {% if author_site.url %}
     <p class="about__site">
       For my work as a software engineer, see
-      <a href="{{ author_site.url }}" rel="me">{{ author_site.url|cut:"https://" }}</a>.
+      {% comment %}
+      New tab, like the social links: this is the one link that leaves the
+      blog, and someone part-way through the posts should not lose their place
+      to it. `noopener` because a page opened this way can otherwise reach back
+      through window.opener. The hidden note is for screen readers, which
+      otherwise announce nothing to explain why focus has moved.
+      {% endcomment %}
+      <a href="{{ author_site.url }}" target="_blank" rel="me noopener">{{ author_site.url|cut:"https://" }}<span class="visually-hidden"> (opens in a new tab)</span></a>.
     </p>
     {% endif %}
   </div>
