@@ -137,6 +137,7 @@ class PhotoHelperTests(TestCase):
         # Must be a complete dict: the settings module always supplies every
         # key, so the code reads them directly rather than defensively.
         "thumbnail_width": 200,
+        "srcset_widths": [100, 200],
     },
 )
 class SeedCommandTests(TestCase):
