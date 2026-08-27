@@ -566,7 +566,7 @@ a.tag:active {
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: 4rem;
-  padding: 2.25rem var(--gutter) 2rem var(--gutter);
+  padding: 1.85rem var(--gutter) 1.6rem var(--gutter);
   text-align: center;
   /* 9.8:1 on this background. Not pure white — the copyright is the quietest
      thing on the page and should not read as loudly as the links. */
@@ -583,16 +583,27 @@ a.tag:active {
   margin-top: 0;
 }
 
+/* Label and icons on one line. Stacked, they made the footer three rows deep
+   for what is really one item, and the label had to sit tight against the
+   icons to keep the band from growing — close enough to look crowded. Beside
+   them it has room, and the footer loses a row. */
 .site-footer .social {
-  /* Spacing alone separates this from the copyright; a rule between them would
-     be one line too many for two short items. */
-  margin-bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-bottom: 1.15rem;
 }
 
 /* The copyright's own margin was the largest gap in the footer — a browser
    default nobody chose, sitting under the last line and making the band look
-   bottom-heavy. The padding decides the spacing here, not the paragraph. */
-.site-footer p {
+   bottom-heavy. The padding decides the spacing here, not the paragraph.
+
+   Direct child only. "Follow me" is a <p> too, and an unscoped `.site-footer p`
+   outranks `.social__heading` on specificity — it flattened the gap under the
+   heading and pushed it onto the icons. */
+.site-footer > p {
   margin: 0;
 }
 
@@ -830,7 +841,7 @@ a.tag:active {
 
   .site-footer {
     margin-top: 2.5rem;
-    padding: 1.5rem 1.25rem;
+    padding: 1.35rem 1.25rem;
   }
 }
 
@@ -1075,7 +1086,8 @@ body.lightbox-open {
 
 /* Social profile links (footer, and the homepage bio) */
 .social__heading {
-  margin: 0 0 0.75rem 0;
+  /* No bottom margin: it sits beside the icons now, not above them. */
+  margin: 0;
   font-size: 0.8rem;
   font-weight: bold;
   letter-spacing: 0.08em;
