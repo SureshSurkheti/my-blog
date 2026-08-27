@@ -195,6 +195,15 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].append(
 # the environment is simply absent.
 SOCIAL_LINKS = build_social_links(env)
 
+# The author's own site, if they have one elsewhere. Rendered as a plain link in
+# the About section, and — more importantly — declared in the structured data so
+# search engines can tie this blog and that site to one person rather than
+# treating them as two unrelated strangers who happen to share a name.
+AUTHOR_SITE = {
+    "name": env("AUTHOR_NAME", default="Suresh Surkheti"),
+    "url": env("AUTHOR_WEBSITE", default="").strip(),
+}
+
 
 # Uploaded images are re-encoded on save (see blog/imaging.py). 1600px is
 # ample for a full-width photo on this layout; raise it only if you need to.

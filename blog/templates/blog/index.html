@@ -65,6 +65,17 @@
       take, and what I learn along the way — some of it about code, most of
       it not.
     </p>
+    {% comment %}
+    The one outbound link on the page, and it is deliberately the last thing
+    in the About copy: a reader who has got this far is asking who I am, which
+    is the only moment my portfolio is worth interrupting the blog for.
+    {% endcomment %}
+    {% if author_site.url %}
+    <p class="about__site">
+      For my work as a software engineer, see
+      <a href="{{ author_site.url }}" rel="me">{{ author_site.url|cut:"https://" }}</a>.
+    </p>
+    {% endif %}
   </div>
 </section>
 

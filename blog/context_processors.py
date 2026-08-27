@@ -10,6 +10,7 @@ def blog_settings(request):
         "blog": settings.BLOG_SETTINGS,
         "all_tags": Tag.objects.all(),
         "social_links": settings.SOCIAL_LINKS,
+        "author_site": settings.AUTHOR_SITE,
         # A default so every page carries complete tags; views that know more
         # about the page pass their own `seo` and shadow this.
         "seo": seo.build(request),

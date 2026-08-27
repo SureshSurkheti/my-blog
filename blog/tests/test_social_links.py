@@ -188,3 +188,42 @@ class SocialIconTests(TestCase):
 
         self.assertContains(response, 'class="social-link__icon"')
         self.assertContains(response, 'title="Brand New"')
+
+
+class AuthorSiteTests(TestCase):
+    """The link to the author's own site in the About section."""
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
+    )
+    def test_the_about_section_links_to_the_authors_own_site(self):
+        response = self.client.get(reverse("starting-page"))
+
+        self.assertContains(response, 'href="https://sureshsurkheti.com"')
+        # Shown without the scheme: it reads as a name, not a URL.
+        self.assertContains(response, ">sureshsurkheti.com<")
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
+    )
+    def test_the_link_claims_the_site_as_the_same_person(self):
+        # rel="me" is what lets the two sites verify each other.
+        response = self.client.get(reverse("starting-page"))
+
+        self.assertContains(response, 'rel="me"')
+
+    @override_settings(AUTHOR_SITE={"name": "Suresh Surkheti", "url": ""})
+    def test_nothing_renders_when_no_site_is_configured(self):
+        response = self.client.get(reverse("starting-page"))
+
+        self.assertNotContains(response, "about__site")
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"}
+    )
+    def test_the_link_is_only_on_the_home_page(self):
+        # It is the one outbound link on the site; repeating it on every page
+        # would make it noise rather than an invitation.
+        response = self.client.get(reverse("posts-page"))
+
+        self.assertNotContains(response, "about__site")

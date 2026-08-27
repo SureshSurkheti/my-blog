@@ -141,6 +141,56 @@ class StructuredDataTests(TestCase):
 
         self.assertIn("search?q={search_term_string}", json.dumps(payload))
 
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"},
+        SOCIAL_LINKS=[
+            {"key": "instagram", "label": "Instagram", "url": "https://insta/x"}
+        ],
+    )
+    def test_homepage_ties_the_author_to_their_other_sites(self):
+        # sameAs is what makes the portfolio and this blog one entity to a
+        # search engine rather than two strangers with the same name.
+        body = self.client.get(reverse("starting-page")).content.decode()
+        author = self._schema(body)["WebSite"]["author"]
+
+        self.assertEqual(author["@type"], "Person")
+        self.assertEqual(author["url"], "https://sureshsurkheti.com")
+        self.assertEqual(
+            author["sameAs"], ["https://sureshsurkheti.com", "https://insta/x"]
+        )
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"},
+        SOCIAL_LINKS=[],
+    )
+    def test_a_post_by_the_owner_carries_their_other_sites(self):
+        author = make_author("Suresh", "Surkheti")
+        post = make_post("Mine", author=author)
+
+        body = self.client.get(post.get_absolute_url()).content.decode()
+        payload = self._schema(body)["BlogPosting"]
+
+        self.assertEqual(payload["author"]["sameAs"], ["https://sureshsurkheti.com"])
+
+    @override_settings(
+        AUTHOR_SITE={"name": "Suresh Surkheti", "url": "https://sureshsurkheti.com"},
+        SOCIAL_LINKS=[],
+    )
+    def test_a_guest_author_does_not_inherit_the_owners_identity(self):
+        # Claiming a guest's byline is the owner's identity would be a lie to
+        # every search engine that reads it.
+        post = make_post("Theirs", author=make_author("Ada", "Lovelace"))
+
+        body = self.client.get(post.get_absolute_url()).content.decode()
+
+        self.assertNotIn("sameAs", self._schema(body)["BlogPosting"]["author"])
+
+    @override_settings(AUTHOR_SITE={"name": "Nobody", "url": ""}, SOCIAL_LINKS=[])
+    def test_no_person_is_claimed_when_nothing_is_configured(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+
+        self.assertNotIn("author", self._schema(body)["WebSite"])
+
     def test_script_content_cannot_break_out_of_the_tag(self):
         post = make_post("Breakout", excerpt="</script><script>alert(1)</script>")
         body = self.client.get(post.get_absolute_url()).content.decode()
