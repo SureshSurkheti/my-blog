@@ -1,7 +1,10 @@
 import markdown as md
 import nh3
 from django import template
+from django.conf import settings
 from django.utils.safestring import mark_safe
+
+from blog.imaging import build_thumbnail
 
 register = template.Library()
 
@@ -84,3 +87,29 @@ def query_replace(context, **kwargs):
         else:
             params[key] = value
     return params.urlencode()
+
+
+@register.simple_tag
+def srcset(image):
+    """A two-entry ``srcset`` for a stored image, small variant first.
+
+    Cards and gallery tiles are a few hundred pixels wide but the stored file
+    is up to 1600px. This offers the browser both and lets it pick, which is
+    the whole saving — the markup still names the full-size file in ``src``,
+    so a browser that ignores srcset loses nothing.
+
+    Returns an empty string when there is no smaller variant to offer, so the
+    attribute can be omitted entirely rather than repeating one file twice.
+    """
+    if not image:
+        return ""
+    try:
+        thumb = build_thumbnail(image.storage, image.name)
+    except (FileNotFoundError, OSError):
+        # A missing or unreadable file must not take the page down with it.
+        return ""
+    if not thumb:
+        return ""
+
+    width = settings.IMAGE_UPLOAD["thumbnail_width"]
+    return mark_safe(f"{image.storage.url(thumb)} {width}w, {image.url} {image.width}w")

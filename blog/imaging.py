@@ -70,3 +70,45 @@ def optimize_uploaded_image(field_file, max_dimension=None, quality=None):
     name = Path(field_file.name).with_suffix(suffix).name
     field_file.save(name, ContentFile(buffer.getvalue()), save=False)
     return width, height
+
+
+def thumbnail_name(name, width):
+    """Where the narrow variant of ``name`` lives, e.g. beppu.jpg -> beppu.800w.jpg."""
+    path = Path(name)
+    return str(path.with_suffix(f".{width}w{path.suffix}"))
+
+
+def build_thumbnail(storage, name, width=None, quality=None):
+    """Write a narrower copy of a stored image beside it, once.
+
+    Cards and gallery tiles are a few hundred pixels wide, but the stored file
+    is up to 1600px — roughly twenty times the data a card actually needs.
+    Returns the thumbnail's storage name, or None if the source is already
+    narrow enough to be worth serving as-is.
+    """
+    if width is None:
+        width = settings.IMAGE_UPLOAD["thumbnail_width"]
+    if quality is None:
+        quality = settings.IMAGE_UPLOAD["jpeg_quality"]
+
+    target = thumbnail_name(name, width)
+    if storage.exists(target):
+        return target
+
+    with storage.open(name, "rb") as handle:
+        with Image.open(handle) as opened:
+            if opened.width <= width:
+                return None
+            image = opened.convert("RGB")
+            image.thumbnail((width, width * 10), Image.LANCZOS)
+            buffer = BytesIO()
+            image.save(
+                buffer,
+                format="JPEG",
+                quality=quality,
+                optimize=True,
+                progressive=True,
+            )
+
+    storage.save(target, ContentFile(buffer.getvalue()))
+    return target

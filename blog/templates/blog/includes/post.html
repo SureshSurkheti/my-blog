@@ -3,7 +3,10 @@
   <article class="post">
     <a href="{{ post.get_absolute_url }}">
       {% if post.image %}
+      {% srcset post.image as card_srcset %}
       <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy"
+           {% if card_srcset %}srcset="{{ card_srcset }}"
+           sizes="(max-width: 37.5rem) 92vw, (max-width: 64rem) 45vw, 23rem"{% endif %}
            {% if post.image_width %}width="{{ post.image_width }}" height="{{ post.image_height }}"{% endif %}
            style="object-position: {{ post.focal_css }}" />
       {% endif %}
