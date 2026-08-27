@@ -23,12 +23,6 @@
      interactive without going muddy. It was repeated as a raw hex in sixteen
      places before it was a token. */
   --accent: #5706c0;
-  /* The footer. A step lighter than the header bar and pulled back from full
-     saturation: the bar is a 64px strip, the footer is a 167px block, and the
-     same colour over two and a half times the area reads far heavier than it
-     does up top. Same family, lower energy — a footer should settle the page,
-     not shout at the bottom of it. */
-  --brand-soft: #4a2d7d;
   /* The pill palette. --accent-line is the lightest purple that still clears
      3:1 against the grey page behind it, which is what a component boundary
      needs to be seen at all. */
@@ -554,31 +548,29 @@ a.tag:active {
 }
 
 /* --------------------------------------------------------------------------
-   Footer. Dark enough to close the page and clearly the same purple as the
-   header, but a step lighter than that bar — see --brand-soft for why the
-   same hex does not work over this much more area.
+   Footer. White, like the cards, so the page ends light instead of closing on
+   a slab of colour.
 
-   It used to be cream, which meant it had to turn white — then grey — on the
-   home page, because the about panel above it is cream too and the two would
-   have run together. Dark needs no exception: it separates from the grey page
-   at 12.6:1 and from the about panel's cream at 13.9:1, so one rule covers
-   every page.
+   The rule above it is not decoration. White is 1.24:1 against the grey page
+   and 1.12:1 against the about panel's cream — as seams go, both are invisible,
+   and without a line the footer just looks like the page ran out. The line is
+   what makes it a band, and it is what lets one treatment work on every page
+   regardless of what sits above it.
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: 4rem;
   padding: 1.85rem var(--gutter) 1.6rem var(--gutter);
   text-align: center;
-  /* 9.8:1 on this background. Not pure white — the copyright is the quietest
-     thing on the page and should not read as loudly as the links. */
-  color: rgba(255, 255, 255, 0.78);
+  color: #666;
   font-size: 0.9rem;
-  background-color: var(--brand-soft);
+  background-color: white;
+  border-top: 1px solid #cfc9c0;
 }
 
-/* No gap on the home page: the about panel runs straight into the footer, so
-   the colour change is the join. Elsewhere the 4rem above it is grey page.
-   Keyed off a body class rather than an adjacent-sibling selector, because the
-   about panel is a block in the page, not a sibling of the footer. */
+/* No gap on the home page: the about panel runs straight into the footer and
+   the rule above is the join. Elsewhere the 4rem is grey page. Keyed off a body
+   class rather than an adjacent-sibling selector, because the about panel is a
+   block in the page, not a sibling of the footer. */
 .has-about .site-footer {
   margin-top: 0;
 }
@@ -608,10 +600,7 @@ a.tag:active {
 }
 
 .site-footer a {
-  /* White against the dimmer copyright text, so a link is distinguishable by
-     weight of colour and not by hue alone. The accent purple this used to be
-     is unreadable on a dark ground. */
-  color: white;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -622,7 +611,7 @@ a.tag:active {
 
 .site-footer__sep {
   margin: 0 0.4rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: #b3b3b3;
 }
 
 /* --------------------------------------------------------------------------
@@ -1092,10 +1081,9 @@ body.lightbox-open {
   font-weight: bold;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  /* Was #5f5f5f for the old cream footer; on the dark one it needs to be
-     light. 8.5:1 here, dimmed just enough to sit under the icons rather than
-     compete with them. */
-  color: rgba(255, 255, 255, 0.72);
+  /* 6.4:1 on white. Quieter than the copyright beside it, which is the point:
+     it labels the icons rather than announcing itself. */
+  color: #5f5f5f;
 }
 
 .social-links {
@@ -1118,12 +1106,10 @@ body.lightbox-open {
   width: 2.6rem;
   height: 2.6rem;
   border-radius: 50%;
-  /* Outlined on the dark ground rather than filled: two white discs would be
-     the brightest thing on the page, which is not what the footer is for. The
-     ring is 4.1:1, past the 3:1 a UI boundary needs. */
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background-color: transparent;
-  color: white;
+  /* 3.34:1 for the ring, past the 3:1 a UI boundary needs on white. */
+  border: 1px solid #9b7ecf;
+  background-color: white;
+  color: var(--accent);
   text-decoration: none;
   transition:
     background-color 0.15s ease,
@@ -1137,12 +1123,9 @@ body.lightbox-open {
 
 .social-link:hover,
 .social-link:focus-visible {
-  /* Inverts to white. Filling with the accent purple, as it did on the pale
-     footer, is only 1.63:1 against this background — the hover would have
-     looked like nothing had happened at all. */
-  background-color: white;
-  border-color: white;
-  color: var(--accent);
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: white;
   outline: none;
 }
 
