@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from blog.models import Comment
 
@@ -541,9 +542,15 @@ class SavedPageTests(TestCase):
     def test_each_row_shows_the_picture_title_date_and_length(self):
         response = self.client.get(reverse("read-later"))
 
+        # The template renders the date in the site's timezone, so the
+        # expected value has to be localised too. Comparing against the raw
+        # UTC value passes for most of the day and then fails between
+        # midnight and 09:00 in Tokyo, where UTC is still on the day before.
+        local_date = timezone.localtime(self.post.published_at)
+
         self.assertContains(response, "saved-item__thumb")
         self.assertContains(response, "A Saved Post")
-        self.assertContains(response, self.post.published_at.strftime("%d %b %Y"))
+        self.assertContains(response, local_date.strftime("%d %b %Y"))
         self.assertContains(response, "min read")
 
     def test_the_count_agrees_with_the_list(self):
