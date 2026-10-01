@@ -33,7 +33,10 @@ class TagSitemap(Sitemap):
     priority = 0.4
 
     def items(self):
-        return Tag.objects.all()
+        # A tag carried only by drafts renders a page with nothing on it.
+        # Listing that is worse than not listing it at all, so a tag waits
+        # here until one of its posts is actually published.
+        return Tag.objects.filter(posts__in=Post.objects.published()).distinct()
 
 
 class AuthorSitemap(Sitemap):
@@ -41,4 +44,6 @@ class AuthorSitemap(Sitemap):
     priority = 0.4
 
     def items(self):
-        return Author.objects.all()
+        # Same reasoning as the tags: an author with nothing published yet
+        # has an empty page, and an empty page should not be advertised.
+        return Author.objects.filter(posts__in=Post.objects.published()).distinct()

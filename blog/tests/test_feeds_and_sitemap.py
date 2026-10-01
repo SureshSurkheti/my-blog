@@ -38,10 +38,10 @@ class FeedTests(TestCase):
 
 class SitemapTests(TestCase):
     def test_sitemap_lists_published_posts_tags_and_authors(self):
-        post = make_post("Mapped")
-        make_post("Draft copy", published=False)
         tag = make_tag("Django")
         author = make_author("Grace", "Hopper")
+        post = make_post("Mapped", tags=[tag], author=author)
+        make_post("Draft copy", published=False)
 
         response = self.client.get("/sitemap.xml")
         body = response.content.decode()
@@ -51,6 +51,60 @@ class SitemapTests(TestCase):
         self.assertIn(tag.get_absolute_url(), body)
         self.assertIn(author.get_absolute_url(), body)
         self.assertNotIn("/posts/draft-copy", body)
+
+
+class EmptyPageSitemapTests(TestCase):
+    """A tag or author page with nothing on it must not be advertised.
+
+    Tagging a draft creates the tag immediately, so between writing a post and
+    publishing it the tag exists but its page is blank. Listing that in the
+    sitemap invites a crawler to index an empty page, which is worse for the
+    site than the tag simply not being listed yet.
+    """
+
+    def test_a_tag_carried_only_by_a_draft_is_left_out(self):
+        tag = make_tag("Festivals")
+        make_post("Unpublished", published=False, tags=[tag])
+
+        body = self.client.get("/sitemap.xml").content.decode()
+
+        self.assertNotIn(tag.get_absolute_url(), body)
+
+    def test_an_author_with_only_drafts_is_left_out(self):
+        author = make_author("Unpublished", "Writer")
+        make_post("Still writing", published=False, author=author)
+
+        body = self.client.get("/sitemap.xml").content.decode()
+
+        self.assertNotIn(author.get_absolute_url(), body)
+
+    def test_a_scheduled_post_does_not_count_as_published_yet(self):
+        tag = make_tag("Embargoed")
+        make_future_post("Next week", tags=[tag])
+
+        body = self.client.get("/sitemap.xml").content.decode()
+
+        self.assertNotIn(tag.get_absolute_url(), body)
+
+    def test_publishing_one_post_is_enough_to_list_the_tag(self):
+        tag = make_tag("Oita")
+        make_post("A draft too", published=False, tags=[tag])
+        make_post("Live one", tags=[tag])
+
+        body = self.client.get("/sitemap.xml").content.decode()
+
+        self.assertIn(tag.get_absolute_url(), body)
+
+    def test_a_tag_is_listed_once_however_many_posts_carry_it(self):
+        # ``posts__in`` is a join, so without .distinct() the tag would appear
+        # once per matching post.
+        tag = make_tag("Nature")
+        make_post("First", tags=[tag])
+        make_post("Second", tags=[tag])
+
+        body = self.client.get("/sitemap.xml").content.decode()
+
+        self.assertEqual(body.count(tag.get_absolute_url()), 1)
 
 
 class FeedVisibilityTests(TestCase):
