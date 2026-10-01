@@ -183,6 +183,15 @@ BLOG_SETTINGS = {
         "BLOG_DESCRIPTION",
         default="A software engineer in Japan, writing about the places I visit.",
     ),
+    # What the homepage calls itself in <title> and og:title, which is not the
+    # same job as the name in the header. The header has to stay short enough
+    # not to truncate on a phone; this has to contain the words someone would
+    # actually type. "Suresh's Blog" contains neither "Surkheti" nor "travel",
+    # so a search for either had nothing here to match.
+    "seo_title": env(
+        "BLOG_SEO_TITLE",
+        default="Suresh Surkheti's Blog — Travel writing from Kyushu, Japan",
+    ),
     "posts_per_page": env.int("BLOG_POSTS_PER_PAGE", default=6),
     "latest_posts_count": env.int("BLOG_LATEST_POSTS_COUNT", default=6),
 }

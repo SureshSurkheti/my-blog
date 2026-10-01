@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Photo credits · {{ blog.title }}{% endblock %}
+{% block title %}Photo credits · {{ author_site.name|default:blog.title }}{% endblock %}
 
 {% block content %}
 <section id="credits">

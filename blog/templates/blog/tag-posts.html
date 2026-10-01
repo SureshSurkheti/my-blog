@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Posts tagged “{{ tag.caption }}” · {{ blog.title }}{% endblock %}
+{% block title %}Posts tagged “{{ tag.caption }}” · {{ author_site.name|default:blog.title }}{% endblock %}
 {% block description %}All posts tagged {{ tag.caption }} on {{ blog.title }}.{% endblock %}
 
 {% block css_files %}

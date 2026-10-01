@@ -197,6 +197,53 @@ class StructuredDataTests(TestCase):
         self.assertNotIn("</script><script>alert(1)", body)
 
 
+class NameSearchTests(TestCase):
+    """What a search for the author's name has to match against.
+
+    The blog called itself "Suresh's Blog" and described itself as "a software
+    engineer in Japan". Neither contains "Surkheti", so a search for the
+    surname had nothing on the page to match — while the portfolio, which does
+    carry it, ranked first.
+    """
+
+    @override_settings(AUTHOR_SITE={"name": "Suresh Surkheti", "url": ""})
+    def test_the_home_page_title_carries_the_full_name(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+        title = re.search(r"<title>(.*?)</title>", body, re.S).group(1)
+
+        self.assertIn("Surkheti", title)
+
+    def test_the_home_page_description_carries_the_full_name(self):
+        body = self.client.get(reverse("starting-page")).content.decode()
+        description = re.search(
+            r'<meta name="description" content="(.*?)"', body, re.S
+        ).group(1)
+
+        self.assertIn("Surkheti", description)
+
+    @override_settings(AUTHOR_SITE={"name": "Suresh Surkheti", "url": ""})
+    def test_inner_pages_carry_the_name_too(self):
+        post = make_post("Somewhere", slug="somewhere")
+        for url in (reverse("posts-page"), post.get_absolute_url()):
+            with self.subTest(url=url):
+                body = self.client.get(url).content.decode()
+                title = re.search(r"<title>(.*?)</title>", body, re.S).group(1)
+
+                self.assertIn("Surkheti", title)
+
+    @override_settings(AUTHOR_SITE={"name": "Suresh Surkheti", "url": ""})
+    def test_titles_stay_short_enough_to_show_whole(self):
+        # Google shows roughly 60 characters. Past that the tail is cut, and
+        # the name is the tail.
+        post = make_post(
+            "Karatsu Castle and the Pine Forest by the Sea", slug="karatsu"
+        )
+        body = self.client.get(post.get_absolute_url()).content.decode()
+        title = re.search(r"<title>(.*?)</title>", body, re.S).group(1)
+
+        self.assertLess(len(title), 70, f"{len(title)} chars: {title}")
+
+
 class IndexingRulesTests(TestCase):
     def test_robots_txt_points_at_the_sitemap(self):
         response = self.client.get("/robots.txt")

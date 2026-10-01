@@ -45,7 +45,11 @@ class StartingPageView(PublishedPostListView):
             # The card list is capped at latest_posts_count, so the archive
             # total has to be counted separately for the hero.
             total_posts=Post.objects.published().count(),
-            seo=seo.build(self.request, json_ld=seo.website_schema(self.request)),
+            seo=seo.build(
+                self.request,
+                title=settings.BLOG_SETTINGS["seo_title"],
+                json_ld=seo.website_schema(self.request),
+            ),
             **kwargs,
         )
 

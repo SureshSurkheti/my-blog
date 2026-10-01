@@ -18,9 +18,12 @@ from .factories import (
     make_tag,
 )
 
+# Must be a complete dict: the settings module always supplies every key, so
+# the code reads them directly rather than defensively.
 SETTINGS_TWO_PER_PAGE = {
     "title": "Test Blog",
     "description": "Testing.",
+    "seo_title": "Test Blog — testing",
     "posts_per_page": 2,
     "latest_posts_count": 2,
 }

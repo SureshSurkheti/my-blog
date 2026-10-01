@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if query %}Search: {{ query }}{% else %}Search{% endif %} · {{ blog.title }}{% endblock %}
+{% block title %}{% if query %}Search: {{ query }}{% else %}Search{% endif %} · {{ author_site.name|default:blog.title }}{% endblock %}
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static 'blog/post.css' %}" />

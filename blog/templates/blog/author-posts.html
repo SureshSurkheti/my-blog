@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Posts by {{ author.full_name }} · {{ blog.title }}{% endblock %}
+{% block title %}Posts by {{ author.full_name }} · {{ author_site.name|default:blog.title }}{% endblock %}
 {% block description %}All posts written by {{ author.full_name }}.{% endblock %}
 
 {% block css_files %}

@@ -2,7 +2,7 @@
 {% load static %}
 {% load blog_extras %}
 
-{% block title %}{{ post.title }} · {{ blog.title }}{% endblock %}
+{% block title %}{{ post.title }} · {{ author_site.name|default:blog.title }}{% endblock %}
 
 {% block description %}{{ post.excerpt }}{% endblock %}
 

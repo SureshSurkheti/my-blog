@@ -2,7 +2,7 @@
 {% load static %}
 {% load blog_extras %}
 
-{% block title %}Saved · {{ blog.title }}{% endblock %}
+{% block title %}Saved · {{ author_site.name|default:blog.title }}{% endblock %}
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static 'blog/stored-posts.css' %}" />
