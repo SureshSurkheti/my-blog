@@ -70,99 +70,57 @@ secret key, which signs out every existing session.
 
 ## Deploying
 
-Two providers, on purpose. The code runs on **Render**; the database lives on
-**Neon**. Render's own free Postgres is deleted after 30 days. That is not a
-hypothetical: it took this site down roughly a month after the first deploy,
-with every database-backed page returning 500 until a new database was
-attached. Neon's free database does not expire.
-
-| What | Where | Cost |
-| --- | --- | --- |
-| Django + gunicorn | Render web service | free |
-| Postgres | Neon | free |
-| Images | Cloudinary | free |
-| `blog.sureshsurkheti.com` | DNS → Render | — |
-
-### Render settings
+Code on **Render**, database on **Neon**. They are separate because Render's own
+free Postgres is deleted after 30 days — that is what took the site down once.
 
 | Setting | Value |
 | --- | --- |
 | Build Command | `./build.sh` |
 | Start Command | `gunicorn my_site.wsgi:application` |
 
-`build.sh` installs, runs `collectstatic`, runs `migrate`, and then loads
-`blog/fixtures/content.json` **only if the database has no posts**. That last
-condition matters: `loaddata` overwrites by primary key, so without it every
-deploy would silently revert anything written in the admin.
+`build.sh` installs, collects static, migrates, then loads
+`blog/fixtures/content.json` **only if there are no posts** — so a deploy never
+overwrites what you wrote in the admin.
 
 ### Environment variables
 
-Set these under **Environment** on the web service.
+`DATABASE_URL`, `SECRET_KEY`, `DEBUG=False`,
+`ALLOWED_HOSTS=blog.sureshsurkheti.com`,
+`CSRF_TRUSTED_ORIGINS=https://blog.sureshsurkheti.com`, `CLOUDINARY_URL`,
+`AUTHOR_NAME`, `AUTHOR_WEBSITE`, `SOCIAL_INSTAGRAM`, `SOCIAL_LINKEDIN`.
 
-| Key | Value |
-| --- | --- |
-| `DATABASE_URL` | the Neon connection string |
-| `SECRET_KEY` | a long random string |
-| `DEBUG` | `False` |
-| `ALLOWED_HOSTS` | `blog.sureshsurkheti.com` |
-| `CSRF_TRUSTED_ORIGINS` | `https://blog.sureshsurkheti.com` |
-| `CLOUDINARY_URL` | from the Cloudinary dashboard |
-| `AUTHOR_NAME`, `AUTHOR_WEBSITE` | the portfolio link under "A Little About Me" |
-| `SOCIAL_INSTAGRAM`, `SOCIAL_LINKEDIN` | the footer icons |
+**Never put a `.env` file on the server** — `settings.py` reads it with
+`overwrite=True`, so it would beat all of the above, including `DEBUG`.
 
-**Never put a `.env` file on the server.** `settings.py` reads it with
-`overwrite=True`, so the file would beat every variable set above — including
-`DEBUG`, which would expose tracebacks and bypass `ALLOWED_HOSTS`.
+### Neon
 
-### Setting up the database on Neon
-
-1. [neon.tech](https://neon.tech) → sign up → **Create project**. Any name; pick
-   whichever offered region is closest to your readers.
-2. Copy the connection string. Take the **pooled** one if offered — a web app
-   holding connections suits the pooler better than the direct endpoint.
-   It looks like:
-
-   ```
-   postgres://user:PASSWORD@ep-name-123.region.aws.neon.tech/neondb?sslmode=require
-   ```
-
-   The `?sslmode=require` is required by Neon and must be kept. `env.db_url`
-   parses it into `OPTIONS`, so no code change is needed.
-3. Paste it into `DATABASE_URL` on Render and save.
-4. **Deploys → Manual Deploy → Deploy latest commit.**
-
-The logs should show `Empty database — loading initial content.` followed by
-`Installed 54 object(s) from 1 fixture(s)`.
+1. [neon.tech](https://neon.tech) → **Create project**.
+2. Copy the connection string (the **pooled** one if offered). Keep
+   `?sslmode=require` — Neon needs it, and `env.db_url` handles it with no code
+   change.
+3. Paste into `DATABASE_URL` on Render → save.
+4. **Deploys → Manual Deploy.** Logs should say `Installed 54 object(s)`.
 
 ### Keeping it awake
 
-A free Render service sleeps after 15 minutes idle, and the next visitor waits
-30–60 seconds for it to start. Googlebot counts as that visitor, and it crawls
-slow sites less.
+Free Render sleeps after 15 minutes; the next visitor — Googlebot included —
+waits 30–60s. Point [UptimeRobot](https://uptimerobot.com) at
+`https://blog.sureshsurkheti.com/` every 10 minutes. Use the homepage, not
+`/robots.txt`, so Neon stays warm too.
 
-Point an uptime checker at the site every 10 minutes:
-[UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org),
-both free. Monitor `https://blog.sureshsurkheti.com/` — the homepage, **not**
-`/robots.txt`, because a page that queries the database keeps Neon's compute
-warm as well.
-
-The arithmetic is tight and worth knowing: Render's free allowance is 750
-instance-hours a month and a 31-day month is 744 hours. Staying awake fits,
-with about six hours to spare — but it uses the whole allowance, so **only one
-free service can run on the account**.
+Staying awake costs 744 of the 750 free hours a month, so only one free service
+can run on the account.
 
 ### Backups
 
-`blog/fixtures/content.json` is what a fresh or replaced database is rebuilt
-from, and **nothing updates it on its own**. Re-dump it after publishing:
+`blog/fixtures/content.json` is what a new database is rebuilt from, and nothing
+updates it automatically. After publishing:
 
 ```bash
 DATABASE_URL='postgres://…' make backup
 ```
 
-Without `DATABASE_URL` it dumps the local SQLite file, not the live site. The
-live posts are on Neon, and the free tier of Render has no shell, so passing
-the connection string is the only way to reach them.
+Without `DATABASE_URL` it dumps local SQLite, not the live site.
 
 ## Everyday commands
 
@@ -407,85 +365,44 @@ Metadata is built in `blog/seo.py` and rendered by
 
 ### Indexing
 
-None of the SEO above does anything until Google has the pages. Two conditions
-come first, and both have failed here before: pages must return **200**, and
-they must return it **fast**. Google will not index an error, and it crawls a
-slow site sparingly.
+Check with `site:blog.sureshsurkheti.com`. No results means **not indexed** —
+a different problem from ranking badly.
 
-Check where you stand by searching `site:blog.sureshsurkheti.com`. No results
-means *not indexed* — a different problem from ranking badly, and the one this
-site had on 1 October 2026.
+1. [Search Console](https://search.google.com/search-console) → add
+   `blog.sureshsurkheti.com`. A subdomain is its own property; verifying
+   `sureshsurkheti.com` does not cover it. Verify by DNS TXT.
+2. Submit `https://blog.sureshsurkheti.com/sitemap.xml`.
+3. Request indexing for the homepage and a few posts.
+4. Wait — days for first pages, weeks for a new subdomain to settle.
 
-1. **Add the property.** [Search Console](https://search.google.com/search-console)
-   → add `blog.sureshsurkheti.com`. A subdomain is its own property: verifying
-   `sureshsurkheti.com` does **not** cover it. Verify by DNS TXT record.
-2. **Submit the sitemap** — `https://blog.sureshsurkheti.com/sitemap.xml`. It
-   already lists the homepage, the archive, every published post, and the tag
-   and author pages.
-3. **Request indexing** for the homepage and a few posts through URL
-   Inspection. This asks for a crawl; it does not buy a position.
-4. **Wait.** First pages usually appear within days. A new subdomain takes
-   weeks to settle, and this one is only a few weeks old.
-
-Then watch Search Console's **Pages** report for anything excluded, and
-**Core Web Vitals** for pages flagged slow.
+Nothing happens while pages return 500, and a slow site is crawled less.
 
 ### Ranking
 
-Two different problems, and they are not equally winnable. Nobody can promise a
-position — Google ranks, we only supply the signals.
+**Your name** — *"suresh surkheti blog"*. Winnable, and mostly already there:
+the `sameAs` block in `blog/seo.py` ties the blog, portfolio, Instagram and
+LinkedIn to one person, and `sureshsurkheti.com` ranks first for that query and
+links here. Being indexed is the only blocker.
 
-**Your own name** — *"suresh surkheti blog"*, *"surkheti blog"*. Realistic, and
-largely already done. What decides it:
+**Place names** — *"kurokawa onsen"*. Not winnable. Those belong to JNTO, Japan
+Guide and TripAdvisor, with a decade of backlinks. Posts here run a median of
+375 words.
 
-- Being indexed at all. This is the whole blocker right now.
-- One clear entity. The `sameAs` block ties the blog, the portfolio, Instagram
-  and LinkedIn to one person, so the reputation of all four pools instead of
-  competing. See `author_schema()` in `blog/seo.py`.
-- A link from the portfolio. `sureshsurkheti.com` already links here, and it
-  ranks first for that query — that link is the single strongest asset this
-  site has.
-- The title. `<title>` on the homepage is the blog's name, which is what a
-  branded query matches.
-
-**Place names** — *"kurokawa onsen"*, *"takachiho gorge"*. Be honest about this
-one. Those results are held by JNTO, Japan Guide, TripAdvisor and travel
-magazines with thousands of inbound links. The posts here run a **median of 375
-words**. That is a good read and it will not outrank a 2,000-word guide with a
-decade of backlinks.
-
-What *is* winnable is the long tail, where the writing is first-hand and the
-big sites are generic:
-
-- *"kurokawa onsen wooden pass three baths"*
-- *"yatai fukuoka what it is like to sit down"*
-- *"takachiho gorge rowing boat yourself"*
-
-Write for the specific thing you actually did. That is the one advantage a
-personal blog has over an institutional one, and it is in the posts already —
-it just needs to be in the **titles and first paragraph**, which is what gets
-matched.
+The long tail is winnable, because it is first-hand: *"kurokawa onsen wooden
+pass three baths"*, *"takachiho gorge rowing yourself"*. Put the specific thing
+in the **title and first paragraph** — that is what gets matched.
 
 ### Photos
 
-Image search is a real source of traffic for travel writing, and this is where
-the biggest gaps are. In order of value:
+Two gaps, both needing code that is not written:
 
-1. **Alt text describes the picture, not the post.** Right now the header image
-   uses `alt="{{ post.title }}"` — so a photo of moss-covered cedars is labelled
-   "Walking Among Old Trees on Yakushima". Google reads alt text to understand
-   the image; the title tells it nothing it did not already know from the page.
-   Gallery pictures are better, because they fall back to the caption.
-2. **There is no image sitemap.** Google discovers images through the pages
-   that carry them, which works, but an image sitemap is the direct route.
-3. **Captions.** Gallery images have them and header images do not. A caption is
-   read by both people and crawlers.
-4. **Filenames.** `shiratani-unsui-gorge-18.jpg` is good; a camera's
-   `IMG_4829.jpg` tells a crawler nothing. Rename before uploading.
+1. **Alt text repeats the post title.** `alt="{{ post.title }}"` labels a photo
+   of moss-covered cedars "Walking Among Old Trees on Yakushima". Needs a
+   caption field on `Post.image`. Gallery images already fall back to captions.
+2. **No image sitemap.**
 
-Both of the first two need code, not configuration — a caption field on
-`Post.image` with a migration, and an image sitemap class. Neither is written
-yet.
+Filenames help too — `shiratani-unsui-gorge-18.jpg` says something, `IMG_4829`
+does not. Rename before uploading.
 
 ## Feeds
 
