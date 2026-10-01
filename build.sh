@@ -35,3 +35,9 @@ if [ "$post_count" = "0" ]; then
 else
   echo "Database already has posts — leaving content alone."
 fi
+
+# A rebuilt database carries the image *paths* but not the image *files*:
+# loaddata restores every row and nothing puts the photographs back, so the
+# posts render perfectly with a broken picture on each one. This re-uploads
+# only what storage is actually missing, and does nothing once they're there.
+python manage.py restore_media --fetch

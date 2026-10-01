@@ -25,7 +25,12 @@ sitemaps = {
 def robots_txt(request):
     """Point crawlers at the sitemap and keep them out of what can't help them.
 
-    /search is endless and thin; /admin/ and /files/ are not content.
+    /search is endless and thin, /admin/ is not content, and /read-later and
+    /credits are both marked noindex anyway.
+
+    The pictures under /files/ are deliberately *not* disallowed: blocking them
+    would keep the photographs out of Google Images, which is a large part of
+    how a travel post gets found.
     """
     sitemap_url = request.build_absolute_uri(
         reverse("django.contrib.sitemaps.views.sitemap")
