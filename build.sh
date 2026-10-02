@@ -41,3 +41,9 @@ fi
 # posts render perfectly with a broken picture on each one. This re-uploads
 # only what storage is actually missing, and does nothing once they're there.
 python manage.py restore_media --fetch
+
+# Nobody can log in to a rebuilt database: `dumpdata blog` carries no accounts
+# and the free tier has no shell to run createsuperuser from. The credentials
+# come from the service's environment, never from this repository, and the
+# command is quiet unless something actually changed.
+python manage.py ensure_superuser

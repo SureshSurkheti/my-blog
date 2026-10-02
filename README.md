@@ -89,6 +89,11 @@ overwrites what you wrote in the admin.
 `CSRF_TRUSTED_ORIGINS=https://blog.sureshsurkheti.com`, `CLOUDINARY_URL`,
 `AUTHOR_NAME`, `AUTHOR_WEBSITE`, `SOCIAL_INSTAGRAM`, `SOCIAL_LINKEDIN`.
 
+Plus `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD` — without
+them a rebuilt database has nobody who can log in, because `make backup` dumps
+posts only and the free tier has no shell. To change the password, edit the
+variable and redeploy.
+
 **Never put a `.env` file on the server** — `settings.py` reads it with
 `overwrite=True`, so it would beat all of the above, including `DEBUG`.
 
@@ -259,6 +264,8 @@ Settings that vary by machine live in `.env` (git-ignored). See
 | `IMAGE_MAX_DIMENSION`     | `1600`               | Longest edge kept on upload           |
 | `IMAGE_JPEG_QUALITY`      | `80`                 | JPEG quality on upload                |
 | `MEDIA_ROOT`              | `uploads/`           | Where uploads are written             |
+| `DJANGO_SUPERUSER_USERNAME` | unset              | Admin account made at deploy time     |
+| `DJANGO_SUPERUSER_PASSWORD` | unset              | Set both, or no account is touched    |
 | `BLOG_LATEST_POSTS_COUNT` | `6`                  | Posts shown on the homepage (3 on phones — see below) |
 
 HTTPS-only protections (SSL redirect, secure cookies, HSTS) switch on
