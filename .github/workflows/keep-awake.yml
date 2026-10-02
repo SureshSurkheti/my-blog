@@ -18,7 +18,7 @@ on:
     # The site sleeps overnight, when nobody here is reading it.
     #
     # Offset off the hour because GitHub's scheduler is busiest on the hour.
-    - cron: "3,13,23,33,43,53 22,23,0-16 * * *"
+    - cron: "3,13,23,33,43,53 0-16,22,23 * * *"
   workflow_dispatch: # so it can be run by hand to check it works
 
 concurrency:
