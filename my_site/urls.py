@@ -78,7 +78,15 @@ urlpatterns = [
     path(
         "sitemap.xml",
         sitemap,
-        {"sitemaps": sitemaps},
+        {
+            "sitemaps": sitemaps,
+            # Django's stock template names each page and nothing else. Ours
+            # adds Google's image extension, so a post's photographs are
+            # listed with it. Named rather than shadowing "sitemap.xml" in the
+            # project template directory, which would override Django's
+            # template everywhere without saying so.
+            "template_name": "blog/sitemap-with-images.xml",
+        },
         name="django.contrib.sitemaps.views.sitemap",
     ),
     path("", include("blog.urls")),
