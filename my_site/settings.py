@@ -108,9 +108,33 @@ ASGI_APPLICATION = "my_site.asgi.application"
 
 # Database
 
+def reuse_connections(config, max_age):
+    """Hold a remote database connection open across requests.
+
+    Postgres lives in another data centre — Neon, not Render — so opening a
+    connection per request costs a TCP round trip and a TLS handshake before a
+    page can begin its first query. The health check is one cheap statement
+    that avoids handing a view a connection the server has quietly dropped,
+    which is the usual price of keeping them.
+
+    SQLite is left alone: the file is local, there is nothing to hold open,
+    and a persistent connection only complicates test teardown.
+
+    None of this touches the free tier's 50-second wake from sleep. That is
+    the container starting, long before Django exists.
+    """
+    if "sqlite" in config["ENGINE"]:
+        return config
+
+    config["CONN_MAX_AGE"] = max_age
+    config["CONN_HEALTH_CHECKS"] = True
+    return config
+
+
 DATABASES = {
-    "default": env.db_url(
-        "DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    "default": reuse_connections(
+        env.db_url("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        env.int("CONN_MAX_AGE", default=600),
     )
 }
 
