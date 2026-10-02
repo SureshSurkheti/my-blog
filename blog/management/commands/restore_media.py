@@ -12,13 +12,21 @@ it is safe to run on every deploy.
 The bytes go through the model's own save path rather than straight at the
 storage backend, so a restored picture is resized and re-encoded by the same
 pipeline as a fresh upload instead of landing at full camera resolution.
+
+Storage is allowed to file a picture under a different name than it was asked
+for, and Cloudinary always does: it drops the extension and appends a random
+suffix, so ``posts/beppu.jpg`` comes back as ``files/posts/beppu_a1b2c3``.
+That is also why the fixture's paths never match a Cloudinary account in the
+first place — content.json is dumped from a local database, where storage is
+the filesystem and the names stay clean. Saving the instance writes whatever
+name came back, so the row and the bytes stay together.
 """
 
 from pathlib import Path
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from blog.models import Post, PostImage
 
@@ -67,7 +75,7 @@ class Command(BaseCommand):
             self.stdout.write("Fetching the source photographs…")
             call_command("fetch_seed_photos", photos=str(photo_dir))
 
-        restored, unresolved = 0, []
+        restored, unresolved, failed = 0, [], []
         for instance, field, name in missing:
             source = photo_dir / Path(name).name
             if not source.exists():
@@ -79,23 +87,28 @@ class Command(BaseCommand):
                 restored += 1
                 continue
 
-            setattr(instance, field, self._upload(source))
-            instance.save()
+            # One picture that will not upload must not cost the site the
+            # other thirty-eight, and must not fail the deploy either: a post
+            # missing its photograph is still a post worth serving.
+            try:
+                setattr(instance, field, self._upload(source))
+                instance.save()
+            except Exception as problem:  # noqa: BLE001 - reported, not swallowed
+                failed.append((name, problem))
+                self.stderr.write(f"  could not restore {name}: {problem}")
+                continue
 
-            # A name that comes back changed means storage had something at the
-            # old path after all and Django stepped around it. The row now
-            # points somewhere new, so say so loudly rather than leaving a
-            # silent mismatch between the database and the page.
             stored = getattr(instance, field).name
-            if stored != name:
-                raise CommandError(
-                    f"{name} was restored as {stored} — the database row has moved."
-                )
-
-            self.stdout.write(f"  restored {name}")
+            if stored == name:
+                self.stdout.write(f"  restored {name}")
+            else:
+                self.stdout.write(f"  restored {name} as {stored}")
             restored += 1
 
-        self.stdout.write(f"{restored} restored, {len(unresolved)} without a source.")
+        self.stdout.write(
+            f"{restored} restored, {len(unresolved)} without a source, "
+            f"{len(failed)} failed."
+        )
         for name in unresolved:
             self.stderr.write(f"  no source photograph for {name}")
 

@@ -6,7 +6,7 @@ from io import StringIO
 from pathlib import Path
 
 from django.core.files.storage import default_storage
-from django.core.management import CommandError, call_command
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 
 from .factories import make_gallery_image, make_image_file, make_post
@@ -132,18 +132,68 @@ class RestoreMediaTests(TestCase):
         self.post.refresh_from_db()
         self.assertLessEqual(self.post.image.width, limit)
 
-    def test_it_refuses_to_leave_the_row_pointing_somewhere_new(self):
-        # Storage is free to hand back a different name than it was given.
-        # Silently accepting that would leave the row pointing at one path and
-        # the restored bytes sitting at another, which looks like a success
-        # and still renders a broken picture.
+    def test_a_storage_that_renames_is_followed_not_rejected(self):
+        # Cloudinary files every upload under a new public id: the extension
+        # is dropped and a random suffix added. Treating that as a failure is
+        # what left the live site with one photograph restored and the rest
+        # untouched, because the command stopped on the very first picture.
         name = self.post.image.name
         self._put_source(name)
         self._delete_from_storage(name)
 
-        with _StorageRenamesOnSave(suffix=".moved"):
-            with self.assertRaises(CommandError):
-                self._run()
+        with _StorageRenamesOnSave(suffix="_a1b2c3"):
+            output = self._run()
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.image.name, name + "_a1b2c3")
+        self.assertIn(f"restored {name} as {name}_a1b2c3", output)
+
+    def test_a_rename_leaves_the_row_and_the_bytes_together(self):
+        name = self.post.image.name
+        self._put_source(name)
+        self._delete_from_storage(name)
+
+        with _StorageRenamesOnSave(suffix="_a1b2c3"):
+            self._run()
+
+        self.post.refresh_from_db()
+        self.assertTrue(default_storage.exists(self.post.image.name))
+
+    def test_a_second_run_re_uploads_nothing(self):
+        # Without this the command would rename every picture on every deploy,
+        # filling the account with copies and rewriting the rows each time.
+        name = self.post.image.name
+        self._put_source(name)
+        self._delete_from_storage(name)
+        self._run()
+
+        output = self._run()
+
+        self.assertIn("nothing to do", output)
+
+    def test_one_picture_that_will_not_upload_does_not_stop_the_others(self):
+        lost = self.post.image.name
+        also_lost = self.gallery.image.name
+        self._put_source(lost)
+        self._put_source(also_lost)
+        self._delete_from_storage(lost)
+        self._delete_from_storage(also_lost)
+
+        with _StorageFailsOn(lost):
+            output = self._run()
+
+        self.assertIn(f"could not restore {lost}", output)
+        self.assertTrue(default_storage.exists(also_lost))
+
+    def test_a_failure_does_not_bring_the_deploy_down(self):
+        # build.sh runs under `set -o errexit`, so raising here would stop a
+        # deploy over a photograph.
+        name = self.post.image.name
+        self._put_source(name)
+        self._delete_from_storage(name)
+
+        with _StorageFailsOn(name):
+            self._run()  # must not raise
 
 
 class _StorageRenamesOnSave:
@@ -162,6 +212,26 @@ class _StorageRenamesOnSave:
 
         def save(name, content, max_length=None):
             return self.original(name + self.suffix, content, max_length)
+
+        default_storage.save = save
+
+    def __exit__(self, *exc):
+        default_storage.save = self.original
+
+
+class _StorageFailsOn:
+    """Refuse to store one particular path, the way a bad upload would."""
+
+    def __init__(self, name):
+        self.name = name
+
+    def __enter__(self):
+        self.original = default_storage.save
+
+        def save(name, content, max_length=None):
+            if name == self.name:
+                raise OSError("upload refused")
+            return self.original(name, content, max_length)
 
         default_storage.save = save
 
