@@ -196,6 +196,40 @@ class Post(models.Model):
     def focal_css(self):
         return FocalPoint.to_css(self.focal_point)
 
+    def related_posts(self, limit=3, exclude=()):
+        """Published posts sharing a tag with this one, closest match first.
+
+        The only links between posts until now were the previous and next in
+        date order, which say nothing about subject: a piece on Beppu's hot
+        springs pointed at whatever happened to be written the week before.
+        This links the onsen posts to each other instead, which is how a
+        reader finds the rest of what they came for, and how a search engine
+        works out that this site has something to say about onsen rather than
+        one page that mentions them.
+
+        Ordered by how many tags are shared, so a post matching both Oita and
+        Festivals outranks one matching Oita alone, with the newer of two
+        equal matches first.
+        """
+        # Iterating the manager uses the prefetch the detail view already
+        # paid for; .values_list() would ignore it and issue a second query
+        # for tags that are sitting in memory.
+        tag_ids = [tag.pk for tag in self.tags.all()]
+        if not tag_ids:
+            return Post.objects.none()
+
+        return (
+            Post.objects.published()
+            .with_related()
+            .filter(tags__in=tag_ids)
+            .exclude(pk=self.pk)
+            .exclude(pk__in=[post.pk for post in exclude if post])
+            .annotate(shared=models.Count("tags", distinct=True,
+                                          filter=models.Q(tags__in=tag_ids)))
+            .order_by("-shared", "-published_at", "-pk")
+            .distinct()[:limit]
+        )
+
     def get_newer_post(self):
         """The next post forward in time, or None at the newest end."""
         return self._neighbour(newer=True)

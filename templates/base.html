@@ -154,7 +154,21 @@
       than offering a way off the site before any of it has been read.
       {% endcomment %}
       {% include "includes/social-links.html" %}
-      <p>&copy; {% now "Y" %} {{ blog.title }}</p>
+      {% comment %}
+      The credits page was deliberately unlinked. That was defensible while it
+      was only tidiness, but most of the photographs on this site are borrowed
+      under CC BY and CC BY-SA, and both licences require attribution a reader
+      can actually reach. A page nobody can find does not satisfy that.
+
+      It stays out of the sitemap and robots.txt — it is a legal notice, not
+      something to rank. Delete this link once the borrowed photographs have
+      been replaced with the owner's own, at which point the page empties out
+      by itself.
+      {% endcomment %}
+      <p>
+        &copy; {% now "Y" %} {{ blog.title }}<span class="site-footer__sep"
+        aria-hidden="true">·</span><a href="{% url 'photo-credits' %}">Photo credits</a>
+      </p>
       {% comment %}
       The feeds are deliberately not linked here: "RSS" means nothing to
       most readers. They stay discoverable through the <link rel="alternate">

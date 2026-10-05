@@ -8,11 +8,13 @@ licences.
 
 ``seed_kyushu`` writes the file; nothing reads it but the credits page.
 
-The page is **not linked from anywhere** — that was a deliberate choice by the
-site owner. It stays reachable at /credits, but CC BY and CC BY-SA both require
-attribution that a reader can actually find, so the site is only properly clear
-of that obligation once these borrowed photographs are replaced with the
-owner's own. Delete this file at that point and the page empties out.
+The page is linked from the footer of every page, because CC BY and CC BY-SA
+both require attribution a reader can actually reach and a page linked from
+nowhere does not provide it. It stays out of the sitemap and robots.txt: it is
+a legal notice rather than something to rank.
+
+The real fix is still to replace these borrowed photographs with the owner's
+own. Delete this file at that point and the page empties out on its own.
 """
 
 import json

@@ -1298,7 +1298,8 @@ body.lightbox-open {
    a panel like #gallery and #comments so it belongs to the page rather than
    floating between sections. A missing neighbour is omitted entirely; an empty
    placeholder just looked broken. */
-#post-nav {
+#post-nav,
+#related-posts {
   width: calc(100% - (2 * var(--gutter)));
   max-width: var(--container);
   margin: 3rem auto;
@@ -1308,7 +1309,8 @@ body.lightbox-open {
   box-shadow: 0 2px 8px var(--shadow);
 }
 
-#post-nav h2 {
+#post-nav h2,
+#related-posts h2 {
   margin: 0 0 1.25rem 0;
   color: var(--text);
   font-size: 1.5rem;
@@ -1619,6 +1621,7 @@ body.lightbox-open {
   :root:not([data-theme="light"]) #latest-posts,
   :root:not([data-theme="light"]) #gallery,
   :root:not([data-theme="light"]) #post-nav,
+  :root:not([data-theme="light"]) #related-posts,
   :root:not([data-theme="light"]) #comments,
   :root:not([data-theme="light"]) #stored-posts,
   :root:not([data-theme="light"]) main {
@@ -1720,6 +1723,7 @@ body.lightbox-open {
 :root[data-theme="dark"] #latest-posts,
 :root[data-theme="dark"] #gallery,
 :root[data-theme="dark"] #post-nav,
+:root[data-theme="dark"] #related-posts,
 :root[data-theme="dark"] #comments,
 :root[data-theme="dark"] #stored-posts,
 :root[data-theme="dark"] main {

@@ -171,6 +171,7 @@ class SinglePostView(View):
         return get_object_or_404(queryset, slug=slug)
 
     def build_context(self, request, post, comment_form=None):
+        newer, older = post.get_newer_post(), post.get_older_post()
         return {
             "post": post,
             "post_tags": post.tags.all(),
@@ -178,8 +179,11 @@ class SinglePostView(View):
             "comment_form": comment_form or CommentForm(),
             "comments": post.comments.approved(),
             "saved_for_later": post.id in _stored_post_ids(request),
-            "newer_post": post.get_newer_post(),
-            "older_post": post.get_older_post(),
+            "newer_post": newer,
+            "older_post": older,
+            # Excluding the two above so the same post is never offered twice
+            # on one page under two different headings.
+            "related_posts": post.related_posts(exclude=(newer, older)),
             "seo": seo.build(
                 request,
                 title=post.title,

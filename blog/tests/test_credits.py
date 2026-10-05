@@ -127,13 +127,23 @@ class CreditsFileSafetyTests(TestCase):
 
 
 class CreditsPagePlacementTests(TestCase):
-    def test_the_footer_does_not_link_the_credits_page(self):
-        # Deliberately unlinked: see the note in blog/credits.py.
+    def test_the_footer_links_the_credits_page(self):
+        # CC BY and CC BY-SA both require attribution a reader can reach. A
+        # page that exists but is linked from nowhere does not satisfy that,
+        # which is why this assertion is the reverse of what it used to be.
         with _CreditsFile(CREDIT_ROWS):
             body = self.client.get("/").content.decode()
 
         footer = body[body.index("site-footer") :]
-        self.assertNotIn(reverse("photo-credits"), footer)
+        self.assertIn(reverse("photo-credits"), footer)
+
+    def test_it_is_linked_from_every_page_not_just_the_home_page(self):
+        # Someone arriving at a post from a search engine has to be able to
+        # find it too.
+        with _CreditsFile(CREDIT_ROWS):
+            body = self.client.get(reverse("posts-page")).content.decode()
+
+        self.assertIn(reverse("photo-credits"), body[body.index("site-footer") :])
 
     def test_the_page_is_still_reachable_directly(self):
         with _CreditsFile(CREDIT_ROWS):

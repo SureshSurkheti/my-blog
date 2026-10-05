@@ -104,6 +104,34 @@
 </section>
 {% endif %}
 
+{% comment %}
+Posts on the same subject, above the date-ordered pair below. Someone who has
+just read about one onsen town wants the other onsen towns, not whatever
+happened to be published the week before — and a search engine reads the same
+links as evidence that this site covers onsen rather than mentioning them once.
+{% endcomment %}
+{% if related_posts %}
+<section id="related-posts" aria-labelledby="related-heading">
+  <h2 id="related-heading">More like this</h2>
+  <div class="post-nav__grid">
+    {% for related in related_posts %}
+    <a class="post-nav__card" href="{{ related.get_absolute_url }}">
+      {% if related.image %}
+      <img src="{{ related.image.url }}" alt="" loading="lazy"
+           {% if related.image_width %}width="{{ related.image_width }}" height="{{ related.image_height }}"{% endif %}
+           style="object-position: {{ related.focal_css }}" />
+      {% endif %}
+      <span class="post-nav__body">
+        <span class="post-nav__dir">{% for tag in related.tags.all %}{% if forloop.first %}{{ tag.caption }}{% endif %}{% endfor %}</span>
+        <span class="post-nav__title">{{ related.title }}</span>
+        <span class="post-nav__date">{{ related.published_at|date:"d M Y" }}</span>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% if newer_post or older_post %}
 <section id="post-nav" aria-labelledby="post-nav-heading">
   <h2 id="post-nav-heading">Keep reading</h2>
