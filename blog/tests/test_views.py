@@ -1,3 +1,4 @@
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -760,18 +761,69 @@ class ResponsiveImageTests(TestCase):
 
 
 class FontLoadingTests(TestCase):
-    def test_fonts_are_linked_from_the_head_not_imported_from_css(self):
+    """Fonts must not cost the first paint a round trip it does not need.
+
+    They used to come from Google, which meant a stylesheet from
+    fonts.googleapis.com naming files on fonts.gstatic.com: two extra DNS
+    lookups and two extra TLS handshakes before a letter could be drawn. They
+    are served from here now, so what these tests guard is that nothing
+    reintroduces a serial fetch — an @import, or a font discovered only after
+    app.css has been parsed.
+    """
+
+    def _css(self):
+        css = (Path(settings.BASE_DIR) / "static" / "app.css").read_text()
+        # Comments stripped first: the notes explaining why there is no
+        # @import, and where the fonts came from, mention both naturally.
+        return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+    def test_the_stylesheet_does_not_import_anything(self):
         # An @import cannot start downloading until app.css has arrived and
         # been parsed — two serial round trips before any text can paint.
-        import re
+        self.assertNotIn("@import", self._css())
 
-        with open(Path(settings.BASE_DIR) / "static" / "app.css") as handle:
-            css = handle.read()
-        # Comments stripped first: the note explaining why there is no @import
-        # here naturally contains the word.
-        code = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-        self.assertNotIn("@import", code)
+    def test_no_font_is_fetched_from_another_host(self):
+        code = self._css()
 
-        response = self.client.get("/")
-        self.assertContains(response, "fonts.googleapis.com/css2")
-        self.assertContains(response, 'rel="preconnect"')
+        self.assertNotIn("fonts.gstatic.com", code)
+        self.assertNotIn("fonts.googleapis.com", code)
+        self.assertNotContains(self.client.get("/"), "fonts.googleapis.com")
+
+    def test_the_faces_are_declared_locally(self):
+        self.assertIn("@font-face", self._css())
+
+    def test_every_face_swaps_rather_than_hiding_the_text(self):
+        # Without font-display: swap the browser hides the text while the
+        # file downloads, which looks like a blank page on a slow connection.
+        faces = self._css().count("@font-face")
+
+        self.assertEqual(self._css().count("font-display: swap"), faces)
+
+    def test_the_two_faces_every_page_needs_are_preloaded(self):
+        # A font named inside a stylesheet is only discovered once that
+        # stylesheet has been fetched and parsed. Preloading starts it in
+        # parallel instead.
+        body = self.client.get("/").content.decode()
+
+        self.assertIn("open-sans-var", body)
+        self.assertIn("lato-700", body)
+        self.assertEqual(body.count('rel="preload"'), 2)
+
+    def test_preloaded_fonts_declare_a_type_and_cross_origin(self):
+        # A preload missing either attribute is fetched a second time rather
+        # than reused, which makes the page slower, not faster.
+        body = self.client.get("/").content.decode()
+
+        for fragment in re.findall(r"<link rel=\"preload\"[^>]*>", body):
+            self.assertIn('as="font"', fragment)
+            self.assertIn('type="font/woff2"', fragment)
+            self.assertIn("crossorigin", fragment)
+
+    def test_the_font_files_are_actually_present(self):
+        fonts = Path(settings.BASE_DIR) / "static" / "fonts"
+
+        for name in ("open-sans-var.woff2", "lato-400.woff2", "lato-700.woff2"):
+            with self.subTest(font=name):
+                self.assertTrue((fonts / name).exists())
+                # WOFF2 files begin with the signature "wOF2".
+                self.assertEqual((fonts / name).read_bytes()[:4], b"wOF2")

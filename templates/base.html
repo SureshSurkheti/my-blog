@@ -22,14 +22,17 @@
     <link rel="manifest" href="{% url 'webmanifest' %}" />
     <meta name="theme-color" content="#003893" />
     {% comment %}
-    Fonts first, and preconnected: the browser can open the connection to
-    Google's font hosts while it is still fetching our own CSS, instead of
-    discovering them afterwards from an @import.
+    The fonts are ours now, declared in app.css. Preloaded because a font
+    named inside a stylesheet is only discovered once that stylesheet has
+    been fetched and parsed, which leaves the body text waiting a round trip
+    it does not need to. Only the two faces every page uses are preloaded —
+    body text and headings — since preloading what a page may not draw just
+    takes bandwidth from what it will.
     {% endcomment %}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@400;700&display=swap" />
+    <link rel="preload" href="{% static 'fonts/open-sans-var.woff2' %}"
+          as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="{% static 'fonts/lato-700.woff2' %}"
+          as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="{% static 'app.css' %}" />
     {% block css_files %}{% endblock %}
   </head>

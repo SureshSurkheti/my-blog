@@ -1,3 +1,53 @@
+/* --------------------------------------------------------------------------
+   Fonts, served from this site rather than fonts.gstatic.com.
+
+   Loading them from Google cost every first-time visitor two extra DNS
+   lookups and two extra TLS handshakes — to fonts.googleapis.com for a
+   stylesheet, which then names files on fonts.gstatic.com — before a single
+   letter could be drawn. Serving them here means they arrive on the
+   connection the browser has already opened, and they are covered by the same
+   immutable cache headers as the rest of the static files.
+
+   Both families are under the SIL Open Font License, which permits this.
+
+   Only the latin subset is kept. The Japanese in some posts was never covered
+   by these fonts anyway, and the unicode-range below tells the browser so, so
+   it reaches straight for the system font instead of waiting.
+
+   Open Sans is one variable file covering every weight; Lato ships a separate
+   file per weight, so there are two of those.
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300 800;
+  font-stretch: 100%;
+  /* swap: show the fallback immediately and repaint when the file lands,
+     rather than leaving the page blank while it downloads. */
+  font-display: swap;
+  src: url("fonts/open-sans-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/lato-400.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/lato-700.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Fonts are linked from <head> in base.html, not @imported here: an
    @import cannot start downloading until this stylesheet has itself
    arrived and been parsed, which serialises two round trips before any
