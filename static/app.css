@@ -222,11 +222,22 @@ h3 {
 }
 
 /* Where supported, let the page tint through — it keeps the homepage gradient
-   readable behind the bar instead of cutting it off with a hard edge. */
+   readable behind the bar instead of cutting it off with a hard edge.
+
+   At 0.85 and a 10px blur, a line of body text scrolling under the bar stayed
+   legible through it: half-letters smeared across the header, which reads as
+   a dirty bar rather than a glass one. It is worse in the dark theme, where
+   the text passing behind is light on dark and smears bright.
+
+   Measured as the spread of brightness inside the bar while scrolling a post
+   — an empty bar is flat, ghosting is variance. 0.85/10px scored 9.4;
+   0.92/22px scores 4.4. Going further flattens it completely but by then the
+   gradient no longer shows through at all, which was the point of doing this.
+   -------------------------------------------------------------------------- */
 @supports (backdrop-filter: blur(8px)) {
   #main-navigation {
-    background-color: rgba(41, 8, 92, 0.85);
-    backdrop-filter: blur(10px);
+    background-color: rgba(41, 8, 92, 0.92);
+    backdrop-filter: blur(22px);
   }
 }
 
