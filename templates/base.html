@@ -3,6 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {% comment %}
+    Inline and first, before any stylesheet: it sets the theme attribute
+    before the browser paints anything. In an external file it would run after
+    the first paint and the reader would see a white flash before the page
+    turned dark, which is the thing that makes a dark site feel broken.
+
+    It only acts on an explicit choice. With nothing stored, the attribute
+    stays absent and the CSS follows the operating system on its own.
+    {% endcomment %}
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "dark" || saved === "light") {
+            document.documentElement.dataset.theme = saved;
+          }
+        } catch (error) {}
+      })();
+    </script>
     <title>{% block title %}{{ blog.title }}{% endblock %}</title>
     <meta name="description" content="{% block description %}{{ blog.description }}{% endblock %}" />
     <meta name="google-site-verification" content="sAIkvTSX0TUIR8c0wnkQnl15DYOxKl5xXNpaSkmV3DA" />
@@ -61,6 +81,35 @@
           Saved
         </a>
 
+        {% comment %}
+        Hidden until theme.js reveals it, the same way the search toggle is:
+        with JavaScript off this cannot work, and a dead control is worse than
+        none. The page still follows the system preference in that case.
+        {% endcomment %}
+        <button class="theme-toggle" type="button" hidden data-theme-toggle
+                aria-label="Switch to dark mode" title="Switch to dark mode">
+          <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true"
+               focusable="false">
+            <circle cx="12" cy="12" r="4.6" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="1.6" x2="12" y2="4.2" />
+              <line x1="12" y1="19.8" x2="12" y2="22.4" />
+              <line x1="1.6" y1="12" x2="4.2" y2="12" />
+              <line x1="19.8" y1="12" x2="22.4" y2="12" />
+              <line x1="4.4" y1="4.4" x2="6.2" y2="6.2" />
+              <line x1="17.8" y1="17.8" x2="19.6" y2="19.6" />
+              <line x1="19.6" y1="4.4" x2="17.8" y2="6.2" />
+              <line x1="6.2" y1="17.8" x2="4.4" y2="19.6" />
+            </g>
+          </svg>
+          <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true"
+               focusable="false">
+            <path fill="currentColor"
+                  d="M21 14.2A9 9 0 0 1 9.8 3a9 9 0 1 0 11.2 11.2z" />
+          </svg>
+          <span class="visually-hidden" data-theme-label>Dark</span>
+        </button>
+
         <button class="nav-search__toggle" type="button" hidden
                 data-nav-search-toggle aria-expanded="false"
                 aria-controls="nav-search-form" aria-label="Search posts">
@@ -115,6 +164,7 @@
     </footer>
 
     <script src="{% static 'nav.js' %}" defer></script>
+    <script src="{% static 'theme.js' %}" defer></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

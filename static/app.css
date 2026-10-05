@@ -1421,15 +1421,86 @@ body.lightbox-open {
 
 
 /* --------------------------------------------------------------------------
+   The light/dark switch.
+
+   It lives on the purple header, which stays purple in both themes, so it is
+   styled against that rather than against the page — the same treatment as
+   the search icon beside it, so the two read as a pair.
+
+   The icon shown is the theme you would get by pressing, not the one you are
+   in: a moon while you are in daylight. Showing the current state instead
+   reads as a status light and people press it expecting nothing to happen.
+   -------------------------------------------------------------------------- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: white;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.24);
+}
+
+.theme-toggle:active {
+  transform: scale(0.94);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* One icon at a time. The moon means "a press takes you to dark", so it is
+   what a reader in light mode sees. */
+.theme-toggle__sun {
+  display: none;
+}
+
+.theme-toggle[data-theme-state="dark"] .theme-toggle__sun {
+  display: block;
+}
+
+.theme-toggle[data-theme-state="dark"] .theme-toggle__moon {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+
+  .theme-toggle:active {
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Dark theme.
 
-   Only the tokens change; not one rule below is duplicated. That is the whole
+   Only the tokens change; not one rule above is duplicated. That is the whole
    reason the colours were pulled into :root first — a second copy of the
    stylesheet would drift from the first within a month.
 
-   It follows the reader's system setting and offers no switch. A switch needs
-   JavaScript, somewhere to remember the choice, and a way to avoid painting
-   the wrong theme first; the operating system already knows the answer.
+   The palette itself is written out twice, which is the one duplication CSS
+   leaves no way around: a declaration block cannot be shared between a media
+   query and a plain selector. ``ThemeTokensTests`` compares the two and fails
+   if they ever stop matching, so the copy cannot rot quietly.
 
    The purple is kept, not inverted. The header and the hero are the site's
    one piece of colour, and a dark page actually suits them — they were always
@@ -1439,96 +1510,207 @@ body.lightbox-open {
    surface and every border clears 3:1, which is what a boundary needs to be
    visible at all.
    -------------------------------------------------------------------------- */
+
+/* Following the system, unless the reader has explicitly asked for light.
+   Without the :not(), someone on a dark phone who picked light would still
+   get dark, and the button would look broken. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* Surfaces: a near-black carrying a little of the brand purple, so the
-       page does not read as cold grey next to the header. */
-    --page-bg: #121019;
-    --surface: #1c1926;
-    --surface-sunken: #2a2338;
-    --code-bg: #0d0b12;
-    --code-fg: #e6e3ec;
+  :root:not([data-theme="light"]) {
 
-    /* Text */
-    --text: #ecebf1;
-    --text-soft: #cbc7d6;
-    --text-muted: #a9a4b8;
-    --text-faint: #8b8699;
-    --text-dim-heading: #ddd9e6;
-    --text-caption: #b5b0c3;
-    --text-footer: #a9a4b8;
-    --text-social-heading: #b5b0c3;
+  /* Surfaces: a near-black carrying a little of the brand purple, so the
+     page does not read as cold grey next to the header. */
+  --page-bg: #121019;
+  --surface: #1c1926;
+  --surface-sunken: #2a2338;
+  --code-bg: #0d0b12;
+  --code-fg: #e6e3ec;
 
-    /* Lines. Lighter than the surface rather than darker: on a dark page a
-       darker line is a hole, not an edge. */
-    --line-footer: #35304a;
-    /* Raised until it clears 3:1 against the surface, which is what WCAG
-       asks of a control's boundary. The first attempt, #4e4766, measured
-       1.99:1 — the search box would have had no visible edge at all. */
-    --line-input: #6d668b;
-    --line-table: #3a3450;
-    --line-card: #342e49;
-    --line-card-focus: #8b6fd0;
-    --line-sep: #6b6480;
-    --line-social: #8b6fd0;
+  /* Text */
+  --text: #ecebf1;
+  --text-soft: #cbc7d6;
+  --text-muted: #a9a4b8;
+  --text-faint: #8b8699;
+  --text-dim-heading: #ddd9e6;
+  --text-caption: #b5b0c3;
+  --text-footer: #a9a4b8;
+  --text-social-heading: #b5b0c3;
 
-    /* The link purple has to come up a long way. #5706c0 on this background
-       is 1.6:1 — unreadable. */
-    --accent: #c2a4ff;
-    --accent-tint: #2b2240;
-    --accent-line: #8b6fd0;
+  /* Lines. Lighter than the surface rather than darker: on a dark page a
+     darker line is a hole, not an edge. */
+  --line-footer: #35304a;
+  /* Raised until it clears 3:1 against the surface, which is what WCAG
+     asks of a control's boundary. The first attempt, #4e4766, measured
+     1.99:1 — the search box would have had no visible edge at all. */
+  --line-input: #6d668b;
+  --line-table: #3a3450;
+  --line-card: #342e49;
+  --line-card-focus: #8b6fd0;
+  --line-sep: #6b6480;
+  --line-social: #8b6fd0;
 
-    /* States. The light theme's red and amber are far too dark to sit on a
-       dark surface, so each one is lifted and its background sunk. */
-    --error: #ff9a9a;
-    --error-text: #ffc9c9;
-    --error-bg: #3b1d1d;
-    --warn-bg: #3a2f14;
-    --warn-text: #f3dc96;
-    --warn-line: #d1a000;
+  /* The link purple has to come up a long way. #5706c0 on this background
+     is 1.6:1 — unreadable. */
+  --accent: #c2a4ff;
+  --accent-tint: #2b2240;
+  --accent-line: #8b6fd0;
 
-    --ink-brand: #c2a4ff;
-    --ink-brand-deep: #d3bcff;
-    /* Lifted so the button reads as a button against the card behind it;
-       #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
-    --button-brand-bg: #5b2bb5;
+  /* States. The light theme's red and amber are far too dark to sit on a
+     dark surface, so each one is lifted and its background sunk. */
+  --error: #ff9a9a;
+  --error-text: #ffc9c9;
+  --error-bg: #3b1d1d;
+  --warn-bg: #3a2f14;
+  --warn-text: #f3dc96;
+  --warn-line: #d1a000;
 
-    --text-card-title: #ecebf1;
-    --text-comment-heading: #cbc7d6;
-    --text-saved-link: #ecebf1;
-    --text-saved-empty: #cbc7d6;
-    --text-remove: #8b8699;
-    --saved-focus-bg: #2b2240;
-    --line-textarea: #6d668b;
-    --line-about-inner: #322c3d;
-    --error-list: #ff9a9a;
-    --shadow-card: rgba(0, 0, 0, 0.55);
-    --shadow-panel: rgba(0, 0, 0, 0.6);
+  --ink-brand: #c2a4ff;
+  --ink-brand-deep: #d3bcff;
+  /* Lifted so the button reads as a button against the card behind it;
+     #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
+  --button-brand-bg: #5b2bb5;
 
-    /* The about panel keeps its own tone so it still reads as a separate
-       band below the posts, the way the warm grey does in daylight. */
-    --about-bg: #17141f;
-    --about-line: #322c3d;
-    --portrait-bg: #2a2338;
-    --line-soft: #2f2941;
-    --line-faint: #2a2438;
-    --invalid-border: #ff7a7a;
-    --invalid-bg: #3b1d1d;
-    --remove-focus-border: #6e3a3a;
-    --remove-focus-bg: #2e1a1a;
-    --welcome-heading: #f4f0fb;
+  --text-card-title: #ecebf1;
+  --text-comment-heading: #cbc7d6;
+  --text-saved-link: #ecebf1;
+  --text-saved-empty: #cbc7d6;
+  --text-remove: #8b8699;
+  --saved-focus-bg: #2b2240;
+  --line-textarea: #6d668b;
+  --line-about-inner: #322c3d;
+  --error-list: #ff9a9a;
+  --shadow-card: rgba(0, 0, 0, 0.55);
+  --shadow-panel: rgba(0, 0, 0, 0.6);
 
-    /* A shadow has to be blacker to register against a dark page. */
-    --shadow: rgba(0, 0, 0, 0.6);
-    --shadow-soft: rgba(0, 0, 0, 0.5);
-    --shadow-strong: rgba(0, 0, 0, 0.7);
+  /* The about panel keeps its own tone so it still reads as a separate
+     band below the posts, the way the warm grey does in daylight. */
+  --about-bg: #17141f;
+  --about-line: #322c3d;
+  --portrait-bg: #2a2338;
+  --line-soft: #2f2941;
+  --line-faint: #2a2438;
+  --invalid-border: #ff7a7a;
+  --invalid-bg: #3b1d1d;
+  --remove-focus-border: #6e3a3a;
+  --remove-focus-bg: #2e1a1a;
+  --welcome-heading: #f4f0fb;
+
+  /* A shadow has to be blacker to register against a dark page. */
+  --shadow: rgba(0, 0, 0, 0.6);
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --shadow-strong: rgba(0, 0, 0, 0.7);
   }
 
-  /* The photographs are the point of the site, so they are not dimmed. The
-     white frame around them is, though — a bright border on a dark page
-     draws the eye to the frame instead of the picture. */
-  .post-nav__card img,
-  .gallery-item img {
+  :root:not([data-theme="light"]) .post-nav__card img,
+  :root:not([data-theme="light"]) .gallery-item img {
     background-color: var(--surface-sunken);
   }
+
+  :root:not([data-theme="light"]) #latest-posts,
+  :root:not([data-theme="light"]) #gallery,
+  :root:not([data-theme="light"]) #post-nav,
+  :root:not([data-theme="light"]) #comments,
+  :root:not([data-theme="light"]) #stored-posts,
+  :root:not([data-theme="light"]) main {
+    border: 1px solid var(--line-card);
+  }
+}
+
+/* The same palette again, for a reader who asked for dark on a light system. */
+:root[data-theme="dark"] {
+
+  /* Surfaces: a near-black carrying a little of the brand purple, so the
+     page does not read as cold grey next to the header. */
+  --page-bg: #121019;
+  --surface: #1c1926;
+  --surface-sunken: #2a2338;
+  --code-bg: #0d0b12;
+  --code-fg: #e6e3ec;
+
+  /* Text */
+  --text: #ecebf1;
+  --text-soft: #cbc7d6;
+  --text-muted: #a9a4b8;
+  --text-faint: #8b8699;
+  --text-dim-heading: #ddd9e6;
+  --text-caption: #b5b0c3;
+  --text-footer: #a9a4b8;
+  --text-social-heading: #b5b0c3;
+
+  /* Lines. Lighter than the surface rather than darker: on a dark page a
+     darker line is a hole, not an edge. */
+  --line-footer: #35304a;
+  /* Raised until it clears 3:1 against the surface, which is what WCAG
+     asks of a control's boundary. The first attempt, #4e4766, measured
+     1.99:1 — the search box would have had no visible edge at all. */
+  --line-input: #6d668b;
+  --line-table: #3a3450;
+  --line-card: #342e49;
+  --line-card-focus: #8b6fd0;
+  --line-sep: #6b6480;
+  --line-social: #8b6fd0;
+
+  /* The link purple has to come up a long way. #5706c0 on this background
+     is 1.6:1 — unreadable. */
+  --accent: #c2a4ff;
+  --accent-tint: #2b2240;
+  --accent-line: #8b6fd0;
+
+  /* States. The light theme's red and amber are far too dark to sit on a
+     dark surface, so each one is lifted and its background sunk. */
+  --error: #ff9a9a;
+  --error-text: #ffc9c9;
+  --error-bg: #3b1d1d;
+  --warn-bg: #3a2f14;
+  --warn-text: #f3dc96;
+  --warn-line: #d1a000;
+
+  --ink-brand: #c2a4ff;
+  --ink-brand-deep: #d3bcff;
+  /* Lifted so the button reads as a button against the card behind it;
+     #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
+  --button-brand-bg: #5b2bb5;
+
+  --text-card-title: #ecebf1;
+  --text-comment-heading: #cbc7d6;
+  --text-saved-link: #ecebf1;
+  --text-saved-empty: #cbc7d6;
+  --text-remove: #8b8699;
+  --saved-focus-bg: #2b2240;
+  --line-textarea: #6d668b;
+  --line-about-inner: #322c3d;
+  --error-list: #ff9a9a;
+  --shadow-card: rgba(0, 0, 0, 0.55);
+  --shadow-panel: rgba(0, 0, 0, 0.6);
+
+  /* The about panel keeps its own tone so it still reads as a separate
+     band below the posts, the way the warm grey does in daylight. */
+  --about-bg: #17141f;
+  --about-line: #322c3d;
+  --portrait-bg: #2a2338;
+  --line-soft: #2f2941;
+  --line-faint: #2a2438;
+  --invalid-border: #ff7a7a;
+  --invalid-bg: #3b1d1d;
+  --remove-focus-border: #6e3a3a;
+  --remove-focus-bg: #2e1a1a;
+  --welcome-heading: #f4f0fb;
+
+  /* A shadow has to be blacker to register against a dark page. */
+  --shadow: rgba(0, 0, 0, 0.6);
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --shadow-strong: rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme="dark"] .post-nav__card img,
+:root[data-theme="dark"] .gallery-item img {
+  background-color: var(--surface-sunken);
+}
+
+:root[data-theme="dark"] #latest-posts,
+:root[data-theme="dark"] #gallery,
+:root[data-theme="dark"] #post-nav,
+:root[data-theme="dark"] #comments,
+:root[data-theme="dark"] #stored-posts,
+:root[data-theme="dark"] main {
+  border: 1px solid var(--line-card);
 }
