@@ -7,8 +7,8 @@
   margin: 2.5rem auto 3rem auto;
   padding: 2rem clamp(1.25rem, 3vw, 2.5rem) 2.25rem;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  background-color: white;
+  box-shadow: 0 2px 8px var(--shadow-soft);
+  background-color: var(--surface);
   width: calc(100% - (2 * var(--gutter)));
   /* The same column as the archive and the post pages. */
   max-width: var(--container);
@@ -17,12 +17,12 @@
 #stored-posts h1 {
   margin: 0 0 0.35rem 0;
   font-size: clamp(1.6rem, 4vw, 2.1rem);
-  color: #2e2e2e;
+  color: var(--text);
 }
 
 .saved-count {
   margin: 0 0 1.5rem 0;
-  color: #666;
+  color: var(--text-footer);
   font-size: 0.9rem;
 }
 
@@ -37,11 +37,11 @@
   align-items: stretch;
   gap: 0.5rem;
   padding: 0.5rem 0;
-  border-top: 1px solid #ececec;
+  border-top: 1px solid var(--line-faint);
 }
 
 .saved-item:last-child {
-  border-bottom: 1px solid #ececec;
+  border-bottom: 1px solid var(--line-faint);
 }
 
 .saved-item__link {
@@ -53,13 +53,13 @@
   padding: 0.5rem;
   border-radius: 10px;
   text-decoration: none;
-  color: #1b1b1b;
+  color: var(--text-saved-link);
   transition: background-color 0.15s ease;
 }
 
 .saved-item__link:hover,
 .saved-item__link:focus-visible {
-  background-color: #f4f1fa;
+  background-color: var(--saved-focus-bg);
   outline: none;
 }
 
@@ -69,7 +69,7 @@
   flex-shrink: 0;
   object-fit: cover;
   border-radius: 8px;
-  background-color: #ede1fb;
+  background-color: var(--surface-sunken);
 }
 
 .saved-item__text {
@@ -85,7 +85,7 @@
 }
 
 .saved-item__meta {
-  color: #666;
+  color: var(--text-footer);
   font-size: 0.85rem;
 }
 
@@ -105,7 +105,7 @@
   font: inherit;
   font-size: 1.4rem;
   line-height: 1;
-  color: #8a8a8a;
+  color: var(--text-remove);
   background: none;
   border: 1px solid transparent;
   border-radius: 50%;
@@ -118,9 +118,9 @@
 
 .saved-item__remove:hover,
 .saved-item__remove:focus-visible {
-  color: #b81b1b;
-  border-color: #e8b4b4;
-  background-color: #fdf3f3;
+  color: var(--error);
+  border-color: var(--remove-focus-border);
+  background-color: var(--remove-focus-bg);
   outline: none;
 }
 
@@ -130,7 +130,7 @@
 
 .saved-empty p {
   margin: 0 0 1.25rem 0;
-  color: #555;
+  color: var(--text-saved-empty);
   line-height: 1.6;
 }
 

@@ -8,7 +8,7 @@
   /* The same gradient as the home hero, so the two biggest coloured surfaces
      on the site are one colour rather than two shades of purple. */
   background: linear-gradient(160deg, var(--brand) 0%, var(--brand-deep) 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px var(--shadow);
   /* Two columns in the flow. The panel grows to whichever side is taller, so
      the author card can never spill out of the bottom the way it did when it
      was absolutely positioned. */
@@ -69,7 +69,7 @@
   width: 10.5rem;
   height: 9.5rem;
   object-fit: cover;
-  background-color: #ede1fb;
+  background-color: var(--surface-sunken);
   border-radius: 12px;
   transform: rotateZ(5deg);
   border: 5px solid white;
@@ -101,14 +101,14 @@ main {
   width: calc(100% - (2 * var(--gutter)));
   max-width: var(--container);
   margin: 3rem auto;
-  background-color: white;
+  background-color: var(--surface);
   padding: 3rem clamp(1.25rem, 3vw, 3rem);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .tag {
-  background-color: white;
+  background-color: var(--surface);
   color: purple;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -135,8 +135,8 @@ main {
   margin-inline: auto;
   padding: 1.5rem;
   border-radius: 12px;
-  background-color: white;
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.25);
+  background-color: var(--surface);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 /* --------------------------------------------------------------------------
@@ -157,9 +157,9 @@ main {
 .comment-form__toggle {
   display: inline-block;
   padding: 0.6rem 1.5rem;
-  border: 1px solid var(--brand-deep);
+  border: 1px solid var(--ink-brand-deep);
   border-radius: 6px;
-  color: var(--brand-deep);
+  color: var(--ink-brand-deep);
   font-weight: bold;
   transition:
     background-color 0.15s ease,
@@ -184,9 +184,9 @@ summary:focus-visible .comment-form__toggle {
 
 #comment-form button {
   font: inherit;
-  background-color: var(--brand-deep);
+  background-color: var(--button-brand-bg);
   color: white;
-  border: 1px solid var(--brand-deep);
+  border: 1px solid var(--button-brand-bg);
   padding: 0.5rem 1.5rem;
   border-radius: 6px;
   cursor: pointer;
@@ -195,7 +195,7 @@ summary:focus-visible .comment-form__toggle {
 #comment-form button:hover,
 #comment-form button:active {
   background-color: var(--brand-deep);
-  border-color: var(--brand-deep);
+  border-color: var(--button-brand-bg);
 }
 
 .form-control {
@@ -215,7 +215,7 @@ summary:focus-visible .comment-form__toggle {
   font: inherit;
   padding: 0.25rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--line-textarea);
 }
 
 
@@ -223,7 +223,7 @@ summary:focus-visible .comment-form__toggle {
   list-style: none;
   margin: 0.5rem 0;
   padding: 0;
-  color: rgb(168, 4, 4);
+  color: var(--error-list);
 }
 
 .invalid label {
@@ -232,8 +232,8 @@ summary:focus-visible .comment-form__toggle {
 
 .invalid input,
 .invalid textarea {
-  border-color: #da0a0a;
-  background-color: #d4d1d1;
+  border-color: var(--invalid-border);
+  background-color: var(--invalid-bg);
 }
 
 #comments {
@@ -241,8 +241,8 @@ summary:focus-visible .comment-form__toggle {
   width: calc(100% - (2 * var(--gutter)));
   max-width: var(--container);
   border-radius: 12px;
-  background-color: white;
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.25);
+  background-color: var(--surface);
+  box-shadow: 0 2px 8px var(--shadow);
   padding: 1rem 2rem;
 
 }
@@ -255,7 +255,7 @@ summary:focus-visible .comment-form__toggle {
 #comments li {
   padding-bottom: 1rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #e4e4e4;
+  border-bottom: 1px solid var(--line-soft);
 }
 
 #comments li:last-of-type {
@@ -273,7 +273,7 @@ summary:focus-visible .comment-form__toggle {
 #comments blockquote p {
   margin: 0 0 0.5rem 0;
   line-height: 1.6;
-  color: #2e2e2e;
+  color: var(--text);
 }
 
 #comments blockquote p:last-child {
@@ -282,7 +282,7 @@ summary:focus-visible .comment-form__toggle {
 
 
 #comments h2 {
-  color: #464646;
+  color: var(--text-comment-heading);
 }
 
 

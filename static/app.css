@@ -59,6 +59,8 @@
    — they used to be 60rem, 68rem and 12% padding, which never lined up.
    -------------------------------------------------------------------------- */
 :root {
+  color-scheme: light dark;
+
   --container: 72rem;
   --gutter: clamp(1.25rem, 5vw, 3rem);
 
@@ -78,6 +80,90 @@
      needs to be seen at all. */
   --accent-tint: #f1ebfb;
   --accent-line: #9068d4;
+
+  /* ---- Surfaces ----------------------------------------------------------
+     Everything below is a pair: the value here, and its counterpart in the
+     dark block at the end of this file. Nothing outside :root should name a
+     colour directly, or the dark theme will miss it. */
+  --page-bg: #e7e7e7;
+  --surface: #ffffff;
+  --surface-sunken: #ede1fb;
+  --code-bg: #2e2e2e;
+  --code-fg: #f4f4f4;
+
+  /* ---- Text, strongest to faintest ---- */
+  --text: #2e2e2e;
+  --text-soft: #4a4a4a;
+  --text-muted: #6b6b6b;
+  --text-faint: #9d9d9d;
+  --text-dim-heading: #3a3a3a;
+  --text-caption: #5a5a5a;
+  --text-footer: #666666;
+  --text-social-heading: #5f5f5f;
+
+  /* ---- Lines ---- */
+  --line-footer: #cfc9c0;
+  --line-input: #c3c3c3;
+  --line-table: #d5d5d5;
+  --line-card: #e2dced;
+  --line-card-focus: #c9b8e8;
+  --line-sep: #b3b3b3;
+  --line-social: #9b7ecf;
+
+  /* ---- Pink, used for the things that are currently active ---- */
+  --pink: #cf54a6;
+  --pink-deep: #a83b83;
+  --focus-ring: #cf79f1;
+  --on-brand-hover: #e9c9fb;
+
+  /* ---- States ---- */
+  --error: #b81b1b;
+  --error-text: #7a0b0b;
+  --error-bg: #fbe1e1;
+  --warn-bg: #fff4d6;
+  --warn-text: #7a5600;
+  --warn-line: #d1a000;
+
+  /* Values that look like duplicates of the tokens above but are not. Folding
+     them together changed the light theme — the card titles alone shifted by
+     46 levels — so each keeps its own pair. */
+  /* The brand purple as ink rather than as a surface. Identical to --brand
+     and --brand-deep in daylight, but they part company in the dark: a panel
+     stays purple, while text on a dark card has to come up to meet it. Using
+     one token for both is what made "Leave a comment" invisible. */
+  --ink-brand: #43148c;
+  --ink-brand-deep: #29085c;
+  --button-brand-bg: #29085c;
+
+  --text-card-title: #000000;
+  --text-comment-heading: #464646;
+  --text-saved-link: #1b1b1b;
+  --text-saved-empty: #555555;
+  --text-remove: #8a8a8a;
+  --saved-focus-bg: #f4f1fa;
+  --line-textarea: #cccccc;
+  --line-about-inner: #e2ddd4;
+  --error-list: #a80404;
+  --shadow-card: rgba(0, 0, 0, 0.2);
+  --shadow-panel: rgba(20, 4, 50, 0.22);
+
+  --about-bg: #f5f2ed;
+  --about-line: #e3ddd3;
+  --portrait-bg: #ffe1bf;
+  --line-soft: #e4e4e4;
+  --line-faint: #ececec;
+  --invalid-border: #da0a0a;
+  --invalid-bg: #d4d1d1;
+  --remove-focus-border: #e8b4b4;
+  --remove-focus-bg: #fdf3f3;
+  --welcome-heading: #f4f0fb;
+
+  --lightbox-bg: #1b0730;
+
+  /* ---- Depth ---- */
+  --shadow: rgba(0, 0, 0, 0.25);
+  --shadow-soft: rgba(0, 0, 0, 0.18);
+  --shadow-strong: rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -94,7 +180,7 @@ body {
      again in post-detail.css, which meant the pages that load neither — Saved
      and Credits — sat on the browser's default white, so a white panel had
      nothing to sit against. */
-  background-color: #e7e7e7;
+  background-color: var(--page-bg);
   /* A short page — an empty search, a tag with one post — used to leave the
      footer floating in the middle of the window with blank space under it. */
   display: flex;
@@ -132,7 +218,7 @@ h3 {
   height: 4rem;
   padding: 0 var(--gutter);
   background-color: var(--brand-bar);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 /* Where supported, let the page tint through — it keeps the homepage gradient
@@ -167,12 +253,12 @@ h3 {
 /* A colour shift rather than an underline — an underline under a large title
    looked heavy, and the title is obviously a link from its position. */
 .site-title:hover {
-  color: #e9c9fb;
+  color: var(--on-brand-hover);
 }
 
 /* Keyboard users still need a visible focus indicator. */
 .site-title:focus-visible {
-  outline: 3px solid #cf79f1;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 4px;
   border-radius: 4px;
 }
@@ -200,7 +286,7 @@ h3 {
 
 #main-navigation nav a:hover,
 #main-navigation nav a:focus-visible {
-  color: #e9c9fb;
+  color: var(--on-brand-hover);
   outline: none;
 }
 
@@ -213,7 +299,7 @@ h3 {
   bottom: 0.85rem;
   height: 3px;
   border-radius: 2px;
-  background-color: #cf54a6;
+  background-color: var(--pink);
 }
 
 .nav-label--short {
@@ -294,7 +380,7 @@ h3 {
 
 .nav-search input:focus-visible,
 .search-form input:focus-visible {
-  outline: 3px solid #cf79f1;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 1px;
 }
 
@@ -304,14 +390,14 @@ h3 {
   padding: 0.4rem 0.85rem;
   border: none;
   border-radius: 8px;
-  background-color: #cf54a6;
+  background-color: var(--pink);
   color: white;
   cursor: pointer;
 }
 
 .nav-search button:hover,
 .nav-search button:focus-visible {
-  background-color: #a83b83;
+  background-color: var(--pink-deep);
   outline: none;
 }
 
@@ -330,15 +416,15 @@ h3 {
   border-radius: 8px;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  background-color: #ede1fb;
-  color: var(--brand-deep);
+  background-color: var(--surface-sunken);
+  color: var(--ink-brand-deep);
   border-left: 5px solid var(--accent);
 }
 
 .message--error {
-  background-color: #fbe1e1;
-  color: #7a0b0b;
-  border-left-color: #b81b1b;
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  border-left-color: var(--error);
 }
 
 /* Tag pills that link through to the tag archive */
@@ -361,7 +447,7 @@ a.tag {
   border-radius: 20px;
   background-color: var(--accent-tint);
   border: 1px solid var(--accent-line);
-  color: var(--brand);
+  color: var(--ink-brand);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: bold;
@@ -396,15 +482,15 @@ a.tag:active {
 
 .pagination a:hover,
 .pagination a:active {
-  color: #cf54a6;
+  color: var(--pink);
 }
 
 .pagination__disabled {
-  color: #9d9d9d;
+  color: var(--text-faint);
 }
 
 .pagination__status {
-  color: #2e2e2e;
+  color: var(--text);
   font-weight: normal;
 }
 
@@ -419,7 +505,7 @@ a.tag:active {
 .search-form input {
   font: inherit;
   padding: 0.6rem 0.9rem;
-  border: 1px solid #c3c3c3;
+  border: 1px solid var(--line-input);
   border-radius: 8px;
   width: min(24rem, 70vw);
 }
@@ -437,12 +523,12 @@ a.tag:active {
 
 .search-form button:hover,
 .search-form button:active {
-  background-color: var(--brand-deep);
+  background-color: var(--ink-brand-deep);
 }
 
 .search-summary {
   text-align: center;
-  color: #4a4a4a;
+  color: var(--text-soft);
 }
 
 /* Rendered markdown body */
@@ -456,7 +542,7 @@ a.tag:active {
 .post-body h2,
 .post-body h3 {
   margin-top: 2rem;
-  color: #2e2e2e;
+  color: var(--text);
 }
 
 .post-body a {
@@ -470,8 +556,8 @@ a.tag:active {
 }
 
 .post-body pre {
-  background-color: #2e2e2e;
-  color: #f4f4f4;
+  background-color: var(--code-bg);
+  color: var(--code-fg);
   padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;
@@ -483,8 +569,8 @@ a.tag:active {
 }
 
 .post-body :not(pre) > code {
-  background-color: #ede1fb;
-  color: var(--brand-deep);
+  background-color: var(--surface-sunken);
+  color: var(--ink-brand-deep);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
 }
@@ -493,7 +579,7 @@ a.tag:active {
   margin: 1.5rem 0;
   padding: 0.5rem 1.25rem;
   border-left: 4px solid var(--accent);
-  color: #4a4a4a;
+  color: var(--text-soft);
   font-style: italic;
 }
 
@@ -504,21 +590,21 @@ a.tag:active {
 
 .post-body th,
 .post-body td {
-  border: 1px solid #d5d5d5;
+  border: 1px solid var(--line-table);
   padding: 0.5rem 0.75rem;
   text-align: left;
 }
 
 /* Small shared bits */
 .post__meta {
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-size: 0.85rem;
   margin: 0.25rem 0 0.5rem 0;
 }
 
 .empty-state {
   text-align: center;
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-style: italic;
   padding: 1.5rem 0;
 }
@@ -538,22 +624,22 @@ a.tag:active {
   max-width: 40rem;
   margin: 0 auto 2rem auto;
   text-align: center;
-  color: #4a4a4a;
+  color: var(--text-soft);
 }
 
 .comment-meta {
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
 .field-error {
-  color: #b81b1b;
+  color: var(--error);
   margin: 0.25rem 0 0 0;
   font-size: 0.9rem;
 }
 
 .form-errors {
-  color: #b81b1b;
+  color: var(--error);
   font-weight: bold;
 }
 
@@ -563,9 +649,9 @@ a.tag:active {
   max-width: 60rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background-color: #fff4d6;
-  color: #7a5600;
-  border-left: 5px solid #d1a000;
+  background-color: var(--warn-bg);
+  color: var(--warn-text);
+  border-left: 5px solid var(--warn-line);
   font-weight: bold;
 }
 
@@ -578,7 +664,7 @@ a.tag:active {
   border: none;
   padding: 0;
   margin-left: 0.75rem;
-  color: #b81b1b;
+  color: var(--error);
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
@@ -611,10 +697,10 @@ a.tag:active {
   margin-top: 4rem;
   padding: 2.75rem var(--gutter) 2.25rem var(--gutter);
   text-align: center;
-  color: #666;
+  color: var(--text-footer);
   font-size: 0.9rem;
-  background-color: white;
-  border-top: 1px solid #cfc9c0;
+  background-color: var(--surface);
+  border-top: 1px solid var(--line-footer);
 }
 
 /* No gap on the home page: the about panel runs straight into the footer and
@@ -643,7 +729,7 @@ a.tag:active {
 
 .site-footer__sep {
   margin: 0 0.4rem;
-  color: #b3b3b3;
+  color: var(--line-sep);
 }
 
 /* --------------------------------------------------------------------------
@@ -659,12 +745,12 @@ a.tag:active {
 
 #credits h1 {
   margin-bottom: 0.5rem;
-  color: #3a3a3a;
+  color: var(--text-dim-heading);
 }
 
 .credits__intro {
   margin-bottom: 2.5rem;
-  color: #6b6b6b;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -678,7 +764,7 @@ a.tag:active {
 }
 
 .credits__group h2 a {
-  color: #3a3a3a;
+  color: var(--text-dim-heading);
   text-decoration: none;
 }
 
@@ -695,7 +781,7 @@ a.tag:active {
 
 .credits__group li {
   margin-bottom: 0.35rem;
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-size: 0.88rem;
   line-height: 1.5;
   /* Commons filenames are long and unbreakable; let them wrap on phones. */
@@ -802,8 +888,8 @@ a.tag:active {
     left: 0;
     right: 0;
     padding: 0.6rem 0.9rem;
-    background-color: var(--brand-deep);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background-color: var(--ink-brand-deep);
+    box-shadow: 0 6px 12px var(--shadow-strong);
   }
 
   .nav-search input {
@@ -917,12 +1003,12 @@ a.tag:active {
 
 /* Current tag on a tag archive page */
 a.tag--active {
-  background-color: #cf54a6;
+  background-color: var(--pink);
 }
 
 a.tag--active:hover,
 a.tag--active:active {
-  background-color: #a83b83;
+  background-color: var(--pink-deep);
 }
 
 /* Gallery on a post page */
@@ -930,15 +1016,15 @@ a.tag--active:active {
   width: calc(100% - (2 * var(--gutter)));
   max-width: var(--container);
   margin: 3rem auto;
-  background-color: white;
+  background-color: var(--surface);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 #gallery h2 {
   margin-top: 0;
-  color: #2e2e2e;
+  color: var(--text);
 }
 
 .gallery-grid {
@@ -957,7 +1043,7 @@ a.tag--active:active {
   object-fit: cover;
   border-radius: 10px;
   display: block;
-  background-color: #ede1fb;
+  background-color: var(--surface-sunken);
   transition: transform 0.2s ease;
   cursor: zoom-in;
 }
@@ -969,7 +1055,7 @@ a.tag--active:active {
 .gallery-item figcaption {
   margin-top: 0.5rem;
   font-size: 0.9rem;
-  color: #5a5a5a;
+  color: var(--text-caption);
   line-height: 1.4;
 }
 
@@ -985,7 +1071,7 @@ a.tag--active:active {
 .field-help {
   margin: 0.25rem 0 0 0;
   font-size: 0.85rem;
-  color: #6b6b6b;
+  color: var(--text-muted);
 }
 
 /* Lightbox: full-screen photo viewer with previous/next on either side. */
@@ -1025,11 +1111,11 @@ body.lightbox-open {
   max-height: calc(100vh - 8rem);
   object-fit: contain;
   border-radius: 8px;
-  background-color: #1b0730;
+  background-color: var(--lightbox-bg);
 }
 
 .lightbox__caption {
-  color: #e9e2f5;
+  color: var(--on-brand-hover);
   text-align: center;
   font-size: 0.95rem;
   max-width: 44rem;
@@ -1102,7 +1188,7 @@ body.lightbox-open {
 .gallery-hint {
   margin: 1rem 0 0 0;
   font-size: 0.85rem;
-  color: #6b6b6b;
+  color: var(--text-muted);
 }
 
 /* Social profile links (footer, and the homepage bio) */
@@ -1114,7 +1200,7 @@ body.lightbox-open {
   text-transform: uppercase;
   /* 6.4:1 on white. Quieter than the copyright beside it, which is the point:
      it labels the icons rather than announcing itself. */
-  color: #5f5f5f;
+  color: var(--text-social-heading);
 }
 
 .social-links {
@@ -1138,8 +1224,8 @@ body.lightbox-open {
   height: 2.6rem;
   border-radius: 50%;
   /* 3.34:1 for the ring, past the 3:1 a UI boundary needs on white. */
-  border: 1px solid #9b7ecf;
-  background-color: white;
+  border: 1px solid var(--line-social);
+  background-color: var(--surface);
   color: var(--accent);
   text-decoration: none;
   transition:
@@ -1161,7 +1247,7 @@ body.lightbox-open {
 }
 
 .social-link:focus-visible {
-  outline: 3px solid #cf79f1;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
@@ -1194,7 +1280,7 @@ body.lightbox-open {
 
 .back-link a:hover,
 .back-link a:focus-visible {
-  color: #cf54a6;
+  color: var(--pink);
 }
 
 /* "Keep reading" — the neighbouring posts at the end of an article. Styled as
@@ -1206,14 +1292,14 @@ body.lightbox-open {
   max-width: var(--container);
   margin: 3rem auto;
   padding: 1.5rem;
-  background-color: white;
+  background-color: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 #post-nav h2 {
   margin: 0 0 1.25rem 0;
-  color: #2e2e2e;
+  color: var(--text);
   font-size: 1.5rem;
 }
 
@@ -1228,12 +1314,12 @@ body.lightbox-open {
   align-items: stretch;
   gap: 0;
   min-width: 0;
-  border: 1px solid #e2dced;
+  border: 1px solid var(--line-card);
   border-radius: 10px;
   overflow: hidden;
   text-decoration: none;
-  color: #2e2e2e;
-  background-color: white;
+  color: var(--text);
+  background-color: var(--surface);
   transition: transform 0.15s ease, box-shadow 0.15s ease,
     border-color 0.15s ease;
 }
@@ -1241,8 +1327,8 @@ body.lightbox-open {
 .post-nav__card:hover,
 .post-nav__card:focus-visible {
   transform: translateY(-2px);
-  border-color: #c9b8e8;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  border-color: var(--line-card-focus);
+  box-shadow: 0 6px 16px var(--shadow-soft);
   outline: none;
 }
 
@@ -1252,7 +1338,7 @@ body.lightbox-open {
   height: 100%;
   min-height: 6rem;
   object-fit: cover;
-  background-color: #ede1fb;
+  background-color: var(--surface-sunken);
 }
 
 /* Mirror the older card so the artwork sits on the side the arrow points to. */
@@ -1286,7 +1372,7 @@ body.lightbox-open {
 
 .post-nav__date {
   font-size: 0.8rem;
-  color: #6b6b6b;
+  color: var(--text-muted);
   font-style: italic;
 }
 
@@ -1331,4 +1417,118 @@ body.lightbox-open {
 .post-nav__card img,
 #summary article img {
   max-width: 100%;
+}
+
+
+/* --------------------------------------------------------------------------
+   Dark theme.
+
+   Only the tokens change; not one rule below is duplicated. That is the whole
+   reason the colours were pulled into :root first — a second copy of the
+   stylesheet would drift from the first within a month.
+
+   It follows the reader's system setting and offers no switch. A switch needs
+   JavaScript, somewhere to remember the choice, and a way to avoid painting
+   the wrong theme first; the operating system already knows the answer.
+
+   The purple is kept, not inverted. The header and the hero are the site's
+   one piece of colour, and a dark page actually suits them — they were always
+   dark. What changes is everything that used to be white underneath.
+
+   Contrast was measured, not guessed: body text clears 4.5:1 against its
+   surface and every border clears 3:1, which is what a boundary needs to be
+   visible at all.
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surfaces: a near-black carrying a little of the brand purple, so the
+       page does not read as cold grey next to the header. */
+    --page-bg: #121019;
+    --surface: #1c1926;
+    --surface-sunken: #2a2338;
+    --code-bg: #0d0b12;
+    --code-fg: #e6e3ec;
+
+    /* Text */
+    --text: #ecebf1;
+    --text-soft: #cbc7d6;
+    --text-muted: #a9a4b8;
+    --text-faint: #8b8699;
+    --text-dim-heading: #ddd9e6;
+    --text-caption: #b5b0c3;
+    --text-footer: #a9a4b8;
+    --text-social-heading: #b5b0c3;
+
+    /* Lines. Lighter than the surface rather than darker: on a dark page a
+       darker line is a hole, not an edge. */
+    --line-footer: #35304a;
+    /* Raised until it clears 3:1 against the surface, which is what WCAG
+       asks of a control's boundary. The first attempt, #4e4766, measured
+       1.99:1 — the search box would have had no visible edge at all. */
+    --line-input: #6d668b;
+    --line-table: #3a3450;
+    --line-card: #342e49;
+    --line-card-focus: #8b6fd0;
+    --line-sep: #6b6480;
+    --line-social: #8b6fd0;
+
+    /* The link purple has to come up a long way. #5706c0 on this background
+       is 1.6:1 — unreadable. */
+    --accent: #c2a4ff;
+    --accent-tint: #2b2240;
+    --accent-line: #8b6fd0;
+
+    /* States. The light theme's red and amber are far too dark to sit on a
+       dark surface, so each one is lifted and its background sunk. */
+    --error: #ff9a9a;
+    --error-text: #ffc9c9;
+    --error-bg: #3b1d1d;
+    --warn-bg: #3a2f14;
+    --warn-text: #f3dc96;
+    --warn-line: #d1a000;
+
+    --ink-brand: #c2a4ff;
+    --ink-brand-deep: #d3bcff;
+    /* Lifted so the button reads as a button against the card behind it;
+       #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
+    --button-brand-bg: #5b2bb5;
+
+    --text-card-title: #ecebf1;
+    --text-comment-heading: #cbc7d6;
+    --text-saved-link: #ecebf1;
+    --text-saved-empty: #cbc7d6;
+    --text-remove: #8b8699;
+    --saved-focus-bg: #2b2240;
+    --line-textarea: #6d668b;
+    --line-about-inner: #322c3d;
+    --error-list: #ff9a9a;
+    --shadow-card: rgba(0, 0, 0, 0.55);
+    --shadow-panel: rgba(0, 0, 0, 0.6);
+
+    /* The about panel keeps its own tone so it still reads as a separate
+       band below the posts, the way the warm grey does in daylight. */
+    --about-bg: #17141f;
+    --about-line: #322c3d;
+    --portrait-bg: #2a2338;
+    --line-soft: #2f2941;
+    --line-faint: #2a2438;
+    --invalid-border: #ff7a7a;
+    --invalid-bg: #3b1d1d;
+    --remove-focus-border: #6e3a3a;
+    --remove-focus-bg: #2e1a1a;
+    --welcome-heading: #f4f0fb;
+
+    /* A shadow has to be blacker to register against a dark page. */
+    --shadow: rgba(0, 0, 0, 0.6);
+    --shadow-soft: rgba(0, 0, 0, 0.5);
+    --shadow-strong: rgba(0, 0, 0, 0.7);
+  }
+
+  /* The photographs are the point of the site, so they are not dimmed. The
+     white frame around them is, though — a bright border on a dark page
+     draws the eye to the frame instead of the picture. */
+  .post-nav__card img,
+  .gallery-item img {
+    background-color: var(--surface-sunken);
+  }
 }

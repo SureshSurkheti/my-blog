@@ -14,7 +14,7 @@
   flex-direction: column;
   height: 100%;
   text-decoration: none;
-  color: black;
+  color: var(--text-card-title);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   padding: 0;
   overflow: hidden;
@@ -23,7 +23,7 @@
 .post a:hover,
 .post a:active {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px var(--shadow-strong);
 }
 
 /* One fixed picture box on every card, whatever the column width or the
@@ -39,7 +39,7 @@
      object-position wins when it does. */
   object-position: center top;
   display: block;
-  background-color: #ede1fb;
+  background-color: var(--surface-sunken);
 }
 
 .post__content {
@@ -58,12 +58,12 @@
 
 .post__content p {
   margin: 0;
-  color: #4a4a4a;
+  color: var(--text-soft);
   line-height: 1.5;
 }
 
 .post time {
-  color: #666666;
+  color: var(--text-footer);
   font-style: italic;
   font-size: 0.85rem;
 }
@@ -71,7 +71,7 @@
 .post a:hover .post__content p,
 .post a:hover .post__meta,
 .post a:hover time {
-  color: #4a4a4a;
+  color: var(--text-soft);
 }
 
 /* --------------------------------------------------------------------------
@@ -84,7 +84,7 @@
   display: block;
   margin-top: auto;
   padding-top: 0.85rem;
-  color: #5706c0;
+  color: var(--accent);
   font-size: 0.9rem;
   font-weight: bold;
 }
