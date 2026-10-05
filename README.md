@@ -94,6 +94,19 @@ them a rebuilt database has nobody who can log in, because `make backup` dumps
 posts only and the free tier has no shell. To change the password, edit the
 variable and redeploy.
 
+### Keeping it awake
+
+Render stops a free service after 15 minutes idle; waking it takes ~36
+seconds (measured). Neon's free plan suspends its compute after 5 minutes and
+that cannot be disabled. One request every 5 minutes prevents both.
+
+Use `deploy/keep-awake-worker.js` as a Cloudflare Worker with a
+`*/5 * * * *` cron trigger, or any uptime monitor pointed at the homepage.
+
+`.github/workflows/keep-awake.yml` tries the same thing on GitHub Actions and
+is **not reliable** — measured at 12 runs in three days instead of 170, with
+an average gap of five hours. It stays as a fallback only.
+
 **Never put a `.env` file on the server** — `settings.py` reads it with
 `overwrite=True`, so it would beat all of the above, including `DEBUG`.
 
