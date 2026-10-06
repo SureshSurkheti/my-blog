@@ -1,5 +1,7 @@
 """Links between posts on the same subject, rather than only by date."""
 
+import re
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -157,3 +159,39 @@ class RelatedPostsQueryTests(TestCase):
 
         with self.assertNumQueries(1):
             list(bare.related_posts())
+
+
+class CardImageWeightTests(TestCase):
+    """Card pictures are 6.5rem wide and must not pull the full upload.
+
+    The Beppu post was 539 KB, of which 396 KB was two card thumbnails
+    fetching their originals into a 104px box.
+    """
+
+    def setUp(self):
+        from .factories import make_image_file
+
+        onsen = make_tag("Onsen")
+        self.post = make_post("Beppu", slug="beppu", tags=[onsen])
+        for n in range(3):
+            make_post(f"Other {n}", slug=f"other-{n}", tags=[onsen],
+                      image=make_image_file(f"other-{n}.jpg", size=(1600, 1000)))
+
+    def test_every_card_picture_offers_narrow_variants(self):
+        body = self.client.get(self.post.get_absolute_url()).content.decode()
+        section = body[body.index("post-nav__grid"):]
+
+        for tag in re.findall(r"<img[^>]*>", section):
+            with self.subTest(tag=tag[:60]):
+                self.assertIn("srcset=", tag)
+
+    def test_the_cards_tell_the_browser_how_small_they_are(self):
+        # A srcset without sizes makes the browser assume full viewport width
+        # and pick the largest rung anyway, which is the bug all over again.
+        body = self.client.get(self.post.get_absolute_url()).content.decode()
+        section = body[body.index("post-nav__grid"):]
+
+        for tag in re.findall(r"<img[^>]*srcset[^>]*>", section):
+            with self.subTest(tag=tag[:60]):
+                self.assertIn("5.5rem", tag)
+                self.assertIn("6.5rem", tag)

@@ -117,7 +117,10 @@ links as evidence that this site covers onsen rather than mentioning them once.
     {% for related in related_posts %}
     <a class="post-nav__card" href="{{ related.get_absolute_url }}">
       {% if related.image %}
+      {% srcset related.image as card_srcset %}
       <img src="{{ related.image.url }}" alt="" loading="lazy"
+           {% if card_srcset %}srcset="{{ card_srcset }}"
+           sizes="(max-width: 48rem) 5.5rem, 6.5rem"{% endif %}
            {% if related.image_width %}width="{{ related.image_width }}" height="{{ related.image_height }}"{% endif %}
            style="object-position: {{ related.focal_css }}" />
       {% endif %}
@@ -133,13 +136,22 @@ links as evidence that this site covers onsen rather than mentioning them once.
 {% endif %}
 
 {% if newer_post or older_post %}
+{% comment %}
+These pictures are 6.5rem wide — 5.5rem on a phone — so they take the
+narrowest rung of the ladder. Without the srcset the browser fetched the
+full-size upload for a thumbnail: 300 KB into a 104px box, which was most of
+the weight of the whole page.
+{% endcomment %}
 <section id="post-nav" aria-labelledby="post-nav-heading">
   <h2 id="post-nav-heading">Keep reading</h2>
   <div class="post-nav__grid">
     {% if newer_post %}
     <a class="post-nav__card" href="{{ newer_post.get_absolute_url }}" rel="prev">
       {% if newer_post.image %}
+      {% srcset newer_post.image as card_srcset %}
       <img src="{{ newer_post.image.url }}" alt="" loading="lazy"
+           {% if card_srcset %}srcset="{{ card_srcset }}"
+           sizes="(max-width: 48rem) 5.5rem, 6.5rem"{% endif %}
            {% if newer_post.image_width %}width="{{ newer_post.image_width }}" height="{{ newer_post.image_height }}"{% endif %}
            style="object-position: {{ newer_post.focal_css }}" />
       {% endif %}
@@ -154,7 +166,10 @@ links as evidence that this site covers onsen rather than mentioning them once.
     {% if older_post %}
     <a class="post-nav__card post-nav__card--older" href="{{ older_post.get_absolute_url }}" rel="next">
       {% if older_post.image %}
+      {% srcset older_post.image as card_srcset %}
       <img src="{{ older_post.image.url }}" alt="" loading="lazy"
+           {% if card_srcset %}srcset="{{ card_srcset }}"
+           sizes="(max-width: 48rem) 5.5rem, 6.5rem"{% endif %}
            {% if older_post.image_width %}width="{{ older_post.image_width }}" height="{{ older_post.image_height }}"{% endif %}
            style="object-position: {{ older_post.focal_css }}" />
       {% endif %}
