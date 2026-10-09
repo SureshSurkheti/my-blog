@@ -11,6 +11,13 @@ JS = Path(settings.BASE_DIR) / "static" / "theme.js"
 
 
 def tokens_in(block):
+    """Token names and values, ignoring comments.
+
+    Without stripping them, a comment mentioning a token by name reads as a
+    declaration and swallows everything up to the next semicolon — which is
+    exactly what happened while fixing the invisible body text.
+    """
+    block = re.sub(r"/\*.*?\*/", "", block, flags=re.S)
     return dict(re.findall(r"(--[a-z-]+):\s*([^;]+);", block))
 
 
@@ -139,3 +146,73 @@ class ThemeScriptTests(TestCase):
         # the reader every time their phone switched at sunset.
         listener = source[source.index('addEventListener("change"') :]
         self.assertIn("if (stored()) return;", listener)
+
+
+class BodyColourTests(TestCase):
+    """Body copy must name its colour instead of inheriting the browser's.
+
+    ``color-scheme: light dark`` tells the browser both themes exist, and it
+    then picks its OWN default text colour from the *system* setting. Nothing
+    on this site set a colour on body, so every paragraph took that default.
+    Choosing light on a dark machine left the page white and the text white
+    with it: headings were fine, because they name their colour, and the prose
+    simply vanished.
+    """
+
+    def _tokens(self, block):
+        return tokens_in(block)
+
+    def test_body_names_its_own_colour(self):
+        css = CSS.read_text()
+        rule = css[css.index("\nbody {") : css.index("}", css.index("\nbody {"))]
+
+        self.assertIn("color: var(--body-text)", rule)
+
+    def test_body_text_is_defined_in_both_palettes(self):
+        css = CSS.read_text()
+        start = css.index(":root {")
+        light = self._tokens(css[start : css.index("\n}", start)])
+        media = css[css.index("@media (prefers-color-scheme: dark)") :]
+        dark = self._tokens(media[media.index("{") : media.index("\n  }")])
+
+        self.assertIn("--body-text", light)
+        self.assertIn("--body-text", dark)
+        self.assertNotEqual(light["--body-text"], dark["--body-text"])
+
+    def test_body_text_contrasts_with_its_own_page(self):
+        def luminance(value):
+            value = value.strip().lstrip("#")
+            channels = [int(value[i : i + 2], 16) / 255 for i in (0, 2, 4)]
+            adjusted = [
+                c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+                for c in channels
+            ]
+            return 0.2126 * adjusted[0] + 0.7152 * adjusted[1] + 0.0722 * adjusted[2]
+
+        css = CSS.read_text()
+        start = css.index(":root {")
+        light = self._tokens(css[start : css.index("\n}", start)])
+        media = css[css.index("@media (prefers-color-scheme: dark)") :]
+        dark = self._tokens(media[media.index("{") : media.index("\n  }")])
+
+        for name, palette in (("light", light), ("dark", dark)):
+            with self.subTest(theme=name):
+                text = luminance(palette["--body-text"])
+                page = luminance(palette["--surface"])
+                ratio = (max(text, page) + 0.05) / (min(text, page) + 0.05)
+                self.assertGreaterEqual(ratio, 4.5)
+
+
+class ColourSchemePinningTests(TestCase):
+    def test_an_explicit_choice_pins_the_browser_s_own_colours(self):
+        # Left at "light dark", the browser keeps styling scrollbars, form
+        # controls and the overscroll area for the system setting rather than
+        # the chosen one — and keeps handing out the wrong default text colour.
+        css = CSS.read_text()
+
+        self.assertIn(':root[data-theme="light"]', css)
+        light_rule = css[css.index(':root[data-theme="light"] {') :]
+        self.assertIn("color-scheme: light;", light_rule[: light_rule.index("}")])
+
+        dark_rule = css[css.index(':root[data-theme="dark"] {') :]
+        self.assertIn("color-scheme: dark;", dark_rule[: dark_rule.index("\n}")])

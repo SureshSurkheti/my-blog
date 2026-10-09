@@ -59,6 +59,13 @@
    — they used to be 60rem, 68rem and 12% padding, which never lined up.
    -------------------------------------------------------------------------- */
 :root {
+  /* Both themes exist, so form controls, scrollbars and the space beyond the
+     page follow along. It has a sharp edge: it also flips the browser's
+     DEFAULT text colour to white whenever the system is dark — and that
+     default applied to every paragraph on the site, because nothing set one.
+     Choosing light on a dark machine then gave white text on a white page.
+     Fixed twice over: body names its colour below, and an explicit choice
+     pins color-scheme to match further down. */
   color-scheme: light dark;
 
   --container: 72rem;
@@ -135,6 +142,10 @@
   --ink-brand-deep: #29085c;
   --button-brand-bg: #29085c;
 
+  /* Body copy. Pure black rather than the softer heading grey, because black
+     is what the browser default was already giving and every page was built
+     and reviewed against it. */
+  --body-text: #000000;
   --text-card-title: #000000;
   --text-comment-heading: #464646;
   --text-saved-link: #1b1b1b;
@@ -176,6 +187,8 @@ html {
 
 body {
   margin: 0;
+  /* Named, not inherited from the browser. See the note on color-scheme. */
+  color: var(--body-text);
   /* The page behind every card. It used to be declared in all-posts.css and
      again in post-detail.css, which meant the pages that load neither — Saved
      and Credits — sat on the browser's default white, so a white panel had
@@ -1582,6 +1595,7 @@ body.lightbox-open {
      #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
   --button-brand-bg: #5b2bb5;
 
+  --body-text: #ecebf1;
   --text-card-title: #ecebf1;
   --text-comment-heading: #cbc7d6;
   --text-saved-link: #ecebf1;
@@ -1629,8 +1643,17 @@ body.lightbox-open {
   }
 }
 
+/* An explicit choice has to move color-scheme with it. Left at "light dark",
+   the browser keeps styling its own furniture — scrollbars, form controls, the
+   area beyond the page — for the system setting rather than the chosen one. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 /* The same palette again, for a reader who asked for dark on a light system. */
 :root[data-theme="dark"] {
+  color-scheme: dark;
+
 
   /* Surfaces: a near-black carrying a little of the brand purple, so the
      page does not read as cold grey next to the header. */
@@ -1684,6 +1707,7 @@ body.lightbox-open {
      #29085c on #1c1926 is barely a shape. White on this is 8.5:1. */
   --button-brand-bg: #5b2bb5;
 
+  --body-text: #ecebf1;
   --text-card-title: #ecebf1;
   --text-comment-heading: #cbc7d6;
   --text-saved-link: #ecebf1;

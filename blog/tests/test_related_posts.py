@@ -1,8 +1,10 @@
 """Links between posts on the same subject, rather than only by date."""
 
 import re
+import shutil
+import tempfile
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from blog.models import Post, Tag
@@ -161,12 +163,21 @@ class RelatedPostsQueryTests(TestCase):
             list(bare.related_posts())
 
 
+CARD_MEDIA_ROOT = tempfile.mkdtemp(prefix="blog-card-media-")
+
+
+@override_settings(MEDIA_ROOT=CARD_MEDIA_ROOT)
 class CardImageWeightTests(TestCase):
     """Card pictures are 6.5rem wide and must not pull the full upload.
 
     The Beppu post was 539 KB, of which 396 KB was two card thumbnails
     fetching their originals into a 104px box.
     """
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(CARD_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         from .factories import make_image_file
