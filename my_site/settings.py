@@ -82,6 +82,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Last, so it sees the finished response and never delays it. It also
+    # needs AuthenticationMiddleware above it to skip the owner's own reads.
+    "blog.analytics.AnalyticsMiddleware",
 ]
 
 ROOT_URLCONF = "my_site.urls"

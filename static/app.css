@@ -1753,3 +1753,112 @@ body.lightbox-open {
 :root[data-theme="dark"] main {
   border: 1px solid var(--line-card);
 }
+
+/* --------------------------------------------------------------------------
+   Stats. Only the owner ever sees this, so it is plain on purpose: the point
+   is to read the numbers, not to admire the page.
+   -------------------------------------------------------------------------- */
+#stats {
+  width: calc(100% - (2 * var(--gutter)));
+  max-width: var(--container);
+  margin: 2rem auto 3rem auto;
+  padding: 1.75rem var(--gutter);
+  background-color: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+#stats h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text);
+}
+
+#stats h2 {
+  margin: 2rem 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.stats__lead {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: var(--text-soft);
+}
+
+.stats__note {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+/* A bar chart from a list: thirty bars need no library, and a library here
+   would be more bytes than the whole page. */
+.stats__chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.stats__chart li {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.stats__bar {
+  width: 100%;
+  /* A day with no readers still shows a sliver, so the gap is visible as a
+     gap rather than as missing data. */
+  min-height: 2px;
+  background-color: var(--accent-line);
+  border-radius: 2px 2px 0 0;
+}
+
+.stats__axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.4rem 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stats__tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0 2.5rem;
+}
+
+.stats__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.stats__table td {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--line-faint);
+  color: var(--text-soft);
+}
+
+.stats__table a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.stats__table a:hover,
+.stats__table a:focus-visible {
+  text-decoration: underline;
+}
+
+.stats__count {
+  width: 4rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}

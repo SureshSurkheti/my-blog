@@ -1,15 +1,19 @@
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from datetime import timedelta
+
+from django.db.models import Sum
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
+from django.utils import timezone
 from django.views.generic import ListView
 
 from . import credits, seo
 from .forms import CommentForm
-from .models import Author, Post, Tag
+from .models import Author, DailyCount, Post, Tag
 
 SESSION_KEY = "stored_posts"
 
@@ -290,3 +294,77 @@ class ReadLaterView(View):
         ):
             return target
         return reverse("read-later")
+
+
+class StatsView(View):
+    """What has been read, for the owner only.
+
+    Deliberately a plain page rather than a Django admin screen: the numbers
+    want to be read side by side, and the admin's list view is built for
+    editing rows one at a time.
+    """
+
+    template_name = "blog/stats.html"
+    DAYS = 30
+
+    def get(self, request):
+        if not (request.user.is_authenticated and request.user.is_staff):
+            # 404 rather than a redirect to the login page: there is no reason
+            # to confirm to a stranger that this address exists.
+            raise Http404
+
+        since = timezone.localdate() - timedelta(days=self.DAYS - 1)
+        counts = DailyCount.objects.filter(day__gte=since)
+
+        by_day = (
+            counts.filter(kind=DailyCount.PAGE)
+            .values("day")
+            .annotate(views=Sum("views"))
+            .order_by("day")
+        )
+        daily = {row["day"]: row["views"] for row in by_day}
+        # Every day in the window, so a quiet day reads as a gap rather than
+        # being silently skipped over in the chart.
+        series = [
+            {"day": since + timedelta(days=offset),
+             "views": daily.get(since + timedelta(days=offset), 0)}
+            for offset in range(self.DAYS)
+        ]
+        peak = max((row["views"] for row in series), default=0) or 1
+        for row in series:
+            row["height"] = round(100 * row["views"] / peak)
+
+        pages = list(
+            counts.filter(kind=DailyCount.PAGE)
+            .values("key")
+            .annotate(views=Sum("views"))
+            .order_by("-views")[:15]
+        )
+        titles = {
+            post.get_absolute_url(): post.title
+            for post in Post.objects.only("slug", "title")
+        }
+        for page in pages:
+            page["title"] = titles.get(page["key"], page["key"])
+
+        referrers = list(
+            counts.filter(kind=DailyCount.REFERRER)
+            .values("key")
+            .annotate(views=Sum("views"))
+            .order_by("-views")[:15]
+        )
+
+        return render(request, self.template_name, {
+            "series": series,
+            "pages": pages,
+            "referrers": referrers,
+            "total": sum(row["views"] for row in series),
+            "days": self.DAYS,
+            "since": since,
+            "until": timezone.localdate(),
+            "seo": seo.build(
+                request, title="Stats",
+                description="Readership for the owner of the site.",
+                noindex=True,
+            ),
+        })

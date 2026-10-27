@@ -335,3 +335,34 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.user_name} on {self.post}"
+
+
+class DailyCount(models.Model):
+    """One row per page per day, rather than one row per visit.
+
+    A blog this size reads a few dozen distinct pages on a busy day, so the
+    table grows by dozens of rows a day instead of thousands. See
+    ``blog/analytics.py`` for what is and is not counted.
+    """
+
+    PAGE = "page"
+    REFERRER = "referrer"
+    KINDS = [(PAGE, "Page"), (REFERRER, "Referrer")]
+
+    kind = models.CharField(max_length=10, choices=KINDS)
+    # A path for a page, a hostname for a referrer.
+    key = models.CharField(max_length=200)
+    day = models.DateField()
+    views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-day", "-views"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["kind", "key", "day"], name="one_row_per_key_per_day"
+            )
+        ]
+        indexes = [models.Index(fields=["kind", "-day"])]
+
+    def __str__(self):
+        return f"{self.key} on {self.day}: {self.views}"

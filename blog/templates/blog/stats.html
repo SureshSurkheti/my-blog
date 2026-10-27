@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Stats · {{ author_site.name|default:blog.title }}{% endblock %}
+
+{% block content %}
+<section id="stats">
+  <h1>Stats</h1>
+  <p class="stats__lead">
+    <strong>{{ total }}</strong> page view{{ total|pluralize }} in the last
+    {{ days }} days, since {{ since|date:"d M Y" }}.
+  </p>
+  <p class="stats__note">
+    Counted on the server: no script, no cookie, nothing that identifies
+    anybody. Search engines, uptime pings and your own visits while signed in
+    are all left out — which is why this will read lower than Render's request
+    graph, and should.
+  </p>
+
+  <h2>By day</h2>
+  {% if total %}
+  <ol class="stats__chart">
+    {% for row in series %}
+    <li>
+      <span class="stats__bar" style="height: {{ row.height }}%"
+            title="{{ row.day|date:'d M Y' }}: {{ row.views }}"></span>
+      <span class="visually-hidden">{{ row.day|date:"d M Y" }}: {{ row.views }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+  <p class="stats__axis">
+    <span>{{ series.0.day|date:"d M" }}</span>
+    <span>{{ until|date:"d M" }}</span>
+  </p>
+  {% else %}
+  <p class="empty-state">Nothing counted yet — the first reader will show up here.</p>
+  {% endif %}
+
+  <div class="stats__tables">
+    <div>
+      <h2>Most read</h2>
+      {% if pages %}
+      <table class="stats__table">
+        <tbody>
+          {% for page in pages %}
+          <tr>
+            <td><a href="{{ page.key }}">{{ page.title }}</a></td>
+            <td class="stats__count">{{ page.views }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<p class="empty-state">Nothing yet.</p>{% endif %}
+    </div>
+
+    <div>
+      <h2>Came from</h2>
+      {% if referrers %}
+      <table class="stats__table">
+        <tbody>
+          {% for referrer in referrers %}
+          <tr>
+            <td>{{ referrer.key }}</td>
+            <td class="stats__count">{{ referrer.views }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty-state">
+        Nothing yet. Anyone arriving straight from a bookmark or typing the
+        address shows up nowhere here — only links from other sites do.
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

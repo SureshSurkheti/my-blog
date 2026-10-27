@@ -16,6 +16,9 @@ urlpatterns = [
     path("search", views.SearchView.as_view(), name="search-page"),
     path("read-later", views.ReadLaterView.as_view(), name="read-later"),
     path("credits", views.PhotoCreditsView.as_view(), name="photo-credits"),
+    # Staff only, noindex, and disallowed in robots.txt: readership numbers
+    # are the owner's business, not a page of the blog.
+    path("stats", views.StatsView.as_view(), name="stats"),
     path("feed/rss", LatestPostsFeed(), name="post-feed-rss"),
     path("feed/atom", LatestPostsAtomFeed(), name="post-feed-atom"),
 ]

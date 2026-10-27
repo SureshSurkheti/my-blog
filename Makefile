@@ -49,7 +49,10 @@ backup: ## Refresh blog/fixtures/content.json from the database
 	@# anything, so pointing it straight at the fixture means a failed backup
 	@# destroys the backup you already had.
 	@echo "  source: $${DATABASE_URL:-local db.sqlite3}" | sed 's|://[^@]*@|://***@|'
-	@$(PY) manage.py dumpdata blog --indent 2 -o blog/fixtures/.content.json.tmp
+	@# DailyCount is readership, not content: it would bloat the fixture and
+	@# loaddata would later write stale counts over the live ones.
+	@$(PY) manage.py dumpdata blog --exclude blog.DailyCount --indent 2 \
+		-o blog/fixtures/.content.json.tmp
 	@mv blog/fixtures/.content.json.tmp blog/fixtures/content.json
 	@echo "  $$(grep -c '"blog.post"' blog/fixtures/content.json) posts captured — commit the file"
 

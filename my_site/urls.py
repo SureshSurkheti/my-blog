@@ -41,6 +41,7 @@ def robots_txt(request):
         "Disallow: /search",
         "Disallow: /read-later",
         "Disallow: /credits",
+        "Disallow: /stats",
         "Allow: /",
         "",
         f"Sitemap: {sitemap_url}",
