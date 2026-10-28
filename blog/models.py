@@ -347,10 +347,18 @@ class DailyCount(models.Model):
 
     PAGE = "page"
     REFERRER = "referrer"
-    KINDS = [(PAGE, "Page"), (REFERRER, "Referrer")]
+    COUNTRY = "country"
+    DEVICE = "device"
+    KINDS = [
+        (PAGE, "Page"),
+        (REFERRER, "Referrer"),
+        (COUNTRY, "Country"),
+        (DEVICE, "Device"),
+    ]
 
     kind = models.CharField(max_length=10, choices=KINDS)
-    # A path for a page, a hostname for a referrer.
+    # A path for a page, a hostname for a referrer, a two-letter code for a
+    # country, one of mobile/tablet/desktop for a device.
     key = models.CharField(max_length=200)
     day = models.DateField()
     views = models.PositiveIntegerField(default=0)

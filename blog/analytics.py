@@ -95,6 +95,35 @@ def referrer_host(request):
     return host[:120]
 
 
+# Two-letter country code, set by Cloudflare, which sits in front of Render.
+# Whether it reaches the application is the host's choice, so this is read
+# defensively: no header simply means no country breakdown, not an error.
+COUNTRY_HEADER = "HTTP_CF_IPCOUNTRY"
+
+
+def country_of(request):
+    code = (request.META.get(COUNTRY_HEADER) or "").strip().upper()
+    # XX is Cloudflare's "unknown", T1 is Tor.
+    if len(code) != 2 or code in {"XX", "T1"}:
+        return None
+    return code
+
+
+def device_of(request):
+    """Roughly what kind of screen this is, from the user agent alone.
+
+    Deliberately crude. The question worth answering is whether the site is
+    being read on a phone — which decides where the design effort goes — and
+    that needs three buckets, not a device database.
+    """
+    agent = request.META.get("HTTP_USER_AGENT", "").lower()
+    if "ipad" in agent or ("android" in agent and "mobile" not in agent):
+        return "tablet"
+    if "mobi" in agent or "iphone" in agent or "android" in agent:
+        return "mobile"
+    return "desktop"
+
+
 def record(request, response):
     """Add one to today's count for this page, and for where it came from."""
     from blog.models import DailyCount  # imported late: models import settings
@@ -108,6 +137,12 @@ def record(request, response):
     host = referrer_host(request)
     if host:
         _bump(DailyCount.REFERRER, host, today)
+
+    country = country_of(request)
+    if country:
+        _bump(DailyCount.COUNTRY, country, today)
+
+    _bump(DailyCount.DEVICE, device_of(request), today)
 
 
 def _bump(kind, key, day):

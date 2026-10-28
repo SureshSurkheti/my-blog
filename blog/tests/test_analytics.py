@@ -204,26 +204,34 @@ class CostTests(TestCase):
             self.client.get(self.url, HTTP_USER_AGENT=HUMAN, **extra)
         return [q["sql"] for q in captured]
 
-    def test_a_repeat_view_costs_a_single_statement(self):
-        # The row exists on every view but the first, so the common path must
-        # be one UPDATE and never a read followed by a write.
-        self._queries()  # the first view creates the row
-        before = len(self._queries())
-        counting = [q for q in self._queries() if "dailycount" in q.lower()]
+    def _counting(self, **extra):
+        return [q for q in self._queries(**extra) if "dailycount" in q.lower()]
 
-        self.assertEqual(len(counting), 1)
-        self.assertIn("UPDATE", counting[0].upper())
-
-    def test_a_referral_costs_one_more_and_no_reads(self):
-        self._queries(HTTP_REFERER="https://news.ycombinator.com/")
-        counting = [
-            q for q in self._queries(HTTP_REFERER="https://news.ycombinator.com/")
-            if "dailycount" in q.lower()
-        ]
+    def test_a_repeat_view_costs_two_writes_and_no_reads(self):
+        # One for the page, one for the kind of screen it was read on. The
+        # rows exist on every view but the first, so the common path is plain
+        # UPDATEs — never a SELECT followed by a write.
+        self._queries()  # the first view creates the rows
+        counting = self._counting()
 
         self.assertEqual(len(counting), 2)
         for sql in counting:
             self.assertIn("UPDATE", sql.upper())
+            self.assertNotIn("SELECT", sql.upper())
+
+    def test_a_referral_costs_one_more_and_still_no_reads(self):
+        referred = {"HTTP_REFERER": "https://news.ycombinator.com/"}
+        self._queries(**referred)
+        counting = self._counting(**referred)
+
+        self.assertEqual(len(counting), 3)
+        for sql in counting:
+            self.assertIn("UPDATE", sql.upper())
+
+    def test_a_country_header_costs_one_more_again(self):
+        self._queries(HTTP_CF_IPCOUNTRY="JP")
+
+        self.assertEqual(len(self._counting(HTTP_CF_IPCOUNTRY="JP")), 3)
 
     def test_an_ignored_request_touches_the_table_not_at_all(self):
         from django.db import connection
@@ -282,3 +290,79 @@ class StatsRenderingTests(TestCase):
 
     def test_an_empty_site_says_so_rather_than_drawing_nothing(self):
         self.assertContains(self.client.get(reverse("stats")), "first reader")
+
+
+class DeviceTests(TestCase):
+    def setUp(self):
+        self.post = make_post("Beppu", slug="beppu")
+
+    def device(self):
+        return DailyCount.objects.filter(kind=DailyCount.DEVICE).values_list(
+            "key", flat=True
+        ).first()
+
+    def test_an_iphone_is_a_phone(self):
+        self.client.get(self.post.get_absolute_url(),
+                        HTTP_USER_AGENT="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148")
+
+        self.assertEqual(self.device(), "mobile")
+
+    def test_an_android_phone_is_a_phone(self):
+        self.client.get(self.post.get_absolute_url(),
+                        HTTP_USER_AGENT="Mozilla/5.0 (Linux; Android 14; Pixel 8) Mobile Safari")
+
+        self.assertEqual(self.device(), "mobile")
+
+    def test_an_ipad_is_a_tablet(self):
+        self.client.get(self.post.get_absolute_url(),
+                        HTTP_USER_AGENT="Mozilla/5.0 (iPad; CPU OS 17_0) AppleWebKit/605")
+
+        self.assertEqual(self.device(), "tablet")
+
+    def test_an_android_tablet_is_a_tablet(self):
+        # Android without "Mobile" in the agent is the convention for tablets.
+        self.client.get(self.post.get_absolute_url(),
+                        HTTP_USER_AGENT="Mozilla/5.0 (Linux; Android 14; Tab S9) Safari")
+
+        self.assertEqual(self.device(), "tablet")
+
+    def test_a_laptop_is_a_desktop(self):
+        self.client.get(self.post.get_absolute_url(), HTTP_USER_AGENT=HUMAN)
+
+        self.assertEqual(self.device(), "desktop")
+
+
+class CountryTests(TestCase):
+    def setUp(self):
+        self.post = make_post("Beppu", slug="beppu")
+
+    def countries(self):
+        return list(
+            DailyCount.objects.filter(kind=DailyCount.COUNTRY).values_list("key", flat=True)
+        )
+
+    def test_the_header_is_recorded_when_the_host_sends_it(self):
+        self.client.get(self.post.get_absolute_url(), HTTP_USER_AGENT=HUMAN,
+                        HTTP_CF_IPCOUNTRY="jp")
+
+        self.assertEqual(self.countries(), ["JP"])
+
+    def test_no_header_simply_means_no_country(self):
+        # Whether it arrives is the host's choice; its absence is not an error.
+        self.client.get(self.post.get_absolute_url(), HTTP_USER_AGENT=HUMAN)
+
+        self.assertEqual(self.countries(), [])
+
+    def test_cloudflare_s_unknown_and_tor_markers_are_ignored(self):
+        for code in ("XX", "T1"):
+            with self.subTest(code=code):
+                self.client.get(self.post.get_absolute_url(), HTTP_USER_AGENT=HUMAN,
+                                HTTP_CF_IPCOUNTRY=code)
+
+        self.assertEqual(self.countries(), [])
+
+    def test_a_malformed_code_is_ignored(self):
+        self.client.get(self.post.get_absolute_url(), HTTP_USER_AGENT=HUMAN,
+                        HTTP_CF_IPCOUNTRY="not-a-country")
+
+        self.assertEqual(self.countries(), [])

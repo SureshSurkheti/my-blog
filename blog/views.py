@@ -347,17 +347,30 @@ class StatsView(View):
         for page in pages:
             page["title"] = titles.get(page["key"], page["key"])
 
-        referrers = list(
-            counts.filter(kind=DailyCount.REFERRER)
-            .values("key")
-            .annotate(views=Sum("views"))
-            .order_by("-views")[:15]
-        )
+        def top(kind, limit=15):
+            return list(
+                counts.filter(kind=kind)
+                .values("key")
+                .annotate(views=Sum("views"))
+                .order_by("-views")[:limit]
+            )
+
+        referrers = top(DailyCount.REFERRER)
+        devices = top(DailyCount.DEVICE, limit=3)
+        countries = top(DailyCount.COUNTRY, limit=12)
+
+        # Devices are read as proportions — "is this mostly phones?" — so the
+        # share matters more than the raw number.
+        device_total = sum(row["views"] for row in devices) or 1
+        for row in devices:
+            row["share"] = round(100 * row["views"] / device_total)
 
         return render(request, self.template_name, {
             "series": series,
             "pages": pages,
             "referrers": referrers,
+            "devices": devices,
+            "countries": countries,
             "total": sum(row["views"] for row in series),
             "days": self.DAYS,
             "since": since,
